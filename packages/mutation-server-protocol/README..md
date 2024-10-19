@@ -22,7 +22,7 @@ The client parses this message and connects to the server.
 
 In the future, the protocol may support additional inter-process communication (IPC) methods, such as standard input/output (stdio), pipes, and sockets.
 
-> !TIP
+> [!TIP]
 > Locations are reported as part of the messages are always 1-based. The first line in a file is 1, the first column in a line is 1.
 
 ### Example
@@ -114,7 +114,7 @@ The `mutationTest` method is used to start a mutation test run. The server must 
 
 Whenever a partial result is in, the server is expected to send a `reportMutationTestProgress` notification with the partial result as `MutationTestResult`.
 
-> !NOTE
+> [!NOTE]
 > The MutantResult should adhere to the [mutation testing report schema](https://github.com/stryker-mutator/mutation-testing-elements/blob/2902d56301cfdaa8ad2be59f3bca07bdf96f89b4/packages/report-schema/src/mutation-testing-report-schema.json#L37)
 
 ```ts
