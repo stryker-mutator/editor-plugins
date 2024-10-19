@@ -59,9 +59,9 @@ Each path can specify exactly which code blocks to mutate/discover by means of a
 
 The MSP defines the following methods:
 
-- `configure`: The first method that must be called by the client to initialize the server. Can also be called subsequently to change the configuration.
-- `discover`: Discovers mutants in the given glob patterns.
-- `mutationTest`: The method to start a mutation test run.
+- [`configure`](#configure): The first method that must be called by the client to initialize the server. Can also be called subsequently to change the configuration.
+- [`discover`](#discover): Discovers mutants in the given glob patterns.
+- [`mutationTest`](#mutationtest): The method to start a mutation test run.
 
 #### Configure
 
