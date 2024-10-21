@@ -4,8 +4,13 @@
   "workspaces": [
     "packages/*"
   ],
-  "dependencies": {},
   "devDependencies": {
-    "lerna": "^8.1.8"
+    "@types/chai": "^5.0.0",
+    "@types/mocha": "^10.0.9",
+    "@types/node": "^22.7.7",
+    "chai": "^5.1.1",
+    "lerna": "^8.1.8",
+    "mocha": "^10.7.3",
+    "typescript": "~5.6.3"
   }
 }
