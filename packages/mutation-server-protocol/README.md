@@ -9,9 +9,7 @@ This document describes the 0.1 version of the mutation server protocol.
 
 ## Base Protocol
 
-The base protocol exchanges [JSON-RPC 2.0](https://www.jsonrpc.org/) messages between the client and the server via a socket connection. Each request from the client must be answered by the server with a response. The server may also send notifications to the client. The protocol is designed to be language agnostic and can be used with any programming language.
-
-Each socket connection correlates to a single JSON-RPC request-response cycle. During this cycle notifications may be send from the server (progress reporting) to the client or from the client to the server (for cancellation purposes).
+The base protocol exchanges [JSON-RPC 2.0](https://www.jsonrpc.org/) messages between the client and the server via a socket connection. The server must answer each request from the client with a response. The server may also send notifications to the client. The protocol is designed to be language agnostic and can be used with any programming language.
 
 The mutation server must:
 
@@ -20,10 +18,10 @@ The mutation server must:
 
 The client parses this message and connects to the server.
 
-In the future, the protocol may support additional inter-process communication (IPC) methods, such as standard input/output (stdio), pipes, and sockets.
+The protocol may support additional inter-process communication (IPC) methods, such as standard input/output (stdio), pipes, and sockets.
 
 > [!TIP]
-> Locations are reported as part of the messages are always 1-based. The first line in a file is 1, the first column in a line is 1.
+> Locations are reported as part of the messages are always 1-based. The first line in a file is 1, and the first column in a line is 1.
 
 ### Example
 
@@ -44,14 +42,14 @@ The message above is a request to the server or from the server to the client. E
 
 ### File paths
 
-Both the `discover` and `mutationTest` methods accept file paths as an array of strings. When a path ends with `/` it indicates a directory.
+The `discover` and `mutationTest` methods accept file paths as an array of strings. A path that ends with `/` indicates a directory.
 
-Each path can specify exactly which code blocks to mutate/discover by means of a mutation range. This can be done postfixing your file with :startLine[:startColumn]-endLine[:endColumn]. Some examples:
+Each path can specify exactly which code blocks to mutate/discover using a mutation range. This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`. Some examples:
 
 - `"src/app.js:1-11"` \
    Discover/mutation-test test lines 1 through 11 inside app.js.
 - `"src/app.js:5:4-6:4"` \
-   Discover/mutation-test from line 5, column 4 through line 6 column 4 inside app.js (columns 4 are included).
+   Discover/mutation-test from line 5, column 4 through line 6, column 4 inside app.js (column 4 is included).
 - `"src/util/"` \
    Discover/mutation-test all files inside the util directory.
 
@@ -59,7 +57,7 @@ Each path can specify exactly which code blocks to mutate/discover by means of a
 
 The MSP defines the following methods:
 
-- [`configure`](#configure): The first method that must be called by the client to initialize the server. Can also be called subsequently to change the configuration.
+- [configure](#configure): Configure the server. Editor plugins are expected to call this on startup, but it can also be called subsequently to change the configuration.
 - [`discover`](#discover): Discovers mutants in the given glob patterns.
 - [`mutationTest`](#mutationtest): The method to start a mutation test run.
 
@@ -110,7 +108,7 @@ export interface DiscoverResult {
 
 #### MutationTest
 
-The `mutationTest` method is used to start a mutation test run. The server must respond with a `MutationTestResult` message.
+The `mutationTest` method starts a mutation test run. The server must respond with a `MutationTestResult` message.
 
 Whenever a partial result is in, the server is expected to send a `reportMutationTestProgress` notification with the partial result as `MutationTestResult`.
 
