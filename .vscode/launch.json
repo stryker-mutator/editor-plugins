@@ -5,7 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "args": ["--timeout", "0", "--colors", "${workspaceFolder}/packages/mutation-server-protocol/dist/**/*.spec.js"],
+      "args": [
+        "--timeout",
+        "0",
+        "--colors",
+        "${workspaceFolder}/packages/mutation-server-protocol/dist/**/*.spec.js"
+      ],
       "internalConsoleOptions": "openOnSessionStart",
       "name": "☕ MSP tests",
       "program": "${workspaceRoot}/node_modules/mocha/bin/mocha",
@@ -13,7 +18,10 @@
       "request": "launch",
       "skipFiles": ["<node_internals>/**"],
       "type": "node",
-      "outFiles": ["${workspaceFolder}/packages/*/dist/**/*.(m|c|)js", "!**/node_modules/**"]
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.(m|c|)js",
+        "!**/node_modules/**"
+      ]
     }
   ]
 }

@@ -96,7 +96,7 @@ describe('Schema', () => {
             end: { line: 1, column: 1 },
           },
           mutatorName: 'foo',
-        })
+        }),
       ).throws();
     });
     it('should throw if location is missing', () => {
@@ -104,7 +104,7 @@ describe('Schema', () => {
         DiscoveredMutant.parse({
           id: 'str',
           mutatorName: 'foo',
-        })
+        }),
       ).throws();
     });
     it('should throw if mutatorName is missing', () => {
@@ -115,7 +115,7 @@ describe('Schema', () => {
             start: { line: 1, column: 1 },
             end: { line: 1, column: 1 },
           },
-        })
+        }),
       ).throws();
     });
   });

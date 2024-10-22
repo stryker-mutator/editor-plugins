@@ -5,7 +5,7 @@
   "description": "Schema validation for the mutation server protocol (MSP).",
   "main": "dist/schema.js",
   "scripts": {
-    "test": "mocha test dist/**/*.spec.js"
+    "test": "mocha dist/**/*.spec.js"
   },
   "repository": {
     "type": "git",

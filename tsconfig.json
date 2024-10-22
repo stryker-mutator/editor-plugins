@@ -1,6 +1,4 @@
 {
-    "files": [],
-    "references": [
-        { "path": "./packages/mutation-server-protocol" },
-    ]
+  "files": [],
+  "references": [{ "path": "./packages/mutation-server-protocol" }]
 }
