@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Schema validation for the mutation server protocol (MSP).",
-  "main": "dist/main.js",
+  "main": "dist/schema.js",
   "scripts": {
     "test": "mocha test dist/**/*.spec.js"
   },
@@ -12,8 +12,15 @@
     "url": "git+https://github.com/stryker-mutator/editor-plugins.git",
     "directory": "packages/mutation-server-protocol"
   },
+  "files": [
+    "dist/",
+    "!dist/**/*.spec.+(js|d.ts)?(.map)",
+    "src/",
+    "!src/**/*.spec.ts"
+  ],
   "keywords": [
     "msp",
+    "mutation-testing-protocol",
     "mutation-testing",
     "stryker",
     "stryker-net",

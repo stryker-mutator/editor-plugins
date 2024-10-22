@@ -4,6 +4,10 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "clean": "rimraf -g packages/*/dist/ packages/*/*.tsbuildinfo",
+    "test": "lerna run test"
+  },
   "devDependencies": {
     "@types/chai": "^5.0.0",
     "@types/mocha": "^10.0.9",
@@ -11,6 +15,7 @@
     "chai": "^5.1.1",
     "lerna": "^8.1.8",
     "mocha": "^10.7.3",
+    "rimraf": "^6.0.1",
     "typescript": "~5.6.3"
   }
 }

@@ -1,7 +1,15 @@
 /**
  * Use named imports to improve tree-shaking capabilities.
  */
-import { array, number, object, string, enum as enum_, type z, boolean } from "zod";
+import {
+  array,
+  number,
+  object,
+  string,
+  enum as enum_,
+  type z,
+  boolean,
+} from 'zod';
 
 export const ConfigureParams = object({
   /**
@@ -37,12 +45,14 @@ const Position = object({
   column: number(),
 });
 
-const Location = object({
+export const Location = object({
   start: Position,
   end: Position,
 });
 
-const DiscoveredMutant = object({
+export type Location = z.infer<typeof Location>;
+
+export const DiscoveredMutant = object({
   id: string(),
   location: Location,
   description: string().optional(),
@@ -56,7 +66,7 @@ export const DiscoverResult = object({
 
 export type DiscoverResult = z.infer<typeof DiscoverResult>;
 
-const MutationTestParams = object({
+export const MutationTestParams = object({
   /**
    * The files to run mutation testing on, or undefined to run mutation testing on all files in the current project.
    * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
@@ -68,14 +78,14 @@ const MutationTestParams = object({
 export type MutationTestParams = z.infer<typeof MutationTestParams>;
 
 const MutantStatus = enum_([
-  "Killed",
-  "Survived",
-  "NoCoverage",
-  "CompileError",
-  "RuntimeError",
-  "Timeout",
-  "Ignored",
-  "Pending",
+  'Killed',
+  'Survived',
+  'NoCoverage',
+  'CompileError',
+  'RuntimeError',
+  'Timeout',
+  'Ignored',
+  'Pending',
 ]);
 
 export type MutantStatus = z.infer<typeof MutantStatus>;
