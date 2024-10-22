@@ -4,6 +4,9 @@
   "type": "module",
   "description": "Schema validation for the mutation server protocol (MSP).",
   "main": "dist/schema.js",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "test": "mocha dist/**/*.spec.js"
   },
