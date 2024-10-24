@@ -21,7 +21,7 @@ export type ConfigureParams = z.infer<typeof ConfigureParams>;
 
 export const ConfigureResult = object({
   /**
-   * The mutation testing server protocol major version that the client supports (major)
+   * The mutation testing server protocol major version that the server supports.
    * For example, "1"
    */
   version: string(),
@@ -31,7 +31,7 @@ export type ConfigureResult = z.infer<typeof ConfigureResult>;
 
 export const DiscoverParams = object({
   /**
-   * The files to run discovery on, or undefined to discover all files in the current project.
+   * The files to run discovery on, or omitted to discover all files in the current project.
    * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
    * This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`.
    */
@@ -68,7 +68,7 @@ export type DiscoverResult = z.infer<typeof DiscoverResult>;
 
 export const MutationTestParams = object({
   /**
-   * The files to run mutation testing on, or undefined to run mutation testing on all files in the current project.
+   * The files to run mutation testing on, or omitted to run mutation testing on all files in the current project.
    * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
    * This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`.
    */
@@ -112,7 +112,7 @@ export const MutantResult = DiscoveredMutant.extend({
    */
   status: MutantStatus,
   /**
-   * The reason that this mutant has this status. In the case of a killed mutant, this should be filled with the failure message(s) of the failing tests. In case of an error mutant, this should be filled with the error message.
+   * The reason that this mutant has this status as free-format text. In the case of a killed mutant, this should be filled with the failure message(s) of the failing tests. In case of an error mutant, this should be filled with the error message.
    */
   statusReason: string().optional(),
   /**
