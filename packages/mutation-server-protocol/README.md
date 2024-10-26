@@ -89,23 +89,42 @@ The `discover` method is used to discover mutants in the given glob patterns. Th
 The `DiscoveredMutant` type is a subset of the `MutantResult` type. The `MutantResult` is the type that can be found in the [mutation testing report schema](https://github.com/stryker-mutator/mutation-testing-elements/blob/2902d56301cfdaa8ad2be59f3bca07bdf96f89b4/packages/report-schema/src/mutation-testing-report-schema.json#L37).
 
 ```ts
-export interface DiscoverParams {
+type DiscoverParams = {
   /**
    * The files to run discovery on, or undefined to discover all files in the current project.
    * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
    * This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`.
    */
   files?: string[];
-}
+};
 
-type DiscoveredMutant = Pick<
-  schema.MutantResult,
-  'id' | 'location' | 'description' | 'mutatorName' | 'replacement'
->;
+type DiscoverResult = {
+  files: DiscoveredFiles;
+};
 
-export interface DiscoverResult {
-  mutants: readonly DiscoveredMutant[];
-}
+type DiscoveredFiles = Record<string, DiscoveredFile>;
+
+type DiscoveredFile = {
+  mutants: DiscoveredMutant[];
+};
+
+type DiscoveredMutant = {
+  id: string;
+  location: Location;
+  description?: string;
+  mutatorName: string;
+  replacement?: string;
+};
+
+type Location = {
+  start: Position;
+  end: Position;
+};
+
+type Position = {
+  line: number;
+  column: number;
+};
 ```
 
 #### MutationTest
@@ -118,7 +137,7 @@ Whenever a partial result is in, the server is expected to send a `reportMutatio
 > The MutantResult should adhere to the [mutation testing report schema](https://github.com/stryker-mutator/mutation-testing-elements/blob/2902d56301cfdaa8ad2be59f3bca07bdf96f89b4/packages/report-schema/src/mutation-testing-report-schema.json#L37)
 
 ```ts
-export interface MutationTestParams {
+type MutationTestParams = {
   /**
    * The files to run mutation testing on, or undefined to run mutation testing on all files in the current project.
    * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
@@ -127,9 +146,33 @@ export interface MutationTestParams {
   files?: string[];
 }
 
-export interface MutationTestResult {
-  mutants: schema.MutantResult[];
+type MutationTestResult = {
+  files: MutantResultFiles;
 }
+
+type MutantResultFiles = Record<string, MutantResultFile>;
+
+type MutantResultFile = {
+  mutants: MutantResult[];
+};
+
+type MutantResult = DiscoveredMutant & {
+  coveredBy?: string[];
+  duration?: number;
+  killedBy?: string[];
+  static?: boolean;
+  status: MutantStatus;
+  statusReason?: string;
+  testsCompleted?: number;
+};
+
+type MutantStatus =
+  | 'Killed'
+  | 'Survived'
+  | 'NoCoverage'
+  | 'Timeout'
+  | 'CompileError'
+  | 'RuntimeError';
 ```
 
 ### Error messages
