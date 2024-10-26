@@ -7,6 +7,9 @@
   "engines": {
     "node": ">=18"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "mocha dist/**/*.spec.js"
   },
