@@ -12,7 +12,8 @@
     "test": "lerna run test",
     "lint": "npm run lint:format",
     "lint:format": "prettier . --check",
-    "lint:format:fix": "npm run lint:format -- --write"
+    "lint:format:fix": "npm run lint:format -- --write",
+    "release": "GH_TOKEN=$(gh auth token) lerna version"
   },
   "devDependencies": {
     "@types/chai": "^5.0.0",
