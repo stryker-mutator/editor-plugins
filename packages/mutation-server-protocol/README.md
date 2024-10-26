@@ -91,14 +91,16 @@ The `DiscoveredMutant` type is a subset of the `MutantResult` type. The `MutantR
 ```ts
 export interface DiscoverParams {
   /**
-   * The glob patterns to files to discover mutant in, or undefined to discover mutants in the entire project.
+   * The files to run discovery on, or undefined to discover all files in the current project.
+   * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
+   * This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`.
    */
-  globPatterns?: string[];
+  files?: string[];
 }
 
 type DiscoveredMutant = Pick<
   schema.MutantResult,
-  "id" | "location" | "description" | "mutatorName" | "replacement"
+  'id' | 'location' | 'description' | 'mutatorName' | 'replacement'
 >;
 
 export interface DiscoverResult {
@@ -118,9 +120,11 @@ Whenever a partial result is in, the server is expected to send a `reportMutatio
 ```ts
 export interface MutationTestParams {
   /**
-   * The glob patterns to mutation test.
+   * The files to run mutation testing on, or undefined to run mutation testing on all files in the current project.
+   * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
+   * This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`.
    */
-  globPatterns?: string[];
+  files?: string[];
 }
 
 export interface MutationTestResult {

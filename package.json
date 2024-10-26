@@ -4,8 +4,25 @@
   "workspaces": [
     "packages/*"
   ],
-  "dependencies": {},
+  "scripts": {
+    "all": "npm run clean && npm run build && npm run lint && npm run test",
+    "clean": "rimraf -g packages/*/dist/ packages/*/*.tsbuildinfo",
+    "build": "npm run build:tsc",
+    "build:tsc": "tsc --build",
+    "test": "lerna run test",
+    "lint": "npm run lint:format",
+    "lint:format": "prettier . --check",
+    "lint:format:fix": "npm run lint:format -- --write"
+  },
   "devDependencies": {
-    "lerna": "^8.1.8"
+    "@types/chai": "^5.0.0",
+    "@types/mocha": "^10.0.9",
+    "@types/node": "^22.7.7",
+    "chai": "^5.1.1",
+    "lerna": "^8.1.8",
+    "mocha": "^10.7.3",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "typescript": "~5.6.3"
   }
 }
