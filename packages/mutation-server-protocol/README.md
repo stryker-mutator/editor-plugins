@@ -144,11 +144,11 @@ type MutationTestParams = {
    * This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`.
    */
   files?: string[];
-}
+};
 
 type MutationTestResult = {
   files: MutantResultFiles;
-}
+};
 
 type MutantResultFiles = Record<string, MutantResultFile>;
 

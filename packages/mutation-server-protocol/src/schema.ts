@@ -67,10 +67,7 @@ export const DiscoveredFile = object({ mutants: array(DiscoveredMutant) });
 
 export type DiscoveredFile = z.infer<typeof DiscoveredFile>;
 
-export const DiscoveredFiles = record(
-  string(),
-  DiscoveredFile,
-);
+export const DiscoveredFiles = record(string(), DiscoveredFile);
 
 export type DiscoveredFiles = z.infer<typeof DiscoveredFiles>;
 
@@ -141,10 +138,7 @@ export const MutantResultFile = object({ mutants: array(MutantResult) });
 
 export type MutantResultFile = z.infer<typeof MutantResultFile>;
 
-export const MutationResultFiles = record(
-  string(),
-  MutantResultFile,
-);
+export const MutationResultFiles = record(string(), MutantResultFile);
 
 export type MutationResultFiles = z.infer<typeof MutationResultFiles>;
 
