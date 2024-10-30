@@ -58,7 +58,7 @@ Each path can specify exactly which code blocks to mutate/discover using a mutat
 The MSP defines the following methods:
 
 - [configure](#configure): Configure the server. Editor plugins are expected to call this on startup, but it can also be called subsequently to change the configuration.
-- [`discover`](#discover): Discovers mutants in the given glob patterns.
+- [`discover`](#discover): Discovers mutants in the given file paths.
 - [`mutationTest`](#mutationtest): The method to start a mutation test run.
 
 #### Configure
@@ -84,7 +84,7 @@ export interface ConfigureResult {
 
 #### Discover
 
-The `discover` method is used to discover mutants in the given glob patterns. The server must respond with a `DiscoverResult` message.
+The `discover` method is used to discover mutants in the given file paths. The server must respond with a `DiscoverResult` message.
 
 The `DiscoveredMutant` type is a subset of the `MutantResult` type. The `MutantResult` is the type that can be found in the [mutation testing report schema](https://github.com/stryker-mutator/mutation-testing-elements/blob/2902d56301cfdaa8ad2be59f3bca07bdf96f89b4/packages/report-schema/src/mutation-testing-report-schema.json#L37).
 
