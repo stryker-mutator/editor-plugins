@@ -40,21 +40,39 @@ describe('Schema', () => {
   }
 
   describe('DiscoverResult', () => {
-    it('should have a mutants field', () => {
-      DiscoverResult.parse({ mutants: [] });
+    it('should have a files field', () => {
+      DiscoverResult.parse({ files: {} });
     });
+
+    it('should allow an arbitrary amount of files', () => {
+      DiscoverResult.parse({
+        files: {
+          'src/index.ts': {
+            mutants: [],
+          },
+          'src/foo.ts': {
+            mutants: [],
+          },
+        },
+      });
+    });
+
     it('should allow an array of DiscoveredMutants', () => {
       DiscoverResult.parse({
-        mutants: [
-          {
-            id: '1',
-            location: {
-              start: { line: 1, column: 1 },
-              end: { line: 1, column: 1 },
-            },
-            mutatorName: 'foo',
+        files: {
+          'src/index.ts': {
+            mutants: [
+              {
+                id: '1',
+                location: {
+                  start: { line: 1, column: 1 },
+                  end: { line: 1, column: 1 },
+                },
+                mutatorName: 'foo',
+              },
+            ],
           },
-        ],
+        },
       });
     });
     it('should throw if the mutants array is missing', () => {
@@ -204,12 +222,28 @@ describe('Schema', () => {
     });
   });
   describe('MutationTestResult', () => {
-    it('should parse an empty array', () => {
-      MutationTestResult.parse({ mutants: [] });
+    it('should parse empty files', () => {
+      MutationTestResult.parse({ files: {} });
+    });
+    it('should parse an arbitrary amount of files', () => {
+      MutationTestResult.parse({
+        files: {
+          'src/foo.ts': {
+            mutants: [],
+          },
+          'src/bar.ts': {
+            mutants: [],
+          },
+        },
+      });
     });
     it('should parse an array of MutantResults', () => {
       MutationTestResult.parse({
-        mutants: [validMinimalMutantResult()],
+        files: {
+          'src/index.ts': {
+            mutants: [validMinimalMutantResult()],
+          },
+        },
       });
     });
     it('should throw if mutants is missing', () => {

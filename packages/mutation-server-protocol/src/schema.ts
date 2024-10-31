@@ -9,6 +9,7 @@ import {
   enum as enum_,
   type z,
   boolean,
+  record,
 } from 'zod';
 
 export const ConfigureParams = object({
@@ -60,8 +61,18 @@ export const DiscoveredMutant = object({
   replacement: string().optional(),
 });
 
+export type DiscoveredMutant = z.infer<typeof DiscoveredMutant>;
+
+export const DiscoveredFile = object({ mutants: array(DiscoveredMutant) });
+
+export type DiscoveredFile = z.infer<typeof DiscoveredFile>;
+
+export const DiscoveredFiles = record(string(), DiscoveredFile);
+
+export type DiscoveredFiles = z.infer<typeof DiscoveredFiles>;
+
 export const DiscoverResult = object({
-  mutants: array(DiscoveredMutant),
+  files: DiscoveredFiles,
 });
 
 export type DiscoverResult = z.infer<typeof DiscoverResult>;
@@ -123,8 +134,16 @@ export const MutantResult = DiscoveredMutant.extend({
 
 export type MutantResult = z.infer<typeof MutantResult>;
 
+export const MutantResultFile = object({ mutants: array(MutantResult) });
+
+export type MutantResultFile = z.infer<typeof MutantResultFile>;
+
+export const MutationResultFiles = record(string(), MutantResultFile);
+
+export type MutationResultFiles = z.infer<typeof MutationResultFiles>;
+
 export const MutationTestResult = object({
-  mutants: array(MutantResult),
+  files: MutationResultFiles,
 });
 
 export type MutationTestResult = z.infer<typeof MutationTestResult>;
