@@ -1,6 +1,6 @@
 {
   "name": "mutation-server-protocol",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "type": "module",
   "description": "Schema validation for the mutation server protocol (MSP).",
   "main": "dist/schema.js",
