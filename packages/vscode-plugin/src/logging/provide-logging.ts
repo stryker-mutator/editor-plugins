@@ -7,3 +7,4 @@ export function provideLogger(injector: Injector) {
 }
 
 provideLogger.inject = [commonTokens.injector] as const;
+export type LoggerProvider = ReturnType<typeof provideLogger>;
