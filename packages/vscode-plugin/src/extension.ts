@@ -1,11 +1,11 @@
 import { createInjector } from 'typed-inject';
-import * as vscode from 'vscode';
+import { Disposable, ExtensionContext } from 'vscode';
 import { LoggerProvider, provideLogger } from './logging/provide-logging';
 import { commonTokens } from './tokens';
 
-export async function activate(context: vscode.ExtensionContext) {
+export async function activate(context: ExtensionContext) {
   const extension = new Extension();
-  context.subscriptions.push(vscode.Disposable.from(extension));
+  context.subscriptions.push(Disposable.from(extension));
 }
 
 export function deactivate() {}

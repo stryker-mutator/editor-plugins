@@ -41,7 +41,23 @@
         "command": "mutation-testing.helloWorld",
         "title": "Hello World"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Mutation Testing",
+      "properties": {
+        "mutationTesting.enable": {
+          "description": "Enable mutation testing",
+          "scope": "resource",
+          "type": "boolean",
+          "default": true
+        },
+        "mutationTesting.mutationServer": {
+          "description": "The path to the mutation server",
+          "scope": "resource",
+          "type": "string"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
