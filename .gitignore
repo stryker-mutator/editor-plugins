@@ -3,3 +3,5 @@ dist/
 *.tsbuildinfo
 *.log
 **/**.vsix
+out/
+.vscode-test/
