@@ -1,5 +1,5 @@
 import { Injector } from "typed-inject";
-import { commonTokens } from "../tokens";
+import { commonTokens } from "../di/tokens";
 import { Logger } from "./logger";
 
 export function provideLogger(injector: Injector) {

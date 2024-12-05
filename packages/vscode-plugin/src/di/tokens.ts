@@ -12,8 +12,10 @@ const injector: import('typed-inject').InjectorToken = '$injector';
  * Common tokens used for dependency injection (see typed-inject readme for more information)
  */
 export const commonTokens = Object.freeze({
+  context: stringLiteral('context'),
   injector,
-  logger: stringLiteral('logger')
+  logger: stringLiteral('logger'),
+  workspaceFolder: stringLiteral('workspaceFolder')
 });
 
 /**

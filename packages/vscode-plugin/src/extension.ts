@@ -1,28 +1,13 @@
 import { createInjector } from 'typed-inject';
-import { Disposable, ExtensionContext } from 'vscode';
-import { LoggerProvider, provideLogger } from './logging/provide-logging';
-import { commonTokens } from './tokens';
+import * as vscode from 'vscode';
+import { Workspace } from './workspace';
 
-export async function activate(context: ExtensionContext) {
-  const extension = new Extension();
-  context.subscriptions.push(Disposable.from(extension));
+export async function activate(context: vscode.ExtensionContext) {
+  const workspace = new Workspace(context, createInjector);
+  context.subscriptions.push(vscode.Disposable.from(workspace));
+  workspace.init();
 }
 
-export function deactivate() {}
+export function deactivate() { }
 
-class Extension {
-  #loggingProvider: LoggerProvider;
-  
-  constructor(private readonly injectorFactory = createInjector) {
-    const rootInjector = this.injectorFactory();
-    this.#loggingProvider = provideLogger(rootInjector);
 
-    const logger = this.#loggingProvider.resolve(commonTokens.logger);
-    logger.info('Extension activated');
-  }
-
-  dispose() {
-    const logger = this.#loggingProvider.resolve(commonTokens.logger);
-    logger.info('Extension deactivated');
-  }
-}

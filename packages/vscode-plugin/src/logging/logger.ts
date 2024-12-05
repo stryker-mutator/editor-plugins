@@ -41,7 +41,7 @@ export class Logger {
      */
     private log(level: string, message: string, label?: string): void {
         const timestamp = new Date().toISOString();
-        this.outputChannel.appendLine(`[${timestamp}] [${level}] ${label ? `[${label}]` : ``} ${message}`);
+        this.outputChannel.appendLine(`[${timestamp}] [${level}] ${label ? `[${label}] ` : ``}${message}`);
     }
 
     /**
