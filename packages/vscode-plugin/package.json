@@ -45,13 +45,13 @@
     "configuration": {
       "title": "Mutation Testing",
       "properties": {
-        "mutationTesting.enable": {
+        "mutation-testing.enable": {
           "description": "Enable mutation testing",
           "scope": "resource",
           "type": "boolean",
           "default": true
         },
-        "mutationTesting.mutationServer": {
+        "mutation-testing.mutationServer": {
           "description": "The path to the mutation server",
           "scope": "resource",
           "type": "string"

@@ -5,7 +5,6 @@ import { Workspace } from './workspace';
 export async function activate(context: vscode.ExtensionContext) {
   const workspace = new Workspace(context, createInjector);
   context.subscriptions.push(vscode.Disposable.from(workspace));
-  workspace.init();
 }
 
 export function deactivate() { }
