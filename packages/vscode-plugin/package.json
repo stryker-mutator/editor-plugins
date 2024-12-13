@@ -45,14 +45,24 @@
     "configuration": {
       "title": "Mutation Testing",
       "properties": {
-        "mutation-testing.enable": {
+        "mutation-testing.enableMutationTesting": {
           "description": "Enable mutation testing",
           "scope": "resource",
           "type": "boolean",
           "default": true
         },
-        "mutation-testing.mutationServer": {
+        "mutation-testing.mutationServer.path": {
           "description": "The path to the mutation server",
+          "scope": "resource",
+          "type": "string"
+        },
+        "mutation-testing.mutationServer.args": {
+          "description": "The arguments to pass to the mutation server.",
+          "scope": "resource",
+          "type": "array"
+        },
+        "mutation-testing.mutationServer.workingDirectory": {
+          "description": "The working directory for the mutation server. Defaults to cwd.",
           "scope": "resource",
           "type": "string"
         }

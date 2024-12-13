@@ -1,1 +1,3 @@
-export const APP_NAME = 'mutation-testing';
+export class Constants {
+  public static readonly AppName = 'mutation-testing';
+}

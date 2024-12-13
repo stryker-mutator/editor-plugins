@@ -1,4 +1,4 @@
-import { Logger } from "../logging/logger";
+import { Logger } from "../logging/index";
 import { commonTokens } from "./tokens";
 import * as vscode from 'vscode';
 

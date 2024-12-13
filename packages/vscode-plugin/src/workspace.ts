@@ -1,12 +1,9 @@
 import * as vscode from 'vscode';
-import { provideLogger } from './logging/provide-logging';
 import { commonTokens } from './di/tokens';
-import { ContextualLogger } from './logging/contextual-logger';
-import { WorkspaceFolder } from './workspace-folder';
-import { BaseContext } from './di/context';
+import { ContextualLogger, provideLogger } from './logging/index';
+import { WorkspaceFolder, Constants } from './index';
+import { BaseContext } from './di/index';
 import { createInjector, Injector } from 'typed-inject';
-import { Configuration, Setting } from './config/configuration';
-import { APP_NAME } from './constants';
 
 export class Workspace {
   #logger: ContextualLogger;
@@ -26,7 +23,7 @@ export class Workspace {
     );
     this.reload();
   }
-  
+
   private reload() {
     this.#logger.info('(Re)loading workspace');
     this.#workspaceFolders.forEach((wf) => this.removeWorkspaceFolder(wf.getWorkspaceFolder()));
@@ -56,16 +53,10 @@ export class Workspace {
       return;
     }
 
-    var mutationTestingEnabled = Configuration.getSetting<boolean>(Setting.MutationTestingEnabled, folder, true);
-    if (!mutationTestingEnabled) {
-      this.#logger.info(`Mutation testing is disabled for ${folder.uri.fsPath}`);
-      return;
-    }
-
     const workspaceFolderInjector = this.#baseContextProvider.provideValue(commonTokens.workspaceFolder, folder);
-    const workspaceFolder = new WorkspaceFolder(workspaceFolderInjector);
+    const workspaceFolder = workspaceFolderInjector.injectClass(WorkspaceFolder);
+    workspaceFolder.init();
     this.#workspaceFolders.push(workspaceFolder);
-    this.#logger.info(`Workspace folder initialized: ${folder.uri.fsPath}`);
   }
 
   private workspaceFolderExists(folder: vscode.WorkspaceFolder) {
@@ -81,7 +72,7 @@ export class Workspace {
 
   private onDidChangeConfiguration(event: vscode.ConfigurationChangeEvent) {
     this.#workspaceFolders.forEach((wf) => {
-      if (event.affectsConfiguration(APP_NAME, wf.getWorkspaceFolder())) {
+      if (event.affectsConfiguration(Constants.AppName, wf.getWorkspaceFolder())) {
         this.#logger.info(`Configuration changed for ${wf.getWorkspaceFolder().uri.fsPath}`);
         this.#logger.info(`Reloading workspace folder: ${wf.getWorkspaceFolder().uri.fsPath}`);
         // TODO: Reload only the necessary parts
@@ -91,7 +82,7 @@ export class Workspace {
       }
     });
 
-    if(event.affectsConfiguration(APP_NAME)) {
+    if (event.affectsConfiguration(Constants.AppName)) {
       this.#logger.info('Configuration changed for the workspace');
       this.reload();
     }
@@ -100,6 +91,5 @@ export class Workspace {
   public dispose() {
     this.#logger.info('Unloading workspace');
     this.#workspaceFolders.forEach((folder) => folder.dispose());
-    this.#logger.info('Workspace unloaded');
   }
 }

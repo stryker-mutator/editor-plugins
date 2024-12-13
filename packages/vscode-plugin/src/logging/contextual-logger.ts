@@ -1,5 +1,5 @@
-import { commonTokens, tokens } from '../di/tokens';
-import { Logger } from './logger';
+import { commonTokens, tokens } from '../di/index';
+import { Logger } from './index';
 
 export class ContextualLogger {
   #logger: Logger;
