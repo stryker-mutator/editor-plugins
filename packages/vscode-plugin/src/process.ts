@@ -1,11 +1,12 @@
 import { Injector } from "typed-inject";
 import { commonTokens, tokens } from "./di/index";
-import { SetupWorkspaceFolderContext } from "./index";
+import { Constants, SetupWorkspaceFolderContext } from "./index";
 import * as vscode from 'vscode';
 import { ContextualLogger } from "./logging/index";
 import { Configuration, Settings } from "./config/index";
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { EventEmitter } from "stream";
+import { ServerLocation } from "./domain/index";
 
 export class Process extends EventEmitter {
   #logger: ContextualLogger;
@@ -21,12 +22,11 @@ export class Process extends EventEmitter {
     this.#logger = this.injector.provideValue(commonTokens.loggerContext, this.#workspaceFolder.name).injectClass(ContextualLogger);
   }
 
-  init() {
+  async init(): Promise<ServerLocation> {
     var serverPath = Configuration.getSetting<string>(Settings.ServerPath, this.#workspaceFolder);
 
     if (!serverPath) {
-      this.#logger.error('Cannot start mutation server. Missing server path configuration');
-      return;
+      throw new Error('Cannot start mutation server. Missing server path configuration');
     }
 
     var serverArgs = Configuration.getSetting<string[]>(Settings.ServerArgs, this.#workspaceFolder, []);
@@ -36,8 +36,7 @@ export class Process extends EventEmitter {
 
     this.#process = spawn(serverPath, serverArgs, { cwd: cwd });
     if (this.#process.pid === undefined) {
-      this.#logger.error('Mutation server could not be started');
-      return;
+      throw new Error('Mutation server could not be started');
     }
 
     this.#logger.info(`Mutation server started with PID ${this.#process.pid}`);
@@ -45,6 +44,27 @@ export class Process extends EventEmitter {
     this.#process.stdout.on('data', (data) => this.emit('data', data.toString()));
     this.#process.stderr.on('data', (error) => this.emit('error', error.toString()));
     this.#process.on('exit', (code) => this.emit('exit', code));
+
+    return await this.getServerLocation();
+  }
+
+  private async getServerLocation(): Promise<ServerLocation> {
+    return await new Promise<ServerLocation>((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        reject(new Error('Mutation server did not start within the timeout'));
+      }, Constants.ServerStartupTimeoutMs);
+
+      this.on('data', (data) => {
+        try {
+          const dataString: string = data.toString();
+          const location: ServerLocation = JSON.parse(dataString);
+          clearTimeout(timeoutId);
+          resolve(location);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
   }
 
   dispose() {

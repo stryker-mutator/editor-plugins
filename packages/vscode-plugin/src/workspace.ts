@@ -47,7 +47,7 @@ export class Workspace {
     this.#logger.warn(`Workspace folder could not be removed: ${folder.uri.fsPath}`);
   }
 
-  private addWorkspaceFolder(folder: vscode.WorkspaceFolder) {
+  private async addWorkspaceFolder(folder: vscode.WorkspaceFolder) {
     if (this.workspaceFolderExists(folder)) {
       this.#logger.warn(`Workspace folder already exists and is therefore not initialized: ${folder.uri.fsPath}`);
       return;
@@ -55,7 +55,7 @@ export class Workspace {
 
     const workspaceFolderInjector = this.#baseContextProvider.provideValue(commonTokens.workspaceFolder, folder);
     const workspaceFolder = workspaceFolderInjector.injectClass(WorkspaceFolder);
-    workspaceFolder.init();
+    await workspaceFolder.init();
     this.#workspaceFolders.push(workspaceFolder);
   }
 
@@ -71,13 +71,13 @@ export class Workspace {
   }
 
   private onDidChangeConfiguration(event: vscode.ConfigurationChangeEvent) {
-    this.#workspaceFolders.forEach((wf) => {
+    this.#workspaceFolders.forEach(async (wf) => {
       if (event.affectsConfiguration(Constants.AppName, wf.getWorkspaceFolder())) {
         this.#logger.info(`Configuration changed for ${wf.getWorkspaceFolder().uri.fsPath}`);
         this.#logger.info(`Reloading workspace folder: ${wf.getWorkspaceFolder().uri.fsPath}`);
         // TODO: Reload only the necessary parts
         this.removeWorkspaceFolder(wf.getWorkspaceFolder());
-        this.addWorkspaceFolder(wf.getWorkspaceFolder());
+        await this.addWorkspaceFolder(wf.getWorkspaceFolder());
         return;
       }
     });

@@ -22,22 +22,22 @@ export class WorkspaceFolder {
     this.#logger = this.injector.provideValue(commonTokens.loggerContext, this.#workspaceFolder.name).injectClass(ContextualLogger);
     this.#process = this.injector.injectClass(Process);
 
-    this.#process.on('exit', (code) => {
+    this.#process.on('exit', async (code) => {
       this.#logger.error(`Mutation server process exited with code ${code}`);
       this.#logger.info('Restarting mutation server');
       this.#process.dispose();
-      this.init();
+      await this.init();
     });
   }
 
-  init() {
+  async init() {
     var mutationTestingEnabled = Configuration.getSetting<boolean>(Settings.MutationTestingEnabled, this.#workspaceFolder, true);
     if (!mutationTestingEnabled) {
       this.#logger.info(`Mutation testing is disabled for ${this.#workspaceFolder.uri.fsPath}`);
       return;
     }
 
-    this.#process.init();
+    const serverLocation = await this.#process.init();
   }
 
   public getWorkspaceFolder(): vscode.WorkspaceFolder {
