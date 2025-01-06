@@ -3,8 +3,9 @@ import * as vscode from 'vscode';
 import { BaseContext, commonTokens } from './di/index';
 import { Configuration, Settings } from './config/index';
 import { ContextualLogger } from './logging/index';
-import { Constants, Process, Server, UnsupportedServerVersionError } from './index';
+import { Constants, Process, MutationServer, UnsupportedServerVersionError } from './index';
 import { ConfigureParams } from 'mutation-server-protocol';
+import { TestExplorer } from './test-explorer';
 
 export interface SetupWorkspaceFolderContext extends BaseContext {
   [commonTokens.workspaceFolder]: vscode.WorkspaceFolder;
@@ -14,7 +15,7 @@ export class WorkspaceFolder {
   #workspaceFolder: vscode.WorkspaceFolder;
   #logger: ContextualLogger;
   #process: Process;
-  #mutationServer?: Server;
+  #testExplorer?: TestExplorer;
 
   public static readonly inject = tokens(commonTokens.injector, commonTokens.workspaceFolder);
   constructor(
@@ -40,17 +41,22 @@ export class WorkspaceFolder {
     }
 
     const serverLocation = await this.#process.init();
-    this.#mutationServer = this.injector.provideValue(commonTokens.serverLocation, serverLocation).injectClass(Server);
+    const mutationServer = this.injector.provideValue(commonTokens.serverLocation, serverLocation).injectClass(MutationServer);
 
     const configureParams: ConfigureParams = {
       configFilePath: Configuration.getSetting<string>(Settings.ConfigFilePath, this.#workspaceFolder)
     };
 
-    const configureResult = await this.#mutationServer.configure(configureParams);
+    const configureResult = await mutationServer.configure(configureParams);
     if (configureResult.version !== Constants.SupportedMspVersion) {
       this.#logger.error(`Unsupported mutation server version: ${configureResult.version}`);
       throw new UnsupportedServerVersionError(configureResult.version);
     }
+
+    this.#logger.info(`Mutation server configuration handshake completed. MSP version: ${configureResult.version}`);
+
+    this.#testExplorer = this.injector.provideValue(commonTokens.mutationServer, mutationServer).injectClass(TestExplorer);
+    await this.#testExplorer.discover();
   }
 
   public getWorkspaceFolder(): vscode.WorkspaceFolder {

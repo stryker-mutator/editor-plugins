@@ -17,7 +17,8 @@ export const commonTokens = Object.freeze({
   logger: stringLiteral('logger'),
   loggerContext: stringLiteral('loggerContext'),
   workspaceFolder: stringLiteral('workspaceFolder'),
-  serverLocation: stringLiteral('serverLocation')
+  serverLocation: stringLiteral('serverLocation'),
+  mutationServer: stringLiteral('mutationServer')
 });
 
 /**

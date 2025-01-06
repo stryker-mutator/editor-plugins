@@ -22,7 +22,7 @@ export interface MutationServerContext extends SetupWorkspaceFolderContext {
   [commonTokens.serverLocation]: ServerLocation;
 }
 
-export class Server {
+export class MutationServer {
   #socket: net.Socket;
   #logger: ContextualLogger;
   #workspaceFolder: vscode.WorkspaceFolder;
