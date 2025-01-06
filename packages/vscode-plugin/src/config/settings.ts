@@ -5,6 +5,7 @@ export enum Settings {
   ServerPath = 'path',
   ServerArgs = 'args',
   CurrentWorkingDirectory = 'workingDirectory',
+  ConfigFilePath = 'configFilePath',
 }
 
 // Define a mapping for the section of each setting
@@ -13,4 +14,5 @@ export const SettingSections = {
   [Settings.ServerPath]: `${Constants.AppName}.mutationServer`,
   [Settings.ServerArgs]: `${Constants.AppName}.mutationServer`,
   [Settings.CurrentWorkingDirectory]: `${Constants.AppName}.mutationServer`,
+  [Settings.ConfigFilePath]: `${Constants.AppName}.mutationServer`,
 };

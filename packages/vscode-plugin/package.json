@@ -45,24 +45,29 @@
     "configuration": {
       "title": "Mutation Testing",
       "properties": {
-        "mutation-testing.enableMutationTesting": {
-          "description": "Enable mutation testing",
+        "mutationTesting.enableMutationTesting": {
+          "description": "Enable mutation testing.",
           "scope": "resource",
           "type": "boolean",
           "default": true
         },
-        "mutation-testing.mutationServer.path": {
-          "description": "The path to the mutation server",
+        "mutationTesting.mutationServer.path": {
+        "description": "The path to the mutation server.",
           "scope": "resource",
           "type": "string"
         },
-        "mutation-testing.mutationServer.args": {
+        "mutationTesting.mutationServer.args": {
           "description": "The arguments to pass to the mutation server.",
           "scope": "resource",
           "type": "array"
         },
-        "mutation-testing.mutationServer.workingDirectory": {
-          "description": "The working directory for the mutation server. Defaults to cwd.",
+        "mutationTesting.mutationServer.workingDirectory": {
+          "description": "The working directory for the mutation server. Defaults to workspace folder's root.",
+          "scope": "resource",
+          "type": "string"
+        },
+        "mutationTesting.mutationServer.configFilePath": {
+          "description": "The (relative or absolute) path to mutation testing framework's config file to load.",
           "scope": "resource",
           "type": "string"
         }
@@ -97,6 +102,7 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+  "json-rpc-2.0": "^1.7.0",
     "mutation-server-protocol": "^0.2.0",
     "typed-inject": "^4.0.0"
   }

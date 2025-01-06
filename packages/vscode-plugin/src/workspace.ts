@@ -33,7 +33,13 @@ export class Workspace {
       this.#logger.info('No workspace (folder) is opened');
       return;
     }
-    vscode.workspace.workspaceFolders?.forEach(this.addWorkspaceFolder.bind(this));
+    vscode.workspace.workspaceFolders?.forEach(async folder => {
+      try {
+        await this.addWorkspaceFolder(folder);
+      } catch (error: any) {
+        this.#logger.error(error.message);
+      }
+    });
   }
 
   private removeWorkspaceFolder(folder: vscode.WorkspaceFolder) {
@@ -41,7 +47,6 @@ export class Workspace {
     if (index !== -1) {
       this.#workspaceFolders[index].dispose();
       this.#workspaceFolders.splice(index, 1);
-      this.#logger.info(`Workspace folder unloaded: ${folder.uri.fsPath}`);
       return;
     }
     this.#logger.warn(`Workspace folder could not be removed: ${folder.uri.fsPath}`);
@@ -49,7 +54,6 @@ export class Workspace {
 
   private async addWorkspaceFolder(folder: vscode.WorkspaceFolder) {
     if (this.workspaceFolderExists(folder)) {
-      this.#logger.warn(`Workspace folder already exists and is therefore not initialized: ${folder.uri.fsPath}`);
       return;
     }
 
@@ -78,7 +82,7 @@ export class Workspace {
         // TODO: Reload only the necessary parts
         this.removeWorkspaceFolder(wf.getWorkspaceFolder());
         await this.addWorkspaceFolder(wf.getWorkspaceFolder());
-        return;
+        return; // TODO: is a return necessary here?
       }
     });
 

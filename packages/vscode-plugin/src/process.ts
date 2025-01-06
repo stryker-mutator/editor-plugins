@@ -1,6 +1,6 @@
 import { Injector } from "typed-inject";
 import { commonTokens, tokens } from "./di/index";
-import { Constants, SetupWorkspaceFolderContext } from "./index";
+import { Constants, MissingServerPathError, CouldNotSpawnProcessError, SetupWorkspaceFolderContext, ServerStartupTimeoutError } from "./index";
 import * as vscode from 'vscode';
 import { ContextualLogger } from "./logging/index";
 import { Configuration, Settings } from "./config/index";
@@ -26,7 +26,8 @@ export class Process extends EventEmitter {
     var serverPath = Configuration.getSetting<string>(Settings.ServerPath, this.#workspaceFolder);
 
     if (!serverPath) {
-      throw new Error('Cannot start mutation server. Missing server path configuration');
+      this.#logger.error('Cannot start server. Missing server path configuration.');
+      throw new MissingServerPathError();
     }
 
     var serverArgs = Configuration.getSetting<string[]>(Settings.ServerArgs, this.#workspaceFolder, []);
@@ -36,10 +37,11 @@ export class Process extends EventEmitter {
 
     this.#process = spawn(serverPath, serverArgs, { cwd: cwd });
     if (this.#process.pid === undefined) {
-      throw new Error('Mutation server could not be started');
+      this.#logger.error('Server process could not be spawned.');
+      throw new CouldNotSpawnProcessError();
     }
 
-    this.#logger.info(`Mutation server started with PID ${this.#process.pid}`);
+    this.#logger.info(`Server started with PID ${this.#process.pid}`);
 
     this.#process.stdout.on('data', (data) => this.emit('data', data.toString()));
     this.#process.stderr.on('data', (error) => this.emit('error', error.toString()));
@@ -51,7 +53,7 @@ export class Process extends EventEmitter {
   private async getServerLocation(): Promise<ServerLocation> {
     return await new Promise<ServerLocation>((resolve, reject) => {
       const timeoutId = setTimeout(() => {
-        reject(new Error('Mutation server did not start within the timeout'));
+        reject(new ServerStartupTimeoutError());
       }, Constants.ServerStartupTimeoutMs);
 
       this.on('data', (data) => {

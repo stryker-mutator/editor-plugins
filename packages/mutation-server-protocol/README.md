@@ -58,8 +58,8 @@ Each path can specify exactly which code blocks to mutate/discover using a mutat
 The MSP defines the following methods:
 
 - [configure](#configure): Configure the server. Editor plugins are expected to call this on startup, but it can also be called subsequently to change the configuration.
-- [`discover`](#discover): Discovers mutants in the given file paths.
-- [`mutationTest`](#mutationtest): The method to start a mutation test run.
+- [discover](#discover): Discovers mutants in the given file paths.
+- [mutationTest](#mutationtest): The method to start a mutation test run.
 
 #### Configure
 
