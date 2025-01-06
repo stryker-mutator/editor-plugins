@@ -33,7 +33,7 @@ export class WorkspaceFolder {
   }
 
   async init() {
-    var mutationTestingEnabled = Configuration.getSetting<boolean>(Settings.MutationTestingEnabled, this.#workspaceFolder, true);
+    const mutationTestingEnabled = Configuration.getSetting<boolean>(Settings.MutationTestingEnabled, this.#workspaceFolder, true);
     if (!mutationTestingEnabled) {
       this.#logger.info(`Mutation testing is disabled for ${this.#workspaceFolder.uri.fsPath}`);
       return;

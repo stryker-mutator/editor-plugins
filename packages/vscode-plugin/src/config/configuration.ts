@@ -17,7 +17,7 @@ export class Configuration {
   public static getSetting<T>(setting: Settings, scope?: ConfigurationScope | null | undefined, defaultValue?: T): T | undefined {
     const section = SettingSections[setting];
     if (defaultValue) {
-      var value = this.get(section,scope).get<T>(setting);
+      const value = this.get(section,scope).get<T>(setting);
       return !value || value === '' ? defaultValue : value;
     }
 

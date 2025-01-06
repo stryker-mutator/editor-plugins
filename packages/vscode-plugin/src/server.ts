@@ -5,10 +5,11 @@ import { SetupWorkspaceFolderContext } from "./index";
 import * as net from 'net';
 import * as vscode from 'vscode';
 import { ContextualLogger } from "./logging";
-import { JSONRPCClient } from 'json-rpc-2.0';
+import { JSONRPCClient, JSONRPCRequest } from 'json-rpc-2.0';
 import { JsonRpcEventDeserializer } from "./utils";
 import { promisify } from "util";
-import { ConfigureParams, ConfigureResult, DiscoverParams, DiscoverResult } from "mutation-server-protocol";
+import { ConfigureParams, ConfigureResult, DiscoverParams, DiscoverResult, MutationTestParams, MutationTestResult } from "mutation-server-protocol";
+import { filter, map, Subject } from "rxjs";
 
 const rpcMethods = Object.freeze({
   configure: 'configure',
@@ -26,6 +27,7 @@ export class Server {
   #logger: ContextualLogger;
   #workspaceFolder: vscode.WorkspaceFolder;
   #jsonRPCClient: JSONRPCClient;
+  #notifications = new Subject<JSONRPCRequest>();
 
   public static readonly inject = tokens(commonTokens.injector, commonTokens.serverLocation);
   constructor(private readonly injector: Injector<MutationServerContext>) {
@@ -47,7 +49,11 @@ export class Server {
     this.#socket.on('data', (data) => {
       const events = deserializer.deserialize(data);
       for (const event of events) {
-        this.#jsonRPCClient.receive(event);
+        if (event.id === undefined) {
+          this.#notifications.next(event);
+        } else {
+          this.#jsonRPCClient.receive(event);
+        }
       }
     });
   }
@@ -59,7 +65,24 @@ export class Server {
   public async discover(discoverParams: DiscoverParams): Promise<DiscoverResult> {
     return await this.#jsonRPCClient.request(rpcMethods.discover, discoverParams);
   }
-  
+
+  public async mutationTest(
+    mutationTestParams: MutationTestParams,
+    onPartialResult: (partialResult: MutationTestResult) => void
+  ): Promise<MutationTestResult> {
+    const subscription = this.#notifications.pipe(
+      filter(notification => notification.method === rpcMethods.reportMutationTestProgressNotification),
+      map(notification => notification.params)
+    ).subscribe(onPartialResult);
+
+    try {
+      const result = await this.#jsonRPCClient.request(rpcMethods.mutationTest, mutationTestParams);
+      return result;
+    } finally {
+      subscription.unsubscribe();
+    }
+  }
+
   public async dispose() {
     await promisify(this.#socket.end.bind(this.#socket))();
   }

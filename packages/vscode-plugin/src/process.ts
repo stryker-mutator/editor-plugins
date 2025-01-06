@@ -23,15 +23,15 @@ export class Process extends EventEmitter {
   }
 
   async init(): Promise<ServerLocation> {
-    var serverPath = Configuration.getSetting<string>(Settings.ServerPath, this.#workspaceFolder);
+    const serverPath = Configuration.getSetting<string>(Settings.ServerPath, this.#workspaceFolder);
 
     if (!serverPath) {
       this.#logger.error('Cannot start server. Missing server path configuration.');
       throw new MissingServerPathError();
     }
 
-    var serverArgs = Configuration.getSetting<string[]>(Settings.ServerArgs, this.#workspaceFolder, []);
-    var cwd = Configuration.getSetting<string>(Settings.CurrentWorkingDirectory, this.#workspaceFolder, this.#workspaceFolder.uri.fsPath);
+    const serverArgs = Configuration.getSetting<string[]>(Settings.ServerArgs, this.#workspaceFolder, []);
+    const cwd = Configuration.getSetting<string>(Settings.CurrentWorkingDirectory, this.#workspaceFolder, this.#workspaceFolder.uri.fsPath);
 
     this.#logger.info(`Server configuration: path=${serverPath}, args=${serverArgs}, cwd=${cwd}`);
 
