@@ -29,16 +29,23 @@ The protocol may support additional inter-process communication (IPC) methods, s
 Content-Length: ...\r\n
 \r\n
 {
-	"jsonrpc": "2.0",
-	"id": 1,
-	"method": "discover",
-	"params": {
-		...
-	}
+ "jsonrpc": "2.0",
+ "id": 1,
+ "method": "discover",
+ "params": {
+  ...
+ }
 }
 ```
 
 The message above is a request to the server or from the server to the client. Each message contains a `Content-Length` header that specifies the length of the content part. The message is encoded as UTF-8.
+
+## Position and Location Semantics
+
+Mutation locations and ranges are defined using a `start` and `end` position and must adhere to the [mutation-testing-report-schema](https://github.com/stryker-mutator/mutation-testing-elements/blob/master/packages/report-schema/src/mutation-testing-report-schema.json):
+
+- `start` is **inclusive**: the character at this position is included.
+- `end` is **exclusive**: the character at this position is not included.
 
 ### File paths
 
@@ -47,9 +54,9 @@ The `discover` and `mutationTest` methods accept file paths as an array of strin
 Each path can specify exactly which code blocks to mutate/discover using a mutation range. This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`. Some examples:
 
 - `"src/app.js:1-11"` \
-   Discover/mutation-test test lines 1 through 11 inside app.js.
+   Discover/mutation-test test lines 1 through 10 inside app.js. Line 11 is excluded.
 - `"src/app.js:5:4-6:4"` \
-   Discover/mutation-test from line 5, column 4 through line 6, column 4 inside app.js (column 4 is included).
+   Discover/mutation-test from line 5, column 4 through line 6, column 4 inside app.js (column 4 is excluded).
 - `"src/util/"` \
    Discover/mutation-test all files inside the util directory.
 
