@@ -14,7 +14,7 @@ The base protocol exchanges [JSON-RPC 2.0](https://www.jsonrpc.org/) messages be
 The mutation server must:
 
 1. Open a socket to accept incoming client connections.
-2. Use the port specified by the client via the `--port <port_number>` argument, if provided. If no port is specified, the server must automatically select an available port.
+2. Provide a method such as command argument to configure a static port number. If a static port number is provided it must be used. If the static port number is already in use the server must exist with an error. If no port number is specified the server must automatically select an available port.
 3. Write connection details to the standard output as the first message, in the following JSON format:
 
 ```json
