@@ -5,7 +5,7 @@ The Mutation Server Protocol (MSP) provides endpoints for IDEs to run mutation t
 > [!NOTE]  
 > Inspired by the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/)
 
-This document describes the 0.1 version of the mutation server protocol.
+This document describes the mutation server protocol.
 
 ## Base Protocol
 
@@ -13,12 +13,12 @@ The base protocol exchanges [JSON-RPC 2.0](https://www.jsonrpc.org/) messages be
 
 The mutation server must:
 
-1. Provide an open socket.
-2. Report the port number and (optionally) the host via standard output as the first message it writes. For example, `{"port": 1234 }`.
-
-The client parses this message and connects to the server.
-
-The protocol may support additional inter-process communication (IPC) methods, such as standard input/output (stdio), pipes, and sockets.
+1. Open a socket to accept incoming client connections.
+2. Use the port specified by the client via the `--port <port_number>` argument, if provided. If no port is specified, the server must automatically select an available port.
+2. Write connection details to the standard output as the first message, in the following JSON format:
+```json
+{ "host": "<host_address>", "port": <port_number> }
+```
 
 > [!TIP]
 > Locations are reported as part of the messages are always 1-based. The first line in a file is 1, and the first column in a line is 1.
