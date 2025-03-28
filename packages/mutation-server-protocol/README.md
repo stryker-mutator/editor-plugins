@@ -18,7 +18,7 @@ The mutation server must:
 3. Write connection details to the standard output as the first message, in the following JSON format:
 
 ```json
-{ "host": "<host_address>", "port": <port_number> }
+{ "port": <port_number> }
 ```
 
 > [!TIP]
