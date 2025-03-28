@@ -29,12 +29,12 @@ The protocol may support additional inter-process communication (IPC) methods, s
 Content-Length: ...\r\n
 \r\n
 {
- "jsonrpc": "2.0",
- "id": 1,
- "method": "discover",
- "params": {
-  ...
- }
+	"jsonrpc": "2.0",
+	"id": 1,
+	"method": "discover",
+	"params": {
+		...
+	}
 }
 ```
 
