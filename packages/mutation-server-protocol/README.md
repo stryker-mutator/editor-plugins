@@ -15,7 +15,8 @@ The mutation server must:
 
 1. Open a socket to accept incoming client connections.
 2. Use the port specified by the client via the `--port <port_number>` argument, if provided. If no port is specified, the server must automatically select an available port.
-2. Write connection details to the standard output as the first message, in the following JSON format:
+3. Write connection details to the standard output as the first message, in the following JSON format:
+
 ```json
 { "host": "<host_address>", "port": <port_number> }
 ```
