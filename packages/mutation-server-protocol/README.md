@@ -5,7 +5,7 @@ The Mutation Server Protocol (MSP) provides endpoints for IDEs to run mutation t
 > [!NOTE]  
 > Inspired by the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/)
 
-This document describes the 0.1 version of the mutation server protocol.
+This document describes the mutation server protocol.
 
 ## Base Protocol
 
@@ -13,12 +13,13 @@ The base protocol exchanges [JSON-RPC 2.0](https://www.jsonrpc.org/) messages be
 
 The mutation server must:
 
-1. Provide an open socket.
-2. Report the port number and (optionally) the host via standard output as the first message it writes. For example, `{"port": 1234 }`.
+1. Open a socket to accept incoming client connections.
+2. Provide a method such as command argument to configure a static port number. If a static port number is provided it must be used. If the static port number is already in use the server must exist with an error. If a port number is not provided the server must automatically select an available port.
+3. Write connection details to the standard output as the first message, in the following JSON format:
 
-The client parses this message and connects to the server.
-
-The protocol may support additional inter-process communication (IPC) methods, such as standard input/output (stdio), pipes, and sockets.
+```json
+{ "port": <port_number> }
+```
 
 > [!TIP]
 > Locations are reported as part of the messages are always 1-based. The first line in a file is 1, and the first column in a line is 1.
@@ -40,6 +41,13 @@ Content-Length: ...\r\n
 
 The message above is a request to the server or from the server to the client. Each message contains a `Content-Length` header that specifies the length of the content part. The message is encoded as UTF-8.
 
+## Position and Location Semantics
+
+Mutation locations and ranges are defined using a `start` and `end` position and must adhere to the [mutation-testing-report-schema](https://github.com/stryker-mutator/mutation-testing-elements/blob/master/packages/report-schema/src/mutation-testing-report-schema.json):
+
+- `start` is **inclusive**: the character at this position is included.
+- `end` is **exclusive**: the character at this position is not included.
+
 ### File paths
 
 The `discover` and `mutationTest` methods accept file paths as an array of strings. A path that ends with `/` indicates a directory.
@@ -47,9 +55,9 @@ The `discover` and `mutationTest` methods accept file paths as an array of strin
 Each path can specify exactly which code blocks to mutate/discover using a mutation range. This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`. Some examples:
 
 - `"src/app.js:1-11"` \
-   Discover/mutation-test test lines 1 through 11 inside app.js.
+   Discover/mutation-test test lines 1 through 10 inside app.js. Line 11 is excluded.
 - `"src/app.js:5:4-6:4"` \
-   Discover/mutation-test from line 5, column 4 through line 6, column 4 inside app.js (column 4 is included).
+   Discover/mutation-test from line 5, column 4 through line 6, column 4 inside app.js (column 4 is excluded).
 - `"src/util/"` \
    Discover/mutation-test all files inside the util directory.
 
