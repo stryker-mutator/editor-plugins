@@ -84,7 +84,7 @@ export const FileTarget = object({
   type: string().refine((val) => val === 'file', {
     message: "Type must be 'file'",
   }),
-    /**
+  /**
    * The file path to test. A path ending with `/` indicates a directory.
    * Mutation ranges can be specified with the format `:startLine[:startColumn]-endLine[:endColumn]`.
    * Example: "src/app.js:1-11" or "src/utils/:5:4-6:4"
@@ -98,7 +98,7 @@ export const MutantTarget = DiscoveredMutant.extend({
   type: string().refine((val) => val === 'mutant', {
     message: "Type must be 'mutant'",
   }),
-    /**
+  /**
    * The file in which the mutant is located.
    */
   file: string(),
