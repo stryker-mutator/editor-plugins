@@ -84,15 +84,23 @@ export const FileTarget = object({
   type: string().refine((val) => val === 'file', {
     message: "Type must be 'file'",
   }),
+    /**
+   * The file path to test. A path ending with `/` indicates a directory.
+   * Mutation ranges can be specified with the format `:startLine[:startColumn]-endLine[:endColumn]`.
+   * Example: "src/app.js:1-11" or "src/utils/:5:4-6:4"
+   */
   file: string(),
 });
 
-export type PathTarget = z.infer<typeof FileTarget>;
+export type FileTarget = z.infer<typeof FileTarget>;
 
 export const MutantTarget = DiscoveredMutant.extend({
   type: string().refine((val) => val === 'mutant', {
     message: "Type must be 'mutant'",
   }),
+    /**
+   * The file in which the mutant is located.
+   */
   file: string(),
 });
 
@@ -104,9 +112,11 @@ export type MutationTestTarget = z.infer<typeof MutationTestTarget>;
 
 export const MutationTestParams = object({
   /**
-   * The files to run mutation testing on, or omitted to run mutation testing on all files in the current project.
-   * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
-   * This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`.
+   * The specific targets to run mutation testing on, or undefined to run mutation testing on all files in the current project.
+   *
+   * Targets can either be:
+   * - File targets: referring to files or directories, optionally with mutation ranges.
+   * - Mutant targets: referring to specific discovered mutants.
    */
   targets: array(MutationTestTarget).optional(),
 });
