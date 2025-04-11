@@ -10,6 +10,7 @@ import {
   type z,
   boolean,
   record,
+  union,
 } from 'zod';
 
 export const ConfigureParams = object({
@@ -41,10 +42,12 @@ export const DiscoverParams = object({
 
 export type DiscoverParams = z.infer<typeof DiscoverParams>;
 
-const Position = object({
+export const Position = object({
   line: number(),
   column: number(),
 });
+
+export type Position = z.infer<typeof Position>;
 
 export const Location = object({
   start: Position,
@@ -77,18 +80,40 @@ export const DiscoverResult = object({
 
 export type DiscoverResult = z.infer<typeof DiscoverResult>;
 
+export const FileTarget = object({
+  type: string().refine((val) => val === 'file', {
+    message: "Type must be 'file'",
+  }),
+  file: string(),
+});
+
+export type PathTarget = z.infer<typeof FileTarget>;
+
+export const MutantTarget = DiscoveredMutant.extend({
+  type: string().refine((val) => val === 'mutant', {
+    message: "Type must be 'mutant'",
+  }),
+  file: string(),
+});
+
+export type MutantTarget = z.infer<typeof MutantTarget>;
+
+export const MutationTestTarget = union([FileTarget, MutantTarget]);
+
+export type MutationTestTarget = z.infer<typeof MutationTestTarget>;
+
 export const MutationTestParams = object({
   /**
    * The files to run mutation testing on, or omitted to run mutation testing on all files in the current project.
    * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
    * This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`.
    */
-  files: array(string()).optional(),
+  targets: array(MutationTestTarget).optional(),
 });
 
 export type MutationTestParams = z.infer<typeof MutationTestParams>;
 
-const MutantStatus = enum_([
+export const MutantStatus = enum_([
   'Killed',
   'Survived',
   'NoCoverage',

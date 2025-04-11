@@ -50,7 +50,14 @@ Mutation locations and ranges are defined using a `start` and `end` position and
 
 ### File paths
 
-The `discover` and `mutationTest` methods accept file paths as an array of strings. A path that ends with `/` indicates a directory.
+The `discover` method and `mutationTest` method both support targeting specific areas of code, but in **different ways**:
+
+- The **`discover`** method accepts an array of **file paths** (as strings). These can refer to individual files, directories, or specific mutation ranges within files.
+- The **`mutationTest`** method accepts an array of **targets**, which can be:
+  - **File targets**: similar to discover, these refer to files, directories, or mutation ranges.
+  - **Mutant targets**: these refer to specific mutants previously discovered via the `discover` method.
+
+#### File path examples
 
 Each path can specify exactly which code blocks to mutate/discover using a mutation range. This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`. Some examples:
 
@@ -147,11 +154,37 @@ Whenever a partial result is in, the server is expected to send a `reportMutatio
 ```ts
 type MutationTestParams = {
   /**
-   * The files to run mutation testing on, or undefined to run mutation testing on all files in the current project.
-   * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
-   * This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`.
+   * The specific targets to run mutation testing on, or undefined to run mutation testing on all files in the current project.
+   *
+   * Targets can either be:
+   * - File targets: referring to files or directories, optionally with mutation ranges.
+   * - Mutant targets: referring to specific discovered mutants.
    */
-  files?: string[];
+  targets?: MutationTestTarget[];
+};
+
+type MutationTestTarget = FileTarget | MutantTarget;
+
+type FileTarget = {
+  type: 'file';
+  /**
+   * The file path to test. A path ending with `/` indicates a directory.
+   * Mutation ranges can be specified with the format `:startLine[:startColumn]-endLine[:endColumn]`.
+   * Example: "src/app.js:1-11" or "src/utils/:5:4-6:4"
+   */
+  file: string;
+};
+
+/**
+ * A target that refers to a specific mutant discovered via the `discover` method.
+ * This type extends `DiscoveredMutant` and includes additional information to uniquely identify it.
+ */
+export type MutantTarget = DiscoveredMutant & {
+  type: 'mutant';
+  /**
+   * The file in which the mutant is located.
+   */
+  file: string;
 };
 
 type MutationTestResult = {
