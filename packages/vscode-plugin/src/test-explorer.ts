@@ -25,23 +25,23 @@ export class TestExplorer {
   public async discover(files?: string[]) {
     const discoverResult = await this.#mutationServer.discover({files});
 
-    Object.entries(discoverResult.files).forEach(([relativePath, mutants]) => {
-      const fileUri = vscode.Uri.file(relativePath);
+    Object.entries(discoverResult.files).forEach(([relativeFilePath, mutants]) => {
+      // const fileUri = vscode.Uri.file(`${this.#workspaceFolder.uri.path}${relativeFilePath}`);
 
-      const fileTestItem = this.findFileTestItem(fileUri);
+      const fileTestItem = this.findFileTestItem(relativeFilePath);
       if (fileTestItem) {
         // Remove mutants that are no longer present in the file
         fileTestItem.children.replace([]);
       }
 
       mutants.mutants.forEach(mutant => {
-        this.addMutantTestItem(fileUri, mutant);
+        this.addMutantTestItem(relativeFilePath, mutant);
       });
     });
   }
 
-  private addMutantTestItem(fileUri: vscode.Uri, mutant: DiscoveredMutant) {
-    const relativeFilePath = vscode.workspace.asRelativePath(fileUri, false);
+  private addMutantTestItem(relativeFilePath: string, mutant: DiscoveredMutant) {
+    // const relativeFilePath = vscode.workspace.asRelativePath(fileUri, false);
     const pathSegments = relativeFilePath.split('/');
 
     let currentCollection = this.#testController.items;
@@ -63,13 +63,19 @@ export class TestExplorer {
       }
     }
 
+    var fileUri = vscode.Uri.file(`${this.#workspaceFolder.uri.path}${currentUri}`);
+
     const testItem = this.#testController.createTestItem(mutant.id, mutant.mutatorName, fileUri);
+    const location = mutant.location;
+    testItem.range = new vscode.Range(
+      new vscode.Position(location.start.line, location.start.column),
+      new vscode.Position(location.end.line, location.end.column)
+    );
 
     currentCollection.add(testItem);
   }
 
-  private findFileTestItem(fileUri: vscode.Uri): vscode.TestItem | undefined {
-    const relativeFilePath = vscode.workspace.asRelativePath(fileUri, false);
+  private findFileTestItem(relativeFilePath: string): vscode.TestItem | undefined {
     const directories = relativeFilePath.split('/');
     const fileName = directories[directories.length - 1];
 
