@@ -53,9 +53,9 @@ Mutation locations and ranges are defined using a `start` and `end` position and
 The `discover` method and `mutationTest` method both support targeting specific areas of code, but in **different ways**:
 
 - The **`discover`** method accepts an array of **file paths** (as strings). These can refer to individual files, directories, or specific mutation ranges within files.
-- The **`mutationTest`** method accepts an array of **targets**, which can be:
-  - **File targets**: similar to discover, these refer to files, directories, or mutation ranges.
-  - **Mutant targets**: these refer to specific mutants previously discovered via the `discover` method.
+- The **`mutationTest`** method accepts two optional fields. If both files and mutants are undefined, the mutation test should be run across all files in the current project.
+  - **Files**: similar to discover, these refer to files, directories, or mutation ranges.
+  - **Mutants**: these refer to specific mutants previously discovered via the `discover` method.
 
 #### File path examples
 
