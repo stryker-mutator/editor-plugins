@@ -10,7 +10,6 @@ import {
   type z,
   boolean,
   record,
-  union,
 } from 'zod';
 
 export const ConfigureParams = object({
@@ -42,12 +41,10 @@ export const DiscoverParams = object({
 
 export type DiscoverParams = z.infer<typeof DiscoverParams>;
 
-export const Position = object({
+const Position = object({
   line: number(),
   column: number(),
 });
-
-export type Position = z.infer<typeof Position>;
 
 export const Location = object({
   start: Position,
@@ -80,50 +77,23 @@ export const DiscoverResult = object({
 
 export type DiscoverResult = z.infer<typeof DiscoverResult>;
 
-export const FileTarget = object({
-  type: string().refine((val) => val === 'file', {
-    message: "Type must be 'file'",
-  }),
-  /**
-   * The file path to test. A path ending with `/` indicates a directory.
-   * Mutation ranges can be specified with the format `:startLine[:startColumn]-endLine[:endColumn]`.
-   * Example: "src/app.js:1-11" or "src/utils/:5:4-6:4"
-   */
-  file: string(),
-});
-
-export type FileTarget = z.infer<typeof FileTarget>;
-
-export const MutantTarget = DiscoveredMutant.extend({
-  type: string().refine((val) => val === 'mutant', {
-    message: "Type must be 'mutant'",
-  }),
-  /**
-   * The file in which the mutant is located.
-   */
-  file: string(),
-});
-
-export type MutantTarget = z.infer<typeof MutantTarget>;
-
-export const MutationTestTarget = union([FileTarget, MutantTarget]);
-
-export type MutationTestTarget = z.infer<typeof MutationTestTarget>;
-
+/**
+ * The specific targets to run mutation testing on, or if both properties are left undefined: run mutation testing on all files in the current project.
+ */
 export const MutationTestParams = object({
   /**
-   * The specific targets to run mutation testing on, or undefined to run mutation testing on all files in the current project.
-   *
-   * Targets can either be:
-   * - File targets: referring to files or directories, optionally with mutation ranges.
-   * - Mutant targets: referring to specific discovered mutants.
+   * Referring to files or directories, optionally with mutation ranges.
    */
-  targets: array(MutationTestTarget).optional(),
+  files: array(string()).optional(),
+  /**
+   * Referring to specific discovered mutants within files previously discovered via the `discover` method.
+   */
+  mutants: DiscoveredFiles.optional(),
 });
 
 export type MutationTestParams = z.infer<typeof MutationTestParams>;
 
-export const MutantStatus = enum_([
+const MutantStatus = enum_([
   'Killed',
   'Survived',
   'NoCoverage',

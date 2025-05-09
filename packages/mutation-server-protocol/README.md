@@ -152,39 +152,18 @@ Whenever a partial result is in, the server is expected to send a `reportMutatio
 > The MutantResult should adhere to the [mutation testing report schema](https://github.com/stryker-mutator/mutation-testing-elements/blob/2902d56301cfdaa8ad2be59f3bca07bdf96f89b4/packages/report-schema/src/mutation-testing-report-schema.json#L37)
 
 ```ts
+/**
+ * The specific targets to run mutation testing on, or if both properties are left undefined: run mutation testing on all files in the current project.
+ */
 type MutationTestParams = {
   /**
-   * The specific targets to run mutation testing on, or undefined to run mutation testing on all files in the current project.
-   *
-   * Targets can either be:
-   * - File targets: referring to files or directories, optionally with mutation ranges.
-   * - Mutant targets: referring to specific discovered mutants.
+   * Referring to files or directories, optionally with mutation ranges.
    */
-  targets?: MutationTestTarget[];
-};
-
-type MutationTestTarget = FileTarget | MutantTarget;
-
-type FileTarget = {
-  type: 'file';
+  files?: string[];
   /**
-   * The file path to test. A path ending with `/` indicates a directory.
-   * Mutation ranges can be specified with the format `:startLine[:startColumn]-endLine[:endColumn]`.
-   * Example: "src/app.js:1-11" or "src/utils/:5:4-6:4"
+   * Referring to specific discovered mutants within files previously discovered via the `discover` method.
    */
-  file: string;
-};
-
-/**
- * A target that refers to a specific mutant discovered via the `discover` method.
- * This type extends `DiscoveredMutant` and includes additional information to uniquely identify it.
- */
-export type MutantTarget = DiscoveredMutant & {
-  type: 'mutant';
-  /**
-   * The file in which the mutant is located.
-   */
-  file: string;
+  mutants?: DiscoveredFiles;
 };
 
 type MutationTestResult = {

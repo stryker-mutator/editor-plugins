@@ -22,135 +22,22 @@ describe('Schema', () => {
     });
   });
 
-  describe('DiscoverParams', () => {
-    it('should have a files field', () => {
-      DiscoverParams.parse({ files: ['src/index.ts'] });
-    });
-    it('should throw if files is not an array of strings', () => {
-      expect(() => DiscoverParams.parse({ files: [42] })).throws();
-    });
-    it('should allow files to be undefined', () => {
-      DiscoverParams.parse({});
-    });
-  });
-
-  describe('MutationTestParams', () => {
-    it('should allow valid FileTarget', () => {
-      MutationTestParams.parse({
-        targets: [
-          {
-            type: 'file',
-            file: 'src/index.ts',
-          },
-        ],
+  for (const [name, type] of [
+    ['DiscoverParams', DiscoverParams],
+    ['MutationTestParams', MutationTestParams],
+  ] as const) {
+    describe(name, () => {
+      it('should have a files field', () => {
+        type.parse({ files: ['src/index.ts'] });
+      });
+      it('should throw if files is not an array of strings', () => {
+        expect(() => type.parse({ files: [42] })).throws();
+      });
+      it('should allow files to be undefined', () => {
+        type.parse({});
       });
     });
-
-    it('should allow valid MutantTarget', () => {
-      MutationTestParams.parse({
-        targets: [
-          {
-            type: 'mutant',
-            file: 'src/index.ts',
-            id: 'mutant-1',
-            location: {
-              start: { line: 1, column: 1 },
-              end: { line: 1, column: 2 },
-            },
-            mutatorName: 'fooMutator',
-          },
-        ],
-      });
-    });
-
-    it('should throw if FileTarget has wrong type value', () => {
-      expect(() =>
-        MutationTestParams.parse({
-          targets: [{ type: 'wrong', file: 'src/index.ts' }],
-        }),
-      ).throws();
-    });
-
-    it('should throw if MutantTarget has wrong type value', () => {
-      expect(() =>
-        MutationTestParams.parse({
-          targets: [
-            {
-              type: 'wrong',
-              file: 'src/index.ts',
-              id: 'mutant-1',
-              location: {
-                start: { line: 1, column: 1 },
-                end: { line: 1, column: 2 },
-              },
-              mutatorName: 'fooMutator',
-            },
-          ],
-        }),
-      ).throws();
-    });
-
-    it('should throw if MutantTarget is missing required fields', () => {
-      expect(() =>
-        MutationTestParams.parse({
-          targets: [
-            {
-              type: 'mutant',
-              file: 'src/foo.ts',
-              id: 'mutant-1',
-              // missing location and mutatorName
-            },
-          ],
-        }),
-      ).throws();
-    });
-
-    it('should throw if targets is not an array', () => {
-      expect(() =>
-        MutationTestParams.parse({
-          targets: 'src/foo.ts',
-        }),
-      ).throws();
-    });
-
-    it('should throw if path in FileTarget is not a string', () => {
-      expect(() =>
-        MutationTestParams.parse({
-          targets: [
-            {
-              type: 'file',
-              file: 123,
-            },
-          ],
-        }),
-      ).throws();
-    });
-
-    it('should allow targets to be undefined', () => {
-      MutationTestParams.parse({});
-    });
-
-    it('should allow both FileTarget and MutantTarget in the same array', () => {
-      MutationTestParams.parse({
-        targets: [
-          {
-            type: 'file',
-            file: 'src/foo.ts',
-          },
-          {
-            type: 'mutant',
-            file: 'src/bar.ts',
-            id: 'mutant-1',
-            location: {
-              start: { line: 1, column: 1 },
-              end: { line: 1, column: 2 },
-            },
-            mutatorName: 'fooMutator',
-          },
-        ],
-      });
-    });
-  });
+  }
 
   describe('DiscoverResult', () => {
     it('should have a files field', () => {
