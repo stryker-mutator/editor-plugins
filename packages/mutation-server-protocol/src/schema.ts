@@ -94,6 +94,8 @@ export type DiscoverResult = z.infer<typeof DiscoverResult>;
 
 /**
  * The specific targets to run mutation testing on, or if both properties are left undefined: run mutation testing on all files in the current project.
+ * Only one of the two properties should be set.
+ * If both properties are set, the `mutants` property takes precedence.
  */
 export const MutationTestParams = object({
   /**
