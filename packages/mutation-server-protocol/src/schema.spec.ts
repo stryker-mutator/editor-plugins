@@ -39,6 +39,76 @@ describe('Schema', () => {
     });
   }
 
+  describe('MutationTestParams', () => {
+    it('should allow mutants to be undefined', () => {
+      MutationTestParams.parse({});
+    });
+  
+    it('should allow a valid DiscoveredFiles object as mutants', () => {
+      MutationTestParams.parse({
+        mutants: {
+          'src/example.ts': {
+            mutants: [
+              {
+                id: '1',
+                location: {
+                  start: { line: 1, column: 0 },
+                  end: { line: 1, column: 10 },
+                },
+                mutatorName: 'arithmetic-operator',
+              },
+            ],
+          },
+        },
+      });
+    });
+  
+    it('should allow both files and mutants to be defined', () => {
+      MutationTestParams.parse({
+        files: ['src/example.ts'],
+        mutants: {
+          'src/example.ts': {
+            mutants: [
+              {
+                id: '1',
+                location: {
+                  start: { line: 1, column: 0 },
+                  end: { line: 1, column: 10 },
+                },
+                mutatorName: 'arithmetic-operator',
+              },
+            ],
+          },
+        },
+      });
+    });
+  
+    it('should throw if mutants is not a record', () => {
+      expect(() =>
+        MutationTestParams.parse({
+          mutants: 42,
+        }),
+      ).throws();
+    });
+  
+    it('should throw if a mutant is missing required fields', () => {
+      expect(() =>
+        MutationTestParams.parse({
+          mutants: {
+            'src/example.ts': {
+              mutants: [
+                {
+                  id: '1',
+                  // missing location and mutatorName and replacement
+                },
+              ],
+            },
+          },
+        }),
+      ).throws();
+    });
+  });  
+
   describe('DiscoverResult', () => {
     it('should have a files field', () => {
       DiscoverResult.parse({ files: {} });
