@@ -30,17 +30,6 @@ export const ConfigureResult = object({
 
 export type ConfigureResult = z.infer<typeof ConfigureResult>;
 
-export const DiscoverParams = object({
-  /**
-   * The files to run discovery on, or omitted to discover all files in the current project.
-   * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
-   * This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`.
-   */
-  files: array(string()).optional(),
-});
-
-export type DiscoverParams = z.infer<typeof DiscoverParams>;
-
 const Position = object({
   line: number(),
   column: number(),
@@ -52,6 +41,32 @@ export const Location = object({
 });
 
 export type Location = z.infer<typeof Location>;
+
+/**
+ * Represents a file or directory and an optional range within that file.
+ */
+export const FileRange = object({
+  /**
+   * File or directory path. A path ending in `/` indicates a directory.
+   */
+  path: string(),
+
+  /**
+   * Optional code range within the file. If omitted, the entire file is considered.
+   */
+  range: Location.optional(),
+});
+
+export type FileRange = z.infer<typeof FileRange>;
+
+export const DiscoverParams = object({
+  /**
+   * The files or directories to run discovery on, or undefined to discover all files in the current project.
+   */
+  files: array(FileRange).optional(),
+});
+
+export type DiscoverParams = z.infer<typeof DiscoverParams>;
 
 export const DiscoveredMutant = object({
   id: string(),
@@ -82,11 +97,13 @@ export type DiscoverResult = z.infer<typeof DiscoverResult>;
  */
 export const MutationTestParams = object({
   /**
-   * Referring to files or directories, optionally with mutation ranges.
+   * Specific source files or directories to run mutation testing on, optionally scoped by range.
+   * If both `files` and `mutants` are omitted, all discovered files will be tested.
    */
-  files: array(string()).optional(),
+  files: array(FileRange).optional(),
   /**
-   * Referring to specific discovered mutants within files previously discovered via the `discover` method.
+   * Specific previously discovered mutants to run mutation testing on,
+   * as returned from the `discover` step.
    */
   mutants: DiscoveredFiles.optional(),
 });
