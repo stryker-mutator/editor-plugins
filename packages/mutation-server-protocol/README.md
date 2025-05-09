@@ -97,7 +97,7 @@ Examples of how `FileRange` objects can be used in `discover` or `mutationTest` 
 }
 ```
 
-### Methods
+## Methods
 
 The MSP defines the following methods:
 
@@ -105,7 +105,7 @@ The MSP defines the following methods:
 - [`discover`](#discover): Discovers mutants in the given file paths.
 - [`mutationTest`](#mutationtest): The method to start a mutation test run.
 
-#### Configure
+### Configure
 
 The `configure` method is used to configure the server. The server must respond with a `ConfigureResult` message.
 
@@ -126,7 +126,7 @@ export interface ConfigureResult {
 }
 ```
 
-#### Discover
+### Discover
 
 The `discover` method is used to discover mutants in the given file paths. The server must respond with a `DiscoverResult` message.
 
@@ -170,7 +170,7 @@ type Position = {
 };
 ```
 
-#### MutationTest
+### MutationTest
 
 The `mutationTest` method starts a mutation test run. The server must respond with a `MutationTestResult` message.
 
@@ -226,6 +226,6 @@ type MutantStatus =
   | 'RuntimeError';
 ```
 
-### Error messages
+## Error messages
 
 TODO
