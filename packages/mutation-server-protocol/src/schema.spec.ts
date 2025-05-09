@@ -43,7 +43,7 @@ describe('Schema', () => {
     it('should allow mutants to be undefined', () => {
       MutationTestParams.parse({});
     });
-  
+
     it('should allow a valid DiscoveredFiles object as mutants', () => {
       MutationTestParams.parse({
         mutants: {
@@ -62,7 +62,7 @@ describe('Schema', () => {
         },
       });
     });
-  
+
     it('should allow both files and mutants to be defined', () => {
       MutationTestParams.parse({
         files: ['src/example.ts'],
@@ -82,7 +82,7 @@ describe('Schema', () => {
         },
       });
     });
-  
+
     it('should throw if mutants is not a record', () => {
       expect(() =>
         MutationTestParams.parse({
@@ -90,7 +90,7 @@ describe('Schema', () => {
         }),
       ).throws();
     });
-  
+
     it('should throw if a mutant is missing required fields', () => {
       expect(() =>
         MutationTestParams.parse({
@@ -107,7 +107,7 @@ describe('Schema', () => {
         }),
       ).throws();
     });
-  });  
+  });
 
   describe('DiscoverResult', () => {
     it('should have a files field', () => {
