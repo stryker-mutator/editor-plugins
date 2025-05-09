@@ -50,7 +50,14 @@ Mutation locations and ranges are defined using a `start` and `end` position and
 
 ### File paths
 
-The `discover` and `mutationTest` methods accept file paths as an array of strings. A path that ends with `/` indicates a directory.
+The `discover` method and `mutationTest` method both support targeting specific areas of code, but in **different ways**:
+
+- The **`discover`** method accepts an array of **file paths** (as strings). These can refer to individual files, directories, or specific mutation ranges within files.
+- The **`mutationTest`** method accepts two optional fields. If both files and mutants are undefined, the mutation test should be run across all files in the current project.
+  - **Files**: similar to discover, these refer to files, directories, or mutation ranges.
+  - **Mutants**: these refer to specific mutants previously discovered via the `discover` method.
+
+#### File path examples
 
 Each path can specify exactly which code blocks to mutate/discover using a mutation range. This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`. Some examples:
 
@@ -145,13 +152,18 @@ Whenever a partial result is in, the server is expected to send a `reportMutatio
 > The MutantResult should adhere to the [mutation testing report schema](https://github.com/stryker-mutator/mutation-testing-elements/blob/2902d56301cfdaa8ad2be59f3bca07bdf96f89b4/packages/report-schema/src/mutation-testing-report-schema.json#L37)
 
 ```ts
+/**
+ * The specific targets to run mutation testing on, or if both properties are left undefined: run mutation testing on all files in the current project.
+ */
 type MutationTestParams = {
   /**
-   * The files to run mutation testing on, or undefined to run mutation testing on all files in the current project.
-   * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
-   * This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`.
+   * Referring to files or directories, optionally with mutation ranges.
    */
   files?: string[];
+  /**
+   * Referring to specific discovered mutants within files previously discovered via the `discover` method.
+   */
+  mutants?: DiscoveredFiles;
 };
 
 type MutationTestResult = {

@@ -77,13 +77,18 @@ export const DiscoverResult = object({
 
 export type DiscoverResult = z.infer<typeof DiscoverResult>;
 
+/**
+ * The specific targets to run mutation testing on, or if both properties are left undefined: run mutation testing on all files in the current project.
+ */
 export const MutationTestParams = object({
   /**
-   * The files to run mutation testing on, or omitted to run mutation testing on all files in the current project.
-   * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
-   * This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`.
+   * Referring to files or directories, optionally with mutation ranges.
    */
   files: array(string()).optional(),
+  /**
+   * Referring to specific discovered mutants within files previously discovered via the `discover` method.
+   */
+  mutants: DiscoveredFiles.optional(),
 });
 
 export type MutationTestParams = z.infer<typeof MutationTestParams>;
