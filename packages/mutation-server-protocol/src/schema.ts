@@ -30,8 +30,6 @@ export const ConfigureResult = object({
 
 export type ConfigureResult = z.infer<typeof ConfigureResult>;
 
-
-
 const Position = object({
   line: number(),
   column: number(),
@@ -98,7 +96,7 @@ export type DiscoverResult = z.infer<typeof DiscoverResult>;
  * The specific targets to run mutation testing on, or if both properties are left undefined: run mutation testing on all files in the current project.
  */
 export const MutationTestParams = object({
- /**
+  /**
    * Specific source files or directories to run mutation testing on, optionally scoped by range.
    * If both `files` and `mutants` are omitted, all discovered files will be tested.
    */

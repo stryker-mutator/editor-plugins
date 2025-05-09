@@ -69,7 +69,7 @@ type FileRange = {
    * If omitted, the entire file is considered.
    */
   range?: Location;
-}
+};
 ```
 
 ### Examples
