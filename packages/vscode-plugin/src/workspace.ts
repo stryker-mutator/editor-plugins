@@ -78,6 +78,8 @@ export class Workspace {
     );
 
     const workspaceFolder = workspaceFolderInjector
+      .provideValue(commonTokens.loggerContext, folder.name)
+      .provideClass(commonTokens.contextualLogger, ContextualLogger)
       .provideClass(commonTokens.process, Process)
       .injectClass(WorkspaceFolder);
 

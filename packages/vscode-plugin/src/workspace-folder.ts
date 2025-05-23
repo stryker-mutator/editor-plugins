@@ -14,7 +14,7 @@ import { provideTestController, TestExplorer } from './test-explorer';
 import { FileSystemWatcher } from './file-system-watcher';
 import * as fs from 'fs';
 
-export interface SetupWorkspaceFolderContext extends BaseContext {
+export interface WorkspaceFolderContext extends BaseContext {
   [commonTokens.workspaceFolder]: vscode.WorkspaceFolder;
 }
 
@@ -28,7 +28,7 @@ export class WorkspaceFolder {
     commonTokens.process,
   );
   constructor(
-    private readonly injector: Injector<SetupWorkspaceFolderContext>,
+    private readonly injector: Injector<WorkspaceFolderContext>,
     private readonly workspaceFolder: vscode.WorkspaceFolder,
     private readonly process: Process,
   ) {
@@ -60,6 +60,8 @@ export class WorkspaceFolder {
     const serverLocation = await this.process.init();
     const mutationServer = this.injector
       .provideValue(commonTokens.serverLocation, serverLocation)
+      .provideValue(commonTokens.loggerContext, this.workspaceFolder.name)
+      .provideClass(commonTokens.contextualLogger, ContextualLogger)
       .injectClass(MutationServer);
 
     const configureParams: ConfigureParams = {

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Constants, SetupWorkspaceFolderContext } from './index';
+import { Constants, WorkspaceFolderContext } from './index';
 import { commonTokens, tokens } from './di/index';
 import { Injector } from 'typed-inject';
 import { Configuration, Settings } from './config';
@@ -23,7 +23,7 @@ export class FileSystemWatcher {
   );
 
   constructor(
-    private readonly injector: Injector<SetupWorkspaceFolderContext>,
+    private readonly injector: Injector<WorkspaceFolderContext>,
     private readonly workspaceFolder: vscode.WorkspaceFolder,
   ) {
     this.fileChangeSubject

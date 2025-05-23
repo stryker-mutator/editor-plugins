@@ -1,9 +1,6 @@
-import { Injector } from 'typed-inject';
 import { commonTokens, tokens } from './di';
 import { ServerLocation } from './domain';
-import { SetupWorkspaceFolderContext } from './index';
 import * as net from 'net';
-import * as vscode from 'vscode';
 import { ContextualLogger } from './logging';
 import { JSONRPCClient, JSONRPCRequest } from 'json-rpc-2.0';
 import { JsonRpcEventDeserializer } from './utils';
@@ -25,30 +22,21 @@ const rpcMethods = Object.freeze({
   reportMutationTestProgressNotification: 'reportMutationTestProgress',
 });
 
-export interface MutationServerContext extends SetupWorkspaceFolderContext {
-  [commonTokens.serverLocation]: ServerLocation;
-}
-
 export class MutationServer {
   #socket: net.Socket;
-  #logger: ContextualLogger;
-  #workspaceFolder: vscode.WorkspaceFolder;
   #jsonRPCClient: JSONRPCClient;
   #notifications = new Subject<JSONRPCRequest>();
 
   public static readonly inject = tokens(
-    commonTokens.injector,
+    commonTokens.contextualLogger,
     commonTokens.serverLocation,
   );
-  constructor(private readonly injector: Injector<MutationServerContext>) {
-    this.#workspaceFolder = this.injector.resolve(commonTokens.workspaceFolder);
-    this.#logger = this.injector
-      .provideValue(commonTokens.loggerContext, this.#workspaceFolder.name)
-      .injectClass(ContextualLogger);
-
-    const serverLocation = this.injector.resolve(commonTokens.serverLocation);
+  constructor(
+    private readonly logger: ContextualLogger,
+    private readonly serverLocation: ServerLocation,
+  ) {
     this.#socket = net.connect(serverLocation.port, serverLocation.host, () => {
-      this.#logger.info('Connected to server');
+      this.logger.info('Connected to server');
     });
 
     this.#jsonRPCClient = new JSONRPCClient((jsonRPCRequest) => {

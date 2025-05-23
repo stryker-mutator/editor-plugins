@@ -4,7 +4,7 @@ import {
   Constants,
   MissingServerPathError,
   CouldNotSpawnProcessError,
-  SetupWorkspaceFolderContext,
+  WorkspaceFolderContext,
   ServerStartupTimeoutError,
 } from './index';
 import * as vscode from 'vscode';
@@ -15,21 +15,19 @@ import { EventEmitter } from 'stream';
 import { ServerLocation } from './domain/index';
 
 export class Process extends EventEmitter {
-  #logger: ContextualLogger;
   #process: ChildProcessWithoutNullStreams | undefined;
 
   public static readonly inject = tokens(
     commonTokens.injector,
     commonTokens.workspaceFolder,
+    commonTokens.contextualLogger,
   );
   constructor(
-    private readonly injector: Injector<SetupWorkspaceFolderContext>,
+    private readonly injector: Injector<WorkspaceFolderContext>,
     private readonly workspaceFolder: vscode.WorkspaceFolder,
+    private readonly logger: ContextualLogger,
   ) {
     super();
-    this.#logger = this.injector
-      .provideValue(commonTokens.loggerContext, this.workspaceFolder.name)
-      .injectClass(ContextualLogger);
   }
 
   async init(): Promise<ServerLocation> {
@@ -39,7 +37,7 @@ export class Process extends EventEmitter {
     );
 
     if (!serverPath) {
-      this.#logger.error(
+      this.logger.error(
         'Cannot start server. Missing server path configuration.',
       );
       throw new MissingServerPathError();
@@ -56,17 +54,17 @@ export class Process extends EventEmitter {
       this.workspaceFolder,
     );
 
-    this.#logger.info(
+    this.logger.info(
       `Server configuration: path=${serverPath}, args=${serverArgs}, cwd=${cwd}`,
     );
 
     this.#process = spawn(serverPath, serverArgs, { cwd: cwd });
     if (this.#process.pid === undefined) {
-      this.#logger.error('Server process could not be spawned.');
+      this.logger.error('Server process could not be spawned.');
       throw new CouldNotSpawnProcessError();
     }
 
-    this.#logger.info(`Server started with PID ${this.#process.pid}`);
+    this.logger.info(`Server started with PID ${this.#process.pid}`);
 
     this.#process.stdout.on('data', (data) =>
       this.emit('data', data.toString()),

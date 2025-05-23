@@ -1,6 +1,4 @@
-import { Injector } from 'typed-inject';
 import { commonTokens, tokens } from './di';
-import { SetupWorkspaceFolderContext, MutationServer } from './index';
 import * as vscode from 'vscode';
 import { DiscoveredMutant, DiscoverResult } from 'mutation-server-protocol';
 
@@ -16,12 +14,10 @@ provideTestController.inject = tokens(commonTokens.workspaceFolder);
 
 export class TestExplorer {
   public static readonly inject = tokens(
-    commonTokens.injector,
     commonTokens.workspaceFolder,
     commonTokens.testController,
   );
   constructor(
-    private readonly injector: Injector<SetupWorkspaceFolderContext>,
     private readonly workspaceFolder: vscode.WorkspaceFolder,
     private readonly testController: vscode.TestController,
   ) {}
