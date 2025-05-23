@@ -16,7 +16,6 @@ import { ServerLocation } from './domain/index';
 
 export class Process extends EventEmitter {
   #logger: ContextualLogger;
-  #workspaceFolder: vscode.WorkspaceFolder;
   #process: ChildProcessWithoutNullStreams | undefined;
 
   public static readonly inject = tokens(
@@ -25,18 +24,18 @@ export class Process extends EventEmitter {
   );
   constructor(
     private readonly injector: Injector<SetupWorkspaceFolderContext>,
+    private readonly workspaceFolder: vscode.WorkspaceFolder,
   ) {
     super();
-    this.#workspaceFolder = this.injector.resolve(commonTokens.workspaceFolder);
     this.#logger = this.injector
-      .provideValue(commonTokens.loggerContext, this.#workspaceFolder.name)
+      .provideValue(commonTokens.loggerContext, this.workspaceFolder.name)
       .injectClass(ContextualLogger);
   }
 
   async init(): Promise<ServerLocation> {
     const serverPath = Configuration.getSetting<string>(
       Settings.ServerPath,
-      this.#workspaceFolder,
+      this.workspaceFolder,
     );
 
     if (!serverPath) {
@@ -49,12 +48,12 @@ export class Process extends EventEmitter {
     const serverArgs = Configuration.getSettingOrDefault<string[]>(
       Settings.ServerArgs,
       [],
-      this.#workspaceFolder,
+      this.workspaceFolder,
     );
     const cwd = Configuration.getSettingOrDefault<string>(
       Settings.CurrentWorkingDirectory,
-      this.#workspaceFolder.uri.fsPath,
-      this.#workspaceFolder,
+      this.workspaceFolder.uri.fsPath,
+      this.workspaceFolder,
     );
 
     this.#logger.info(

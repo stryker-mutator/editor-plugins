@@ -4,56 +4,53 @@ import { SetupWorkspaceFolderContext, MutationServer } from './index';
 import * as vscode from 'vscode';
 import { DiscoveredMutant, DiscoverResult } from 'mutation-server-protocol';
 
-export interface SetupTestExplorerContext extends SetupWorkspaceFolderContext {
-  [commonTokens.mutationServer]: MutationServer;
+export function provideTestController(
+  workspaceFolder: vscode.WorkspaceFolder,
+): vscode.TestController {
+  return vscode.tests.createTestController(
+    workspaceFolder.name,
+    workspaceFolder.name,
+  );
 }
+provideTestController.inject = tokens(commonTokens.workspaceFolder);
 
 export class TestExplorer {
-  #testController: vscode.TestController;
-  #mutationServer: MutationServer;
-  #workspaceFolder: vscode.WorkspaceFolder;
-
   public static readonly inject = tokens(
     commonTokens.injector,
-    commonTokens.mutationServer,
+    commonTokens.workspaceFolder,
+    commonTokens.testController,
   );
-  constructor(private readonly injector: Injector<SetupTestExplorerContext>) {
-    this.#workspaceFolder = this.injector.resolve(commonTokens.workspaceFolder);
-    this.#mutationServer = this.injector.resolve(commonTokens.mutationServer);
-    this.#testController = vscode.tests.createTestController(
-      this.#workspaceFolder.name,
-      this.#workspaceFolder.name,
-    );
+  constructor(
+    private readonly injector: Injector<SetupWorkspaceFolderContext>,
+    private readonly workspaceFolder: vscode.WorkspaceFolder,
+    private readonly testController: vscode.TestController,
+  ) {}
+
+  public async processDiscoverResult(discovery: DiscoverResult) {
+    Object.entries(discovery.files).forEach(([relativeFilePath, mutants]) => {
+      const fileTestItem = this.findFileTestItem(relativeFilePath);
+      if (fileTestItem) {
+        // Remove mutants that are no longer present in the file
+        fileTestItem.children.replace([]);
+      }
+
+      mutants.mutants.forEach((mutant) => {
+        this.addMutantTestItem(relativeFilePath, mutant);
+      });
+    });
   }
 
-  public async discover(files?: string[]) {
-    const discoverResult = await this.#mutationServer.discover({ files });
-
-    Object.entries(discoverResult.files).forEach(
-      ([relativeFilePath, mutants]) => {
-        // const fileUri = vscode.Uri.file(`${this.#workspaceFolder.uri.path}${relativeFilePath}`);
-
-        const fileTestItem = this.findFileTestItem(relativeFilePath);
-        if (fileTestItem) {
-          // Remove mutants that are no longer present in the file
-          fileTestItem.children.replace([]);
-        }
-
-        mutants.mutants.forEach((mutant) => {
-          this.addMutantTestItem(relativeFilePath, mutant);
-        });
-      },
-    );
+  public processFileDeletions(uris: vscode.Uri[]) {
+    throw new Error('Method not implemented.');
   }
 
   private addMutantTestItem(
     relativeFilePath: string,
     mutant: DiscoveredMutant,
   ) {
-    // const relativeFilePath = vscode.workspace.asRelativePath(fileUri, false);
     const pathSegments = relativeFilePath.split('/');
 
-    let currentCollection = this.#testController.items;
+    let currentCollection = this.testController.items;
 
     let currentUri = '';
 
@@ -64,9 +61,9 @@ export class TestExplorer {
 
       if (!node) {
         const uri = vscode.Uri.file(
-          `${this.#workspaceFolder.uri.path}${currentUri}`,
+          `${this.workspaceFolder.uri.path}${currentUri}`,
         );
-        const newDirectory = this.#testController.createTestItem(
+        const newDirectory = this.testController.createTestItem(
           pathSegment,
           pathSegment,
           uri,
@@ -79,10 +76,10 @@ export class TestExplorer {
     }
 
     var fileUri = vscode.Uri.file(
-      `${this.#workspaceFolder.uri.path}${currentUri}`,
+      `${this.workspaceFolder.uri.path}${currentUri}`,
     );
 
-    const testItem = this.#testController.createTestItem(
+    const testItem = this.testController.createTestItem(
       mutant.id,
       mutant.mutatorName,
       fileUri,
@@ -102,7 +99,7 @@ export class TestExplorer {
     const directories = relativeFilePath.split('/');
     const fileName = directories[directories.length - 1];
 
-    let currentCollection = this.#testController.items;
+    let currentCollection = this.testController.items;
 
     // Iterate through the directories to find the file test item in the tree
     for (const directory of directories) {

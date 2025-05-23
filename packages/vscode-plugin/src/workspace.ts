@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { commonTokens } from './di/tokens';
 import { ContextualLogger, provideLogger } from './logging/index';
-import { WorkspaceFolder, Constants } from './index';
+import { WorkspaceFolder, Constants, Process } from './index';
 import { BaseContext } from './di/index';
 import { createInjector, Injector } from 'typed-inject';
 
@@ -76,8 +76,11 @@ export class Workspace {
       commonTokens.workspaceFolder,
       folder,
     );
-    const workspaceFolder =
-      workspaceFolderInjector.injectClass(WorkspaceFolder);
+
+    const workspaceFolder = workspaceFolderInjector
+      .provideClass(commonTokens.process, Process)
+      .injectClass(WorkspaceFolder);
+
     await workspaceFolder.init();
     this.#workspaceFolders.push(workspaceFolder);
   }

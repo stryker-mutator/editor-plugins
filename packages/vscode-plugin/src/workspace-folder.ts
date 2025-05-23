@@ -10,8 +10,9 @@ import {
   UnsupportedServerVersionError,
 } from './index';
 import { ConfigureParams } from 'mutation-server-protocol';
-import { TestExplorer } from './test-explorer';
+import { provideTestController, TestExplorer } from './test-explorer';
 import { FileSystemWatcher } from './file-system-watcher';
+import * as fs from 'fs';
 
 export interface SetupWorkspaceFolderContext extends BaseContext {
   [commonTokens.workspaceFolder]: vscode.WorkspaceFolder;
@@ -19,27 +20,26 @@ export interface SetupWorkspaceFolderContext extends BaseContext {
 
 export class WorkspaceFolder {
   #logger: ContextualLogger;
-  #process: Process;
-  #testExplorer?: TestExplorer;
+  #fileSystemWatcher?: FileSystemWatcher;
 
   public static readonly inject = tokens(
     commonTokens.injector,
     commonTokens.workspaceFolder,
+    commonTokens.process,
   );
   constructor(
     private readonly injector: Injector<SetupWorkspaceFolderContext>,
     private readonly workspaceFolder: vscode.WorkspaceFolder,
+    private readonly process: Process,
   ) {
-    // this.#workspaceFolder = this.injector.resolve(commonTokens.workspaceFolder);
     this.#logger = this.injector
       .provideValue(commonTokens.loggerContext, this.workspaceFolder.name)
       .injectClass(ContextualLogger);
-    this.#process = this.injector.injectClass(Process);
 
-    this.#process.on('exit', async (code) => {
+    this.process.on('exit', async (code) => {
       this.#logger.error(`Mutation server process exited with code ${code}`);
       this.#logger.info('Restarting mutation server');
-      this.#process.dispose();
+      this.process.dispose();
       await this.init();
     });
   }
@@ -57,7 +57,7 @@ export class WorkspaceFolder {
       return;
     }
 
-    const serverLocation = await this.#process.init();
+    const serverLocation = await this.process.init();
     const mutationServer = this.injector
       .provideValue(commonTokens.serverLocation, serverLocation)
       .injectClass(MutationServer);
@@ -81,17 +81,31 @@ export class WorkspaceFolder {
       `Mutation server configuration handshake completed. MSP version: ${configureResult.version}`,
     );
 
-    // this.#testExplorer =
+    const testExplorer = this.injector
+      .provideFactory(commonTokens.testController, provideTestController)
+      .injectClass(TestExplorer);
 
-    const fileSystemWatcher = this.injector
-      .provideValue(commonTokens.mutationServer, mutationServer)
-      .provideClass(commonTokens.testExplorer, TestExplorer)
-      .injectClass(FileSystemWatcher);
+    this.#fileSystemWatcher = this.injector.injectClass(FileSystemWatcher);
 
-    fileSystemWatcher.init();
-    // await this.#testExplorer.discover();
+    this.#fileSystemWatcher.onFilesChanged(async (uris) => {
+      // if uri is directory. add / to the end of the uri
+      const files: string[] = uris.map((uri) => {
+        if (fs.lstatSync(uri.fsPath).isDirectory()) {
+          return `${uri.fsPath}/`;
+        }
+        return uri.fsPath;
+      });
+      const discoverResult = await mutationServer.discover({ files: files });
+      testExplorer.processDiscoverResult(discoverResult);
+    });
 
-    // setupFileWatcher();
+    this.#fileSystemWatcher.onFilesDeleted(async (uris) => {
+      testExplorer.processFileDeletions(uris);
+    });
+
+    // Initial discovery of mutants
+    const discoverResult = await mutationServer.discover({});
+    testExplorer.processDiscoverResult(discoverResult);
   }
 
   public getWorkspaceFolder(): vscode.WorkspaceFolder {
@@ -99,6 +113,7 @@ export class WorkspaceFolder {
   }
 
   dispose() {
-    this.#process.dispose();
+    this.#fileSystemWatcher?.dispose();
+    this.process.dispose();
   }
 }
