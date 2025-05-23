@@ -1,3 +1,5 @@
+import { TestExplorer } from '../test-explorer';
+
 /**
  * Define a string literal.
  * @param value Token literal
@@ -18,7 +20,8 @@ export const commonTokens = Object.freeze({
   loggerContext: stringLiteral('loggerContext'),
   workspaceFolder: stringLiteral('workspaceFolder'),
   serverLocation: stringLiteral('serverLocation'),
-  mutationServer: stringLiteral('mutationServer')
+  mutationServer: stringLiteral('mutationServer'),
+  testExplorer: stringLiteral('testExplorer'),
 });
 
 /**

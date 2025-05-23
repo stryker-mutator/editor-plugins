@@ -1,10 +1,10 @@
-import { Injector } from "typed-inject";
-import { commonTokens, tokens } from "./di";
-import { SetupWorkspaceFolderContext, MutationServer } from "./index";
+import { Injector } from 'typed-inject';
+import { commonTokens, tokens } from './di';
+import { SetupWorkspaceFolderContext, MutationServer } from './index';
 import * as vscode from 'vscode';
-import { DiscoveredMutant, DiscoverResult } from "mutation-server-protocol";
+import { DiscoveredMutant, DiscoverResult } from 'mutation-server-protocol';
 
-export interface TestExplorerContext extends SetupWorkspaceFolderContext {
+export interface SetupTestExplorerContext extends SetupWorkspaceFolderContext {
   [commonTokens.mutationServer]: MutationServer;
 }
 
@@ -13,34 +13,43 @@ export class TestExplorer {
   #mutationServer: MutationServer;
   #workspaceFolder: vscode.WorkspaceFolder;
 
-  public static readonly inject = tokens(commonTokens.injector, commonTokens.mutationServer);
-  constructor(
-    private readonly injector: Injector<TestExplorerContext>
-  ) {
+  public static readonly inject = tokens(
+    commonTokens.injector,
+    commonTokens.mutationServer,
+  );
+  constructor(private readonly injector: Injector<SetupTestExplorerContext>) {
     this.#workspaceFolder = this.injector.resolve(commonTokens.workspaceFolder);
     this.#mutationServer = this.injector.resolve(commonTokens.mutationServer);
-    this.#testController = vscode.tests.createTestController(this.#workspaceFolder.name, this.#workspaceFolder.name);
+    this.#testController = vscode.tests.createTestController(
+      this.#workspaceFolder.name,
+      this.#workspaceFolder.name,
+    );
   }
 
   public async discover(files?: string[]) {
-    const discoverResult = await this.#mutationServer.discover({files});
+    const discoverResult = await this.#mutationServer.discover({ files });
 
-    Object.entries(discoverResult.files).forEach(([relativeFilePath, mutants]) => {
-      // const fileUri = vscode.Uri.file(`${this.#workspaceFolder.uri.path}${relativeFilePath}`);
+    Object.entries(discoverResult.files).forEach(
+      ([relativeFilePath, mutants]) => {
+        // const fileUri = vscode.Uri.file(`${this.#workspaceFolder.uri.path}${relativeFilePath}`);
 
-      const fileTestItem = this.findFileTestItem(relativeFilePath);
-      if (fileTestItem) {
-        // Remove mutants that are no longer present in the file
-        fileTestItem.children.replace([]);
-      }
+        const fileTestItem = this.findFileTestItem(relativeFilePath);
+        if (fileTestItem) {
+          // Remove mutants that are no longer present in the file
+          fileTestItem.children.replace([]);
+        }
 
-      mutants.mutants.forEach(mutant => {
-        this.addMutantTestItem(relativeFilePath, mutant);
-      });
-    });
+        mutants.mutants.forEach((mutant) => {
+          this.addMutantTestItem(relativeFilePath, mutant);
+        });
+      },
+    );
   }
 
-  private addMutantTestItem(relativeFilePath: string, mutant: DiscoveredMutant) {
+  private addMutantTestItem(
+    relativeFilePath: string,
+    mutant: DiscoveredMutant,
+  ) {
     // const relativeFilePath = vscode.workspace.asRelativePath(fileUri, false);
     const pathSegments = relativeFilePath.split('/');
 
@@ -54,8 +63,14 @@ export class TestExplorer {
       const node = currentCollection.get(pathSegment);
 
       if (!node) {
-        const uri = vscode.Uri.file(`${this.#workspaceFolder.uri.path}${currentUri}`);
-        const newDirectory = this.#testController.createTestItem(pathSegment, pathSegment, uri);
+        const uri = vscode.Uri.file(
+          `${this.#workspaceFolder.uri.path}${currentUri}`,
+        );
+        const newDirectory = this.#testController.createTestItem(
+          pathSegment,
+          pathSegment,
+          uri,
+        );
         currentCollection.add(newDirectory);
         currentCollection = newDirectory.children;
       } else {
@@ -63,19 +78,27 @@ export class TestExplorer {
       }
     }
 
-    var fileUri = vscode.Uri.file(`${this.#workspaceFolder.uri.path}${currentUri}`);
+    var fileUri = vscode.Uri.file(
+      `${this.#workspaceFolder.uri.path}${currentUri}`,
+    );
 
-    const testItem = this.#testController.createTestItem(mutant.id, mutant.mutatorName, fileUri);
+    const testItem = this.#testController.createTestItem(
+      mutant.id,
+      mutant.mutatorName,
+      fileUri,
+    );
     const location = mutant.location;
     testItem.range = new vscode.Range(
       new vscode.Position(location.start.line, location.start.column),
-      new vscode.Position(location.end.line, location.end.column)
+      new vscode.Position(location.end.line, location.end.column),
     );
 
     currentCollection.add(testItem);
   }
 
-  private findFileTestItem(relativeFilePath: string): vscode.TestItem | undefined {
+  private findFileTestItem(
+    relativeFilePath: string,
+  ): vscode.TestItem | undefined {
     const directories = relativeFilePath.split('/');
     const fileName = directories[directories.length - 1];
 

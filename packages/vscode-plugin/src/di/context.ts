@@ -1,5 +1,5 @@
-import { Logger } from "../logging/index";
-import { commonTokens } from "./tokens";
+import { Logger } from '../logging/index';
+import { commonTokens } from './tokens';
 import * as vscode from 'vscode';
 
 /**
@@ -7,5 +7,5 @@ import * as vscode from 'vscode';
  */
 export interface BaseContext {
   [commonTokens.logger]: Logger;
-  [commonTokens.context]: vscode.ExtensionContext
+  [commonTokens.context]: vscode.ExtensionContext;
 }
