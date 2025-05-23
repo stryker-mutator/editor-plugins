@@ -41,7 +41,45 @@ export class TestExplorer {
   }
 
   public processFileDeletions(uris: vscode.Uri[]) {
-    throw new Error('Method not implemented.');
+    for (const uri of uris) {
+      this.deleteUriFromTestExplorer(uri);
+    }
+  }
+
+  private deleteUriFromTestExplorer(uri: vscode.Uri): void {
+    const relativePath = vscode.workspace.asRelativePath(uri, false);
+    const directories = relativePath.split('/');
+
+    let currentNodes = this.testController.items;
+    let parent: vscode.TestItem | undefined;
+
+    const fileName = directories[directories.length - 1];
+    const parentDirectory = directories[directories.length - 2];
+
+    // Traverse the tree to find the parent directory
+    for (const directory of directories) {
+      const node = currentNodes.get(directory);
+
+      if (directory === parentDirectory) {
+        parent = node;
+        node!.children.delete(fileName);
+        break;
+      }
+
+      currentNodes = node!.children;
+    }
+
+    // Remove parent directories that have no children
+    while (parent && parent.children.size === 0) {
+      const parentParent: vscode.TestItem | undefined = parent.parent;
+      if (!parentParent) {
+        // Parent is top-level item
+        this.testController.items.delete(parent.id);
+        break;
+      }
+      parentParent.children.delete(parent.id);
+      parent = parentParent;
+    }
   }
 
   private addMutantTestItem(
