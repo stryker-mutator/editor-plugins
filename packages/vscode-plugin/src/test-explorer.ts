@@ -1,6 +1,15 @@
-import { commonTokens, tokens } from './di';
+import { commonTokens, tokens } from './di/index';
 import * as vscode from 'vscode';
-import { DiscoveredMutant, DiscoverResult } from 'mutation-server-protocol';
+import {
+  DiscoveredMutant,
+  DiscoverResult,
+  MutantResult,
+  MutationTestParams,
+  MutationTestResult,
+} from 'mutation-server-protocol';
+import { Constants, MutationServer } from './index';
+import * as fs from 'fs';
+import { ContextualLogger } from './logging/index';
 
 export function provideTestController(
   workspaceFolder: vscode.WorkspaceFolder,
@@ -16,13 +25,133 @@ export class TestExplorer {
   public static readonly inject = tokens(
     commonTokens.workspaceFolder,
     commonTokens.testController,
+    commonTokens.mutationServer,
+    commonTokens.contextualLogger,
   );
   constructor(
     private readonly workspaceFolder: vscode.WorkspaceFolder,
     private readonly testController: vscode.TestController,
-  ) {}
+    private readonly mutationServer: MutationServer,
+    private readonly logger: ContextualLogger,
+  ) {
+    this.testController.createRunProfile(
+      Constants.TestRunProfileLabel,
+      vscode.TestRunProfileKind.Run,
+      this.testRunHandler.bind(this),
+    );
+  }
 
-  public async processDiscoverResult(discovery: DiscoverResult) {
+  public async testRunHandler(
+    request: vscode.TestRunRequest,
+    token: vscode.CancellationToken,
+  ) {
+    this.logger.info('Starting mutation test run');
+
+    const testRun = this.testController.createTestRun(
+      request,
+      Constants.AppName,
+      true,
+    );
+
+    // If the request includes specific tests, use them; otherwise, use all test items
+    const queue: vscode.TestItem[] = request.include
+      ? [...request.include]
+      : [...this.testController.items].map(([_, testItem]) => testItem);
+
+    queue.forEach((testItem) => {
+      this.traverseTestItems(testItem, (item) => {
+        testRun.started(item);
+      });
+    }); 
+
+    const mutationTestParams: MutationTestParams = {
+      files: this.toFilePaths(queue),
+    };
+
+    token.onCancellationRequested(async () => {
+      testRun.appendOutput('Test run cancellation requested, ending test run.');
+      testRun.end();
+    });
+
+    try {
+      await this.mutationServer.mutationTest(mutationTestParams, (progress) =>
+        this.processMutationTestResult(progress, testRun),
+      );
+    } catch (error: Error | unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Mutation server threw an exception during mutation testing:
+        ${errorMessage}`,
+      );
+      queue.forEach((testItem) => {
+        this.traverseTestItems(testItem, (item) => {
+          testRun.errored(item, new vscode.TestMessage(errorMessage));
+        });
+      });
+    } finally {
+      testRun.end();
+      this.logger.info('Mutation test run finished');
+    }
+  }
+
+  private traverseTestItems(
+    testItem: vscode.TestItem,
+    action: (item: vscode.TestItem) => void,
+  ): void {
+    action(testItem);
+    for (const [, child] of testItem.children) {
+      this.traverseTestItems(child, action);
+    }
+  }
+
+  private toFilePaths(testItems: vscode.TestItem[]): string[] {
+    let filePaths: string[] = [];
+    // based on uri, check if uri is folder or file, then if folder, add / to the end
+    testItems.forEach((testItem) => {
+      const uri = testItem.uri;
+      if (uri) {
+        if (fs.lstatSync(uri.fsPath).isDirectory()) {
+          filePaths.push(`${uri.fsPath}/`);
+        } else {
+          filePaths.push(uri.fsPath);
+        }
+      }
+    });
+    return filePaths;
+  }
+
+  private async processMutationTestResult(
+    mutationTestResult: MutationTestResult,
+    testRun: vscode.TestRun,
+  ) {
+    for (const [filePath, mutants] of Object.entries(
+      mutationTestResult.files,
+    )) {
+      for (const mutant of mutants.mutants) {
+        // const fileUri = vscode.Uri.file(filePath);
+        const testItem = this.addMutantTestItem(filePath, mutant);
+        switch (mutant.status) {
+          case 'Timeout':
+          case 'RuntimeError':
+          case 'CompileError':
+          case 'Killed':
+            testRun.passed(testItem);
+            break;
+          case 'Ignored':
+            testRun.skipped(testItem);
+            break;
+          default:
+            testRun.failed(testItem, []); // TODO: add error message
+            break;
+        }
+
+        testRun.appendOutput(this.createOutputMessage(mutant, filePath));
+      }
+    }
+  }
+
+  public processDiscoverResult(discovery: DiscoverResult) {
     Object.entries(discovery.files).forEach(([relativeFilePath, mutants]) => {
       const fileTestItem = this.findFileTestItem(relativeFilePath);
       if (fileTestItem) {
@@ -46,23 +175,28 @@ export class TestExplorer {
     const relativePath = vscode.workspace.asRelativePath(uri, false);
     const directories = relativePath.split('/');
 
-    let currentNodes = this.testController.items;
-    let parent: vscode.TestItem | undefined;
-
     const fileName = directories[directories.length - 1];
     const parentDirectory = directories[directories.length - 2];
+
+    let currentNodes = this.testController.items;
+    let parent: vscode.TestItem | undefined;
 
     // Traverse the tree to find the parent directory
     for (const directory of directories) {
       const node = currentNodes.get(directory);
 
-      if (directory === parentDirectory) {
-        parent = node;
-        node!.children.delete(fileName);
+      if (!node) {
+        // Directory not found, exit the loop
         break;
       }
 
-      currentNodes = node!.children;
+      if (directory === parentDirectory) {
+        parent = node;
+        node.children.delete(fileName);
+        break;
+      }
+
+      currentNodes = node.children;
     }
 
     // Remove parent directories that have no children
@@ -80,8 +214,8 @@ export class TestExplorer {
 
   private addMutantTestItem(
     relativeFilePath: string,
-    mutant: DiscoveredMutant,
-  ) {
+    mutant: DiscoveredMutant | MutantResult,
+  ): vscode.TestItem {
     const pathSegments = relativeFilePath.split('/');
 
     let currentCollection = this.testController.items;
@@ -113,9 +247,16 @@ export class TestExplorer {
       `${this.workspaceFolder.uri.path}${currentUri}`,
     );
 
+    const mutantId =
+      `${mutant.mutatorName}(${mutant.location.start.line}:` +
+      `${mutant.location.start.column}-${mutant.location.end.line}:` +
+      `${mutant.location.end.column}) (${mutant.replacement})`;
+
+    const mutantName = `${mutant.mutatorName} (${mutant.location.start.line}:${mutant.location.start.column})`;
+
     const testItem = this.testController.createTestItem(
-      mutant.id,
-      mutant.mutatorName,
+      mutantId,
+      mutantName,
       fileUri,
     );
     const location = mutant.location;
@@ -125,6 +266,7 @@ export class TestExplorer {
     );
 
     currentCollection.add(testItem);
+    return testItem;
   }
 
   private findFileTestItem(
@@ -149,5 +291,43 @@ export class TestExplorer {
 
       currentCollection = node.children;
     }
+  }
+
+  private createOutputMessage(mutant: MutantResult, filePath: string): string {
+    let outputMessage = '';
+
+    const relativeFilePath = vscode.workspace.asRelativePath(filePath, false);
+
+    const makeBold = (text: string) => `\x1b[1m${text}\x1b[0m`;
+    const makeBlue = (text: string) => `\x1b[34m${text}\x1b[0m`;
+    const makeYellow = (text: string) => `\x1b[33m${text}\x1b[0m`;
+
+    outputMessage += `[${mutant.status}] ${mutant.mutatorName}\r\n`;
+    outputMessage += `${makeBlue(relativeFilePath)}:${makeYellow(mutant.location.start.line.toString())}:${makeYellow(mutant.location.start.column.toString())}\r\n`;
+    outputMessage += `${makeBold('Replacement:')} ${mutant.replacement}\r\n`;
+    outputMessage += `${makeBold('Covered by tests:')}\r\n`;
+    if (mutant.coveredBy && mutant.coveredBy.length > 0) {
+      mutant.coveredBy.forEach((test) => {
+        outputMessage += `\t${test}\r\n`;
+      });
+    }
+
+    outputMessage += `${makeBold('Killed by tests:')}\r\n`;
+    if (mutant.killedBy && mutant.killedBy.length > 0) {
+      mutant.killedBy.forEach((test) => {
+        outputMessage += `\t${test}\r\n`;
+      });
+    }
+
+    if (mutant.duration) {
+      outputMessage += `${makeBold('Test Duration:')}${mutant.duration} milliseconds\r\n`;
+    }
+    if (mutant.testsCompleted) {
+      outputMessage += `${makeBold('Tests Completed:')}${mutant.testsCompleted}\r\n`;
+    }
+
+    outputMessage += '\r\n\r\n';
+
+    return outputMessage;
   }
 }

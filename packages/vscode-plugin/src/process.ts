@@ -18,12 +18,10 @@ export class Process extends EventEmitter {
   #process: ChildProcessWithoutNullStreams | undefined;
 
   public static readonly inject = tokens(
-    commonTokens.injector,
     commonTokens.workspaceFolder,
     commonTokens.contextualLogger,
   );
   constructor(
-    private readonly injector: Injector<WorkspaceFolderContext>,
     private readonly workspaceFolder: vscode.WorkspaceFolder,
     private readonly logger: ContextualLogger,
   ) {

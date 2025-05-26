@@ -15,30 +15,29 @@ import { FileSystemWatcher } from './file-system-watcher';
 import * as fs from 'fs';
 
 export interface WorkspaceFolderContext extends BaseContext {
+  [commonTokens.loggerContext]: string;
+  [commonTokens.contextualLogger]: ContextualLogger;
   [commonTokens.workspaceFolder]: vscode.WorkspaceFolder;
 }
 
 export class WorkspaceFolder {
-  #logger: ContextualLogger;
   #fileSystemWatcher?: FileSystemWatcher;
 
   public static readonly inject = tokens(
     commonTokens.injector,
     commonTokens.workspaceFolder,
     commonTokens.process,
+    commonTokens.contextualLogger,
   );
   constructor(
     private readonly injector: Injector<WorkspaceFolderContext>,
     private readonly workspaceFolder: vscode.WorkspaceFolder,
     private readonly process: Process,
+    private readonly logger: ContextualLogger,
   ) {
-    this.#logger = this.injector
-      .provideValue(commonTokens.loggerContext, this.workspaceFolder.name)
-      .injectClass(ContextualLogger);
-
     this.process.on('exit', async (code) => {
-      this.#logger.error(`Mutation server process exited with code ${code}`);
-      this.#logger.info('Restarting mutation server');
+      this.logger.error(`Mutation server process exited with code ${code}`);
+      this.logger.info('Restarting mutation server');
       this.process.dispose();
       await this.init();
     });
@@ -51,7 +50,7 @@ export class WorkspaceFolder {
       this.workspaceFolder,
     );
     if (!mutationTestingEnabled) {
-      this.#logger.info(
+      this.logger.info(
         `Mutation testing is disabled for ${this.workspaceFolder.uri.fsPath}`,
       );
       return;
@@ -60,8 +59,6 @@ export class WorkspaceFolder {
     const serverLocation = await this.process.init();
     const mutationServer = this.injector
       .provideValue(commonTokens.serverLocation, serverLocation)
-      .provideValue(commonTokens.loggerContext, this.workspaceFolder.name)
-      .provideClass(commonTokens.contextualLogger, ContextualLogger)
       .injectClass(MutationServer);
 
     const configureParams: ConfigureParams = {
@@ -73,18 +70,19 @@ export class WorkspaceFolder {
 
     const configureResult = await mutationServer.configure(configureParams);
     if (configureResult.version !== Constants.SupportedMspVersion) {
-      this.#logger.error(
+      this.logger.error(
         `Unsupported mutation server version: ${configureResult.version}`,
       );
       throw new UnsupportedServerVersionError(configureResult.version);
     }
 
-    this.#logger.info(
+    this.logger.info(
       `Mutation server configuration handshake completed. MSP version: ${configureResult.version}`,
     );
 
     const testExplorer = this.injector
       .provideFactory(commonTokens.testController, provideTestController)
+      .provideValue(commonTokens.mutationServer, mutationServer)
       .injectClass(TestExplorer);
 
     this.#fileSystemWatcher = this.injector.injectClass(FileSystemWatcher);

@@ -18,12 +18,10 @@ export class FileSystemWatcher {
   public readonly onFilesDeleted = this._onFilesDeleted.event;
 
   public static readonly inject = tokens(
-    commonTokens.injector,
     commonTokens.workspaceFolder,
   );
-
+  
   constructor(
-    private readonly injector: Injector<WorkspaceFolderContext>,
     private readonly workspaceFolder: vscode.WorkspaceFolder,
   ) {
     this.fileChangeSubject

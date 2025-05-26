@@ -15,6 +15,7 @@ export class Configuration {
     section?: string,
     scope?: ConfigurationScope | null | undefined,
   ): WorkspaceConfiguration {
+    
     return workspace.getConfiguration(section, scope);
   }
 
@@ -27,7 +28,8 @@ export class Configuration {
     scope?: ConfigurationScope | null | undefined,
   ): T | undefined {
     const section = SettingSections[setting];
-    return this.get(section, scope).get<T>(setting);
+    const value = this.get(section, scope).get<T>(setting);
+    return !value || value === '' ? undefined : value;
   }
 
   public static getSettingOrDefault<T>(
