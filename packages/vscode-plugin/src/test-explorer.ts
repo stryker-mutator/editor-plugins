@@ -157,23 +157,27 @@ export class TestExplorer {
     const message = new vscode.TestMessage(
       `${mutant.mutatorName} (${mutant.location.start.line}:${mutant.location.start.column}) ${mutant.status}`);
 
+    const uri = vscode.Uri.joinPath(this.workspaceFolder.uri, filePath);
+
+    message.location = new vscode.Location(uri, TestExplorer.locationToRange(mutant.location));
+    message.message = `${mutant.mutatorName} ${mutant.status}`;
+
     if (!mutant.replacement) {
       return message;
     }
 
     // // TODO: Fix? as actually this is not the original code, but the code once the mutation result was received.
     // // TODO: Store the original code or maybe cancel this part of the run if the code has changed
-    const uri = vscode.Uri.joinPath(this.workspaceFolder.uri, filePath);
     try {
       const fileBuffer = await vscode.workspace.fs.readFile(uri);
       const originalCode = fileBuffer.toString();
       const originalLines = originalCode.split('\n');
-      
+
       const codeLines = originalLines.slice(mutant.location.start.line - 1, mutant.location.end.line);
       message.expectedOutput = codeLines.join('\n');
 
       if (codeLines.length === 1) {
-        const replacedPart = codeLines[0].substring(mutant.location.start.column -1 , mutant.location.end.column - 1);
+        const replacedPart = codeLines[0].substring(mutant.location.start.column - 1, mutant.location.end.column - 1);
         message.actualOutput = codeLines[0].replace(replacedPart, mutant.replacement);
       } else {
         const firstLine = codeLines[0].substring(0, mutant.location.start.column - 1);
@@ -181,7 +185,7 @@ export class TestExplorer {
         message.actualOutput = firstLine + mutant.replacement + lastLine;
       }
 
-    return message;
+      return message;
     } catch (error) {
       this.logger.error(`Failed to read file ${filePath}: ${error}`);
       return message;
