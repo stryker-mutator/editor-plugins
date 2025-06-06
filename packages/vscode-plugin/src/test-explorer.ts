@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import {
   DiscoveredMutant,
   DiscoverResult,
+  Location,
   MutantResult,
   MutationTestParams,
   MutationTestResult,
@@ -62,7 +63,7 @@ export class TestExplorer {
       this.traverseTestItems(testItem, (item) => {
         testRun.started(item);
       });
-    }); 
+    });
 
     const mutationTestParams: MutationTestParams = {
       files: this.toFilePaths(queue),
@@ -74,8 +75,8 @@ export class TestExplorer {
     });
 
     try {
-      await this.mutationServer.mutationTest(mutationTestParams, (progress) =>
-        this.processMutationTestResult(progress, testRun),
+      await this.mutationServer.mutationTest(mutationTestParams, async (progress) =>
+        await this.processMutationTestResult(progress, testRun),
       );
     } catch (error: Error | unknown) {
       const errorMessage =
@@ -129,7 +130,6 @@ export class TestExplorer {
       mutationTestResult.files,
     )) {
       for (const mutant of mutants.mutants) {
-        // const fileUri = vscode.Uri.file(filePath);
         const testItem = this.addMutantTestItem(filePath, mutant);
         switch (mutant.status) {
           case 'Timeout':
@@ -142,12 +142,49 @@ export class TestExplorer {
             testRun.skipped(testItem);
             break;
           default:
-            testRun.failed(testItem, []); // TODO: add error message
+            const testMessage = await this.getTestMessage(mutant, filePath);
+            testRun.failed(testItem, testMessage);
             break;
         }
 
         testRun.appendOutput(this.createOutputMessage(mutant, filePath));
       }
+    }
+  }
+
+  // A test message is shown as an annotation in the editor
+  private async getTestMessage(mutant: MutantResult, filePath: string): Promise<vscode.TestMessage> {
+    const message = new vscode.TestMessage(
+      `${mutant.mutatorName} (${mutant.location.start.line}:${mutant.location.start.column}) ${mutant.status}`);
+
+    if (!mutant.replacement) {
+      return message;
+    }
+
+    // // TODO: Fix? as actually this is not the original code, but the code once the mutation result was received.
+    // // TODO: Store the original code or maybe cancel this part of the run if the code has changed
+    const uri = vscode.Uri.joinPath(this.workspaceFolder.uri, filePath);
+    try {
+      const fileBuffer = await vscode.workspace.fs.readFile(uri);
+      const originalCode = fileBuffer.toString();
+      const originalLines = originalCode.split('\n');
+      
+      const codeLines = originalLines.slice(mutant.location.start.line - 1, mutant.location.end.line);
+      message.expectedOutput = codeLines.join('\n');
+
+      if (codeLines.length === 1) {
+        const replacedPart = codeLines[0].substring(mutant.location.start.column -1 , mutant.location.end.column - 1);
+        message.actualOutput = codeLines[0].replace(replacedPart, mutant.replacement);
+      } else {
+        const firstLine = codeLines[0].substring(0, mutant.location.start.column - 1);
+        const lastLine = codeLines[codeLines.length - 1].substring(mutant.location.end.column - 1);
+        message.actualOutput = firstLine + mutant.replacement + lastLine;
+      }
+
+    return message;
+    } catch (error) {
+      this.logger.error(`Failed to read file ${filePath}: ${error}`);
+      return message;
     }
   }
 
@@ -259,14 +296,33 @@ export class TestExplorer {
       mutantName,
       fileUri,
     );
-    const location = mutant.location;
-    testItem.range = new vscode.Range(
-      new vscode.Position(location.start.line, location.start.column),
-      new vscode.Position(location.end.line, location.end.column),
-    );
+
+    testItem.range = TestExplorer.locationToRange(mutant.location);
 
     currentCollection.add(testItem);
     return testItem;
+  }
+
+  private static locationToRange(location: Location): vscode.Range {
+    // Convert the 1-based line and column numbers to 0-based for VS Code
+    return new vscode.Range(
+      new vscode.Position(location.start.line - 1, location.start.column - 1),
+      new vscode.Position(location.end.line - 1, location.end.column - 1),
+    );
+  }
+
+  private static rangeToLocation(range: vscode.Range): Location {
+    // Convert the 0-based line and column numbers to 1-based for the mutation server
+    return {
+      start: {
+        line: range.start.line + 1,
+        column: range.start.character + 1,
+      },
+      end: {
+        line: range.end.line + 1,
+        column: range.end.character + 1,
+      },
+    };
   }
 
   private findFileTestItem(
