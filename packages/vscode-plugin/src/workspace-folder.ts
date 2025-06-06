@@ -9,7 +9,7 @@ import {
   MutationServer,
   UnsupportedServerVersionError,
 } from './index';
-import { ConfigureParams } from 'mutation-server-protocol';
+import { ConfigureParams, MutationTestParams } from 'mutation-server-protocol';
 import { provideTestController, TestExplorer } from './test-explorer';
 import { FileSystemWatcher } from './file-system-watcher';
 import * as fs from 'fs';
@@ -89,13 +89,18 @@ export class WorkspaceFolder {
 
     this.#fileSystemWatcher.onFilesChanged(async (uris) => {
       // if uri is directory. add / to the end of the uri
-      const files: string[] = uris.map((uri) => {
-        if (fs.lstatSync(uri.fsPath).isDirectory()) {
-          return `${uri.fsPath}/`;
-        }
-        return uri.fsPath;
+      const fileRanges = uris.map((uri) => {
+        const filePath = fs.lstatSync(uri.fsPath).isDirectory()
+          ? `${uri.fsPath}/`
+          : uri.fsPath;
+        return { path: filePath };
       });
-      const discoverResult = await mutationServer.discover({ files: files });
+
+      const mutationTestParams: MutationTestParams = {
+        files: fileRanges,
+      };
+
+      const discoverResult = await mutationServer.discover(mutationTestParams);
       testExplorer.processDiscoverResult(discoverResult);
     });
 
