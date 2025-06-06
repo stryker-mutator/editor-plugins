@@ -66,7 +66,9 @@ export class TestExplorer {
     });
 
     const mutationTestParams: MutationTestParams = {
-      files: this.toFilePaths(queue),
+      files: this.toFilePaths(queue).map((filePath) => ({
+        path: filePath,
+      })),
     };
 
     token.onCancellationRequested(async () => {

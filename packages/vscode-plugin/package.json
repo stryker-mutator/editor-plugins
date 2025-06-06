@@ -103,7 +103,7 @@
   },
   "dependencies": {
     "json-rpc-2.0": "^1.7.0",
-    "mutation-server-protocol": "^0.2.0",
+    "mutation-server-protocol": "^0.3.0",
     "rxjs": "^7.8.1",
     "typed-inject": "^4.0.0"
   }
