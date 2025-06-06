@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import {
   DiscoveredMutant,
   DiscoverResult,
+  FileRange,
   Location,
   MutantResult,
   MutationTestParams,
@@ -65,21 +66,21 @@ export class TestExplorer {
       });
     });
 
-    const mutationTestParams: MutationTestParams = {
-      files: this.toFilePaths(queue).map((filePath) => ({
-        path: filePath,
-      })),
-    };
-
     token.onCancellationRequested(async () => {
       testRun.appendOutput('Test run cancellation requested, ending test run.');
       testRun.end();
     });
 
+    const mutationTestParams = this.toMutationTestParams(queue);
+
+    let progressPromises: Promise<void>[] = [];
+
     try {
-      await this.mutationServer.mutationTest(mutationTestParams, async (progress) =>
-        await this.processMutationTestResult(progress, testRun),
-      );
+      await this.mutationServer.mutationTest(mutationTestParams, async (progress) => {
+        const progressPromise = this.processMutationTestResult(progress, testRun);
+        progressPromises.push(progressPromise);
+        await progressPromise;
+      });
     } catch (error: Error | unknown) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -93,6 +94,7 @@ export class TestExplorer {
         });
       });
     } finally {
+      await Promise.all(progressPromises);
       testRun.end();
       this.logger.info('Mutation test run finished');
     }
@@ -106,6 +108,32 @@ export class TestExplorer {
     for (const [, child] of testItem.children) {
       this.traverseTestItems(child, action);
     }
+  }
+
+  private toMutationTestParams(testItems: vscode.TestItem[]): MutationTestParams {
+    const files: FileRange[] = testItems.map((testItem) => {
+      if (!testItem.uri) {
+        throw new Error(
+          `Test item ${testItem.label} does not have a URI. Cannot run mutation tests on it.`,
+        );
+      }
+
+      const uri = testItem.uri;
+      let path = uri.fsPath;
+      if (fs.lstatSync(uri.fsPath).isDirectory()) {
+        path = `${uri.fsPath}/`;
+      }
+
+      if (!testItem.range) {
+        return { path };
+      }
+
+      return { path, range: TestExplorer.rangeToLocation(testItem.range) };
+    });
+
+    return {
+      files: files
+    };
   }
 
   private toFilePaths(testItems: vscode.TestItem[]): string[] {
