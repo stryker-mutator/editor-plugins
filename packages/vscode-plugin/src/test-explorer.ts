@@ -77,7 +77,7 @@ export class TestExplorer {
 
     try {
       await this.mutationServer.mutationTest(mutationTestParams, async (progress) => {
-        const progressPromise = this.processMutationTestResult(progress, testRun);
+        const progressPromise = this.processMutationTestResult(progress, testRun, queue);
         progressPromises.push(progressPromise);
         await progressPromise;
       });
@@ -136,30 +136,19 @@ export class TestExplorer {
     };
   }
 
-  private toFilePaths(testItems: vscode.TestItem[]): string[] {
-    let filePaths: string[] = [];
-    // based on uri, check if uri is folder or file, then if folder, add / to the end
-    testItems.forEach((testItem) => {
-      const uri = testItem.uri;
-      if (uri) {
-        if (fs.lstatSync(uri.fsPath).isDirectory()) {
-          filePaths.push(`${uri.fsPath}/`);
-        } else {
-          filePaths.push(uri.fsPath);
-        }
-      }
-    });
-    return filePaths;
-  }
-
   private async processMutationTestResult(
     mutationTestResult: MutationTestResult,
     testRun: vscode.TestRun,
+    queue: vscode.TestItem[],
   ) {
     for (const [filePath, mutants] of Object.entries(
       mutationTestResult.files,
     )) {
       for (const mutant of mutants.mutants) {
+        if (!isMutantInTestQueue(mutant, queue)) {
+          continue; // Skip mutants that were not requested in the test run
+        }
+
         const testItem = this.addMutantTestItem(filePath, mutant);
         switch (mutant.status) {
           case 'Timeout':
@@ -421,3 +410,22 @@ export class TestExplorer {
     return outputMessage;
   }
 }
+
+function isMutantInTestQueue(mutant: MutantResult, queue: vscode.TestItem[]): boolean {
+  const mutantId = `${mutant.mutatorName}(${mutant.location.start.line}:${mutant.location.start.column}-${mutant.location.end.line}:${mutant.location.end.column}) (${mutant.replacement})`;
+
+  function hasMutantId(testItem: vscode.TestItem): boolean {
+    if (testItem.id === mutantId) {
+      return true;
+    }
+    for (const [, child] of testItem.children) {
+      if (hasMutantId(child)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  return queue.some(hasMutantId);
+}
+
