@@ -52,10 +52,10 @@
           "default": true
         },
         "mutationTesting.fileSystemWatcherPattern": {
-          "description": "The file system watcher pattern that is used to watch for file changes inside the workspace folder.",
+          "markdownDescription": "The file system watcher pattern that is used to watch for file changes inside the workspace folder. Use [Visual Studio Code's glob pattern syntax](https://code.visualstudio.com/docs/editor/glob-patterns#_glob-pattern-syntax).",
           "scope": "resource",
           "type": "string",
-          "default": "**/{!node_modules,!.*}/**/*.{js,ts,jsx,tsx}"
+          "default": "**/*.{js,ts,jsx,tsx}"
         },
         "mutationTesting.mutationServer.path": {
           "description": "The path to the mutation server.",

@@ -115,8 +115,6 @@ export class Workspace {
         await this.addWorkspaceFolder(wf.getWorkspaceFolder());
       }
     };
-
-
   }
 
   async dispose() {
