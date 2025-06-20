@@ -23,6 +23,7 @@ export interface WorkspaceFolderContext extends BaseContext {
 
 export class WorkspaceFolder {
   #fileSystemWatcher?: FileSystemWatcher;
+  #testExplorer?: TestExplorer;
 
   static readonly inject = tokens(
     commonTokens.injector,
@@ -81,7 +82,7 @@ export class WorkspaceFolder {
       `Mutation server configuration handshake completed. MSP version: ${configureResult.version}`,
     );
 
-    const testExplorer = this.injector
+    this.#testExplorer = this.injector
       .provideFactory(commonTokens.testController, provideTestController)
       .provideValue(commonTokens.mutationServer, mutationServer)
       .provideClass(commonTokens.testRunner, TestRunner)
@@ -103,24 +104,25 @@ export class WorkspaceFolder {
       };
 
       const discoverResult = await mutationServer.discover(mutationTestParams);
-      testExplorer.processDiscoverResult(discoverResult);
+      this.#testExplorer!.processDiscoverResult(discoverResult);
     });
 
     this.#fileSystemWatcher.onFilesDeleted(async (uris) => {
-      testExplorer.processFileDeletions(uris);
+      this.#testExplorer!.processFileDeletions(uris);
     });
 
     // Initial discovery of mutants
     const discoverResult = await mutationServer.discover({});
-    testExplorer.processDiscoverResult(discoverResult);
+    this.#testExplorer.processDiscoverResult(discoverResult);
   }
 
   public getWorkspaceFolder(): vscode.WorkspaceFolder {
     return this.workspaceFolder;
   }
 
-  dispose() {
+  async dispose() {
     this.#fileSystemWatcher?.dispose();
+    await this.#testExplorer?.dispose();
     this.process.dispose();
   }
 }

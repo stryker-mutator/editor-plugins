@@ -58,4 +58,11 @@ export class TestExplorer {
       testControllerUtils.removeTestItemsForUri(this.testController, uri);
     }
   }
+
+  async dispose() {
+    this.testController.dispose();
+    // Wait for the event loop to process disposal, 
+    // otherwise a new test controller cannot be created immediately when the workspace is reloaded.
+    await Promise.resolve(); 
+  }
 }

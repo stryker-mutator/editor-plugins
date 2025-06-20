@@ -24,41 +24,43 @@ export class Workspace {
       .injectClass(ContextualLogger);
     context.subscriptions.push(
       vscode.workspace.onDidChangeWorkspaceFolders(
-        this.onWorkspaceFoldersChanged.bind(this),
+        async (event) => await this.onWorkspaceFoldersChanged(event),
       ),
       vscode.workspace.onDidChangeConfiguration(
-        this.onDidChangeConfiguration.bind(this),
+        async (event) => await this.onDidChangeConfiguration(event),
       ),
     );
-    this.reload();
   }
 
-  private reload() {
+  async init() {
     this.#logger.info('(Re)loading workspace');
-    this.#workspaceFolders.forEach((wf) =>
-      this.removeWorkspaceFolder(wf.getWorkspaceFolder()),
+    await Promise.all(
+      this.#workspaceFolders.map((wf) =>
+        this.removeWorkspaceFolder(wf.getWorkspaceFolder()),
+      ),
     );
 
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (!workspaceFolders || workspaceFolders.length === 0) {
+    const workspaceFolders = vscode.workspace.workspaceFolders || [];
+    if (workspaceFolders.length === 0) {
       this.#logger.info('No workspace (folder) is opened');
       return;
     }
-    vscode.workspace.workspaceFolders?.forEach(async (folder) => {
-      try {
-        await this.addWorkspaceFolder(folder);
-      } catch (error: any) {
-        this.#logger.error(error.message);
-      }
-    });
+
+    await Promise.all(
+      workspaceFolders.map((folder) =>
+        this.addWorkspaceFolder(folder).catch((error: any) => {
+          this.#logger.error(error.message ?? error);
+        })
+      )
+    );
   }
 
-  private removeWorkspaceFolder(folder: vscode.WorkspaceFolder) {
+  private async removeWorkspaceFolder(folder: vscode.WorkspaceFolder) {
     const index = this.#workspaceFolders.findIndex(
       (wf) => wf.getWorkspaceFolder() === folder,
     );
     if (index !== -1) {
-      this.#workspaceFolders[index].dispose();
+      await this.#workspaceFolders[index].dispose();
       this.#workspaceFolders.splice(index, 1);
       return;
     }
@@ -93,15 +95,15 @@ export class Workspace {
     );
   }
 
-  private onWorkspaceFoldersChanged(event: vscode.WorkspaceFoldersChangeEvent) {
+  private async onWorkspaceFoldersChanged(event: vscode.WorkspaceFoldersChangeEvent) {
     this.#logger.info('Handling workspace folders change');
 
-    event.removed.forEach(this.removeWorkspaceFolder.bind(this));
-    event.added.forEach(this.addWorkspaceFolder.bind(this));
+    await Promise.all(event.removed.map((folder) => this.removeWorkspaceFolder(folder)));
+    await Promise.all(event.added.map((folder) => this.addWorkspaceFolder(folder)));
   }
 
-  private onDidChangeConfiguration(event: vscode.ConfigurationChangeEvent) {
-    this.#workspaceFolders.forEach(async (wf) => {
+  private async onDidChangeConfiguration(event: vscode.ConfigurationChangeEvent) {
+    for (const wf of this.#workspaceFolders) {
       if (
         event.affectsConfiguration(Constants.AppName, wf.getWorkspaceFolder())
       ) {
@@ -112,20 +114,19 @@ export class Workspace {
           `Reloading workspace folder: ${wf.getWorkspaceFolder().uri.fsPath}`,
         );
         // TODO: Reload only the necessary parts
-        this.removeWorkspaceFolder(wf.getWorkspaceFolder());
+        await this.removeWorkspaceFolder(wf.getWorkspaceFolder());
         await this.addWorkspaceFolder(wf.getWorkspaceFolder());
-        return; // TODO: is a return necessary here?
       }
-    });
+    };
 
     if (event.affectsConfiguration(Constants.AppName)) {
       this.#logger.info('Configuration changed for the workspace');
-      this.reload();
+      await this.init();
     }
   }
 
-  public dispose() {
+  async dispose() {
     this.#logger.info('Unloading workspace');
-    this.#workspaceFolders.forEach((folder) => folder.dispose());
+    await Promise.all(this.#workspaceFolders.map(async (folder) => await folder.dispose()));
   }
 }
