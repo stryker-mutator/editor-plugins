@@ -13,6 +13,7 @@ import { ConfigureParams, MutationTestParams } from 'mutation-server-protocol';
 import { provideTestController, TestExplorer } from './test-explorer';
 import { FileSystemWatcher } from './file-system-watcher';
 import * as fs from 'fs';
+import { TestRunner } from './test-runner';
 
 export interface WorkspaceFolderContext extends BaseContext {
   [commonTokens.loggerContext]: string;
@@ -23,7 +24,7 @@ export interface WorkspaceFolderContext extends BaseContext {
 export class WorkspaceFolder {
   #fileSystemWatcher?: FileSystemWatcher;
 
-  public static readonly inject = tokens(
+  static readonly inject = tokens(
     commonTokens.injector,
     commonTokens.workspaceFolder,
     commonTokens.process,
@@ -83,6 +84,7 @@ export class WorkspaceFolder {
     const testExplorer = this.injector
       .provideFactory(commonTokens.testController, provideTestController)
       .provideValue(commonTokens.mutationServer, mutationServer)
+      .provideClass(commonTokens.testRunner, TestRunner)
       .injectClass(TestExplorer);
 
     this.#fileSystemWatcher = this.injector.injectClass(FileSystemWatcher);

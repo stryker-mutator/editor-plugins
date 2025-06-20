@@ -1,10 +1,8 @@
-import { Injector } from 'typed-inject';
 import { commonTokens, tokens } from './di/index';
 import {
   Constants,
   MissingServerPathError,
   CouldNotSpawnProcessError,
-  WorkspaceFolderContext,
   ServerStartupTimeoutError,
 } from './index';
 import * as vscode from 'vscode';
@@ -17,7 +15,7 @@ import { ServerLocation } from './domain/index';
 export class Process extends EventEmitter {
   #process: ChildProcessWithoutNullStreams | undefined;
 
-  public static readonly inject = tokens(
+  static readonly inject = tokens(
     commonTokens.workspaceFolder,
     commonTokens.contextualLogger,
   );

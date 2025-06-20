@@ -17,6 +17,7 @@ export const commonTokens = Object.freeze({
   mutationServer: 'mutationServer',
   testExplorer: 'testExplorer',
   testController: 'testController',
+  testRunner: 'testRunner',
 });
 
 /**
