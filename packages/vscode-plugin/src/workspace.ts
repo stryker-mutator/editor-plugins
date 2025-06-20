@@ -108,10 +108,7 @@ export class Workspace {
         event.affectsConfiguration(Constants.AppName, wf.getWorkspaceFolder())
       ) {
         this.#logger.info(
-          `Configuration changed for ${wf.getWorkspaceFolder().uri.fsPath}`,
-        );
-        this.#logger.info(
-          `Reloading workspace folder: ${wf.getWorkspaceFolder().uri.fsPath}`,
+          `Configuration changed for ${wf.getWorkspaceFolder().uri.fsPath}. Reloading workspace folder`,
         );
         // TODO: Reload only the necessary parts
         await this.removeWorkspaceFolder(wf.getWorkspaceFolder());
@@ -119,10 +116,7 @@ export class Workspace {
       }
     };
 
-    if (event.affectsConfiguration(Constants.AppName)) {
-      this.#logger.info('Configuration changed for the workspace');
-      await this.init();
-    }
+
   }
 
   async dispose() {
