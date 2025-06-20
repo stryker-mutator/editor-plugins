@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Location, DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
+import { DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
 import { locationUtils } from './location-utils';
 
 export const testControllerUtils = {

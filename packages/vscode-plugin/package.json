@@ -51,6 +51,12 @@
           "type": "boolean",
           "default": true
         },
+        "mutationTesting.fileSystemWatcherPattern": {
+          "description": "The file system watcher pattern that is used to watch for file changes inside the workspace folder.",
+          "scope": "resource",
+          "type": "string",
+          "default": "**/{!node_modules,!.*}/**/*.{js,ts,jsx,tsx}"
+        },
         "mutationTesting.mutationServer.path": {
           "description": "The path to the mutation server.",
           "scope": "resource",

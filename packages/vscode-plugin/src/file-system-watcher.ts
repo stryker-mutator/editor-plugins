@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
-import { Constants, WorkspaceFolderContext } from './index';
+import { Constants } from './index';
 import { commonTokens, tokens } from './di/index';
-import { Injector } from 'typed-inject';
 import { Configuration, Settings } from './config';
 import { Subject, buffer, debounceTime } from 'rxjs';
 
