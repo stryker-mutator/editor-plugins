@@ -1,10 +1,7 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 import {
-  MutationTestParams,
   MutationTestResult,
   MutantResult,
-  FileRange,
 } from 'mutation-server-protocol';
 import { ContextualLogger } from './logging/index';
 import { MutationServer } from './index';
@@ -48,7 +45,7 @@ export class TestRunner {
       testRun.end();
     });
 
-    const mutationTestParams = this.toMutationTestParams(queue);
+    const mutationTestParams = testItemUtils.toMutationTestParams(queue);
     let progressPromises: Promise<void>[] = [];
 
     try {
@@ -70,26 +67,6 @@ export class TestRunner {
       testRun.end();
       this.logger.info('Mutation test run finished');
     }
-  }
-
-  private toMutationTestParams(testItems: vscode.TestItem[]): MutationTestParams {
-    const files: FileRange[] = testItems.map((testItem) => {
-      if (!testItem.uri) {
-        throw new Error(
-          `Test item ${testItem.label} does not have a URI. Cannot run mutation tests on it.`
-        );
-      }
-      const uri = testItem.uri;
-      let path = uri.fsPath;
-      if (fs.lstatSync(uri.fsPath).isDirectory()) {
-        path = `${uri.fsPath}/`;
-      }
-      if (!testItem.range) {
-        return { path };
-      }
-      return { path, range: locationUtils.rangeToLocation(testItem.range) };
-    });
-    return { files };
   }
 
   private async processMutationTestResult(
