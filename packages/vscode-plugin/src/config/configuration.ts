@@ -29,7 +29,7 @@ export class Configuration {
   ): T | undefined {
     const section = SettingSections[setting];
     const value = this.get(section, scope).get<T>(setting);
-    return !value || value === '' ? undefined : value;
+    return value === undefined || value === '' ? undefined : value;
   }
 
   public static getSettingOrDefault<T>(
@@ -39,7 +39,7 @@ export class Configuration {
   ): T {
     const section = SettingSections[setting];
     const value = this.get(section, scope).get<T>(setting);
-    return !value || value === '' ? defaultValue : value;
+    return value === undefined || value === '' ? defaultValue : value;
   }
   /**
    * Update a setting in the configuration
