@@ -1,6 +1,6 @@
 {
-  "name": "mutation-testing",
-  "displayName": "mutation-testing",
+  "name": "stryker-mutator",
+  "displayName": "Stryker Mutator",
   "description": "Test your tests with mutation testing.",
   "version": "0.0.1",
   "engines": {
@@ -36,43 +36,37 @@
   },
   "main": "./dist/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "mutation-testing.helloWorld",
-        "title": "Hello World"
-      }
-    ],
     "configuration": {
-      "title": "Mutation Testing",
+      "title": "Stryker Mutator",
       "properties": {
-        "mutationTesting.enableMutationTesting": {
+        "strykerMutator.enableMutationTesting": {
           "description": "Enable mutation testing.",
           "scope": "resource",
           "type": "boolean",
           "default": true
         },
-        "mutationTesting.fileSystemWatcherPattern": {
+        "strykerMutator.fileSystemWatcherPattern": {
           "markdownDescription": "The file system watcher pattern that is used to watch for file changes inside the workspace folder. Use [Visual Studio Code's glob pattern syntax](https://code.visualstudio.com/docs/editor/glob-patterns#_glob-pattern-syntax).",
           "scope": "resource",
           "type": "string",
           "default": "**/*.{js,ts,jsx,tsx}"
         },
-        "mutationTesting.mutationServer.path": {
+        "strykerMutator.mutationServer.path": {
           "description": "The path to the mutation server.",
           "scope": "resource",
           "type": "string"
         },
-        "mutationTesting.mutationServer.args": {
+        "strykerMutator.mutationServer.args": {
           "description": "The arguments to pass to the mutation server.",
           "scope": "resource",
           "type": "array"
         },
-        "mutationTesting.mutationServer.workingDirectory": {
+        "strykerMutator.mutationServer.workingDirectory": {
           "description": "The working directory for the mutation server. Defaults to workspace folder's root.",
           "scope": "resource",
           "type": "string"
         },
-        "mutationTesting.mutationServer.configFilePath": {
+        "strykerMutator.mutationServer.configFilePath": {
           "description": "The (relative or absolute) path to mutation testing framework's config file to load.",
           "scope": "resource",
           "type": "string"
