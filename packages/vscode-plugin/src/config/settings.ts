@@ -1,20 +1,20 @@
 import { Constants } from '../constants';
 
 export enum Settings {
-  MutationTestingEnabled = 'enableMutationTesting',
+  MutationTestingEnabled = 'enable',
   ServerPath = 'path',
   ServerArgs = 'args',
   CurrentWorkingDirectory = 'workingDirectory',
-  ConfigFilePath = 'configFilePath',
-  FileSystemWatcherPattern = 'fileSystemWatcherPattern',
+  ConfigFilePath = 'configFile',
+  FileSystemWatcherPattern = 'watchPattern',
 }
 
 // Define a mapping for the section of each setting
 export const SettingSections = {
   [Settings.FileSystemWatcherPattern]: Constants.AppName,
   [Settings.MutationTestingEnabled]: Constants.AppName, // No section for this setting
-  [Settings.ServerPath]: `${Constants.AppName}.mutationServer`,
-  [Settings.ServerArgs]: `${Constants.AppName}.mutationServer`,
-  [Settings.CurrentWorkingDirectory]: `${Constants.AppName}.mutationServer`,
-  [Settings.ConfigFilePath]: `${Constants.AppName}.mutationServer`,
+  [Settings.ServerPath]: `${Constants.AppName}.server`,
+  [Settings.ServerArgs]: `${Constants.AppName}.server`,
+  [Settings.CurrentWorkingDirectory]: `${Constants.AppName}.server`,
+  [Settings.ConfigFilePath]: `${Constants.AppName}.server`,
 };

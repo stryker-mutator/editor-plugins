@@ -57,7 +57,9 @@ export class WorkspaceFolder {
         Settings.MutationTestingEnabled,
         this.workspaceFolder,
       );
-    } else if (!enabled) {
+    } 
+    
+    if (!enabled) {
       this.logger.info(
         `Mutation testing is disabled for ${this.workspaceFolder.uri.fsPath}`,
       );

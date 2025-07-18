@@ -63,11 +63,11 @@ export class Process extends EventEmitter {
     this.logger.info(`Server process started with PID ${this.#process.pid}`);
 
     this.#process.stdout.on('data', (data) => {
-      this.handleProcessOutput(data, this.logger.info, 'SERVER STDOUT', 'data');
+      this.handleProcessOutput(data, this.logger.info, 'SERVER', 'data');
     });
 
     this.#process.stderr.on('data', (data) => {
-      this.handleProcessOutput(data, this.logger.error, 'SERVER STDERR', 'error');
+      this.handleProcessOutput(data, this.logger.error, 'SERVER', 'error');
     });
 
     this.#process.on('exit', (code) => this.emit('exit', code));
