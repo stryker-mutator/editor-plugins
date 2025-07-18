@@ -1,32 +1,72 @@
-# Mutation Testing
-This extension provides seamless integration with mutation testing frameworks that support the Mutation Server Protocol. For now, only [StrykerJS](https://stryker-mutator.io/docs/stryker-js/introduction/) supports this protocol.
+# Stryker Mutation Testing for VS Code
 
-With this extension, you can run mutation tests directly within Visual Studio Code. It allows you to quickly identify weak spots in your codebase, helping improve the overall quality and effectiveness of your tests.
+The Stryker Mutation Testing extension for Visual Studio Code brings mutation testing to life with a fast, visual, and fully integrated experience. Say goodbye to sifting through raw terminal output or hunting through HTML reports. This extension puts everything right where you need it: in your code, in your workflow, and in real time.
 
-## What is mutation testing?
-Mutation testing involves introducing bugs (mutants) into your code, then running your tests for each mutant. The goal is to see if your tests can "kill" the mutant by causing the test to fail. If the test passes despite the mutation, the mutant survives, which may indicate that your tests aren't fully covering the code. A higher percentage of killed mutants suggests more effective and comprehensive tests.
+## Why use the extension instead of the CLI?
 
-[Learn more about mutation testing](https://stryker-mutator.io/docs/) in general for a deeper understanding of the process.
+While the Stryker CLI is powerful, this extension amplifies its utility by delivering:
+
+- 🚀 Real-time feedback directly in your code editor. See which mutants survive or are killed without leaving VS Code.
+- 🧭 Test Explorer integration. Browse discover and test mutants per file, folder, or individually.
+- 👀 Inline annotations and diff views. Instantly see how each mutation changed your code, and whether your tests caught it.
+- 🔁 Streamlined workflow. No need to jump between CLI, browser reports, and code. Everything happens in your IDE.
+
+## What is Mutation Testing?
+
+Mutation testing is a fault-based testing strategy that evaluates the effectiveness of your test suite by intentionally introducing small changes (called mutants) into the source code. Each mutant simulates a potential bug; tests are executed to determine whether they detect the anomaly. If the test suite fails as expected, the mutant is killed. If it passes, the mutant survives, signaling an opportunity to improve test coverage or logic.
+
+Higher kill rates indicate stronger, more resilient tests. Mutation testing provides an objective metric to guide improvements in your test suite.
+
+Learn more about mutation testing and StrykerJS in the [official documentation](https://stryker-mutator.io/docs/).
 
 ## Features
 
-### Test Explorer Integration
-Effortlessly navigate through mutants in your project via the Test Explorer view. Find mutants and run mutation tests per folder, per file or individually. Get visual feedback on the status of mutants within your code and easily navigate to mutants in your codebase directly from the Test Explorer.
+- **Test Explorer Integration:**
+  - Browse and test mutants using the VS Code Test Explorer.
+  - Visual feedback on mutant status per folder, file, or individual mutant.
+  - Quickly jump to mutant locations in your codebase.
 
-![test-explorer](images/test-explorer.png)
+  ![test-explorer](images/test-explorer.gif)
 
-### Code annotations
-Easily test mutations right where they're written using the test icon in your code editor. You'll see the status of each tested mutation right next to your code. Plus, with the code diff view, you can quickly spot the changes Stryker made to your code.
+- **Code Annotations:**
+  - See mutation test results inline in your code editor.
+  - Re-test mutants directly from the editor.
+  - Use the code diff view to see exactly what the mutation changed.
 
-![code-editor](images/code-editor.png)
+  ![code-editor](images/code-editor.gif)
 
 ## Requirements
-To use this extension, ensure that you have a mutation testing tool set up in your project. You can configure this in the extension settings if you're using a framework that supports the Mutation Server Protocol.
+
+- You must have [StrykerJS](https://stryker-mutator.io/docs/stryker-js/introduction/) installed and configured in your project.
+- The extension will automatically detect your Stryker configuration and guide you through setup.
+
 
 ## Extension Settings
+
 This extension contributes the following settings:
 
-// TODO
+- **`strykerMutator.enable`** (boolean):
+  - Enable or disable Stryker mutation testing integration for this workspace.
 
-## Troubleshooting
-We’d love to get your help in making this extension better! If you have feedback or encounter any problems, please reach out on our [GitHub repository](https://github.com/stryker-mutator/editor-plugins).
+- **`strykerMutator.watchPattern`** (string):
+  - Glob pattern for files to watch for changes and trigger mutation discovery. Uses [VS Code glob pattern syntax](https://code.visualstudio.com/docs/editor/glob-patterns#_glob-pattern-syntax).
+  - Default: `**/*.{js,ts,jsx,tsx}`
+
+- **`strykerMutator.server.path`** (string):
+  - Path to the Stryker server executable. Can be absolute or relative to the workspace folder.
+  - Default: `node_modules/.bin/stryker`
+
+- **`strykerMutator.server.args`** (array):
+  - Arguments to pass to the Stryker server process when starting.
+  - Default: `["runServer"]`
+
+- **`strykerMutator.server.workingDirectory`** (string):
+  - Working directory for the Stryker server process. Defaults to the workspace folder if not set.
+
+- **`strykerMutator.server.configFile`** (string):
+  - Path to the Stryker configuration file to use. Can be absolute or relative to the workspace folder.
+  - Default: `stryker.config.json`
+
+## Troubleshooting & Feedback
+
+If you have feedback or encounter any problems, please open an issue on our [GitHub repository](https://github.com/stryker-mutator/editor-plugins).

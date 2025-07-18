@@ -1,6 +1,6 @@
 {
   "name": "stryker-mutator",
-  "displayName": "Stryker Mutator",
+  "displayName": "Stryker Mutation Testing",
   "description": "Test your tests with mutation testing.",
   "version": "0.0.1",
   "engines": {
