@@ -5,7 +5,7 @@ import { Logger } from './index';
 export function provideLogger(injector: Injector) {
   return injector.provideValue(
     commonTokens.logger,
-    new Logger('Mutation Testing'),
+    new Logger('Stryker Mutator'),
   );
 }
 

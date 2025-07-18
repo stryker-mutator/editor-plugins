@@ -43,7 +43,7 @@
           "description": "Enable mutation testing.",
           "scope": "resource",
           "type": "boolean",
-          "default": true
+          "default": null
         },
         "strykerMutator.fileSystemWatcherPattern": {
           "markdownDescription": "The file system watcher pattern that is used to watch for file changes inside the workspace folder. Use [Visual Studio Code's glob pattern syntax](https://code.visualstudio.com/docs/editor/glob-patterns#_glob-pattern-syntax).",
@@ -52,24 +52,27 @@
           "default": "**/*.{js,ts,jsx,tsx}"
         },
         "strykerMutator.mutationServer.path": {
-          "description": "The path to the mutation server.",
+          "description": "The path to the mutation server. Absolute path or relative to the workspace folder.",
           "scope": "resource",
-          "type": "string"
+          "type": "string",
+          "default": "node_modules/.bin/stryker"
         },
         "strykerMutator.mutationServer.args": {
           "description": "The arguments to pass to the mutation server.",
           "scope": "resource",
-          "type": "array"
+          "type": "array",
+          "default": ["runServer"]
         },
         "strykerMutator.mutationServer.workingDirectory": {
-          "description": "The working directory for the mutation server. Defaults to workspace folder's root.",
+          "description": "The working directory for the mutation server. If not set, the workspace folder path will be used.",
           "scope": "resource",
           "type": "string"
         },
         "strykerMutator.mutationServer.configFilePath": {
-          "description": "The (relative or absolute) path to mutation testing framework's config file to load.",
+          "description": "Path to the Stryker configuration file. Absolute path or relative to the workspace folder.",
           "scope": "resource",
-          "type": "string"
+          "type": "string",
+          "default": "stryker.config.json"
         }
       }
     }

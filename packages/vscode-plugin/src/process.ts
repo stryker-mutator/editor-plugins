@@ -60,7 +60,7 @@ export class Process extends EventEmitter {
       throw new CouldNotSpawnProcessError();
     }
 
-    this.logger.info(`Server started with PID ${this.#process.pid}`);
+    this.logger.info(`Server process started with PID ${this.#process.pid}`);
 
     this.#process.stdout.on('data', (data) =>
       this.emit('data', data.toString()),

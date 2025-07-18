@@ -1,6 +1,5 @@
 import {
   ConfigurationScope,
-  ConfigurationTarget,
   workspace,
   WorkspaceConfiguration,
 } from 'vscode';
@@ -15,7 +14,7 @@ export class Configuration {
     section?: string,
     scope?: ConfigurationScope | null | undefined,
   ): WorkspaceConfiguration {
-    
+
     return workspace.getConfiguration(section, scope);
   }
 
@@ -41,17 +40,25 @@ export class Configuration {
     const value = this.get(section, scope).get<T>(setting);
     return value === undefined || value === '' ? defaultValue : value;
   }
-  /**
-   * Update a setting in the configuration
-   * @param setting
-   * @param value
-   * @param configurationTarget
-   */
+
   public static async updateSetting(
     setting: Settings,
     value: any,
-    configurationTarget?: boolean | ConfigurationTarget | undefined,
+    scope?: ConfigurationScope | null | undefined) {
+    const section = SettingSections[setting];
+    await this
+      .get(section, scope)
+      .update(setting, value);
+  }
+
+  public static async updateSettingIfChanged<T>(
+    setting: Settings,
+    value: T,
+    scope?: ConfigurationScope | null | undefined
   ): Promise<void> {
-    await this.get().update(setting, value, configurationTarget);
+    const current = this.getSetting<T>(setting, scope);
+    if (JSON.stringify(current) !== JSON.stringify(value)) {
+      await this.updateSetting(setting, value, scope);
+    }
   }
 }
