@@ -62,12 +62,14 @@ export class Process extends EventEmitter {
 
     this.logger.info(`Server process started with PID ${this.#process.pid}`);
 
-    this.#process.stdout.on('data', (data) =>
-      this.emit('data', data.toString()),
-    );
-    this.#process.stderr.on('data', (error) =>
-      this.emit('error', error.toString()),
-    );
+    this.#process.stdout.on('data', (data) => {
+      this.handleProcessOutput(data, this.logger.info, 'SERVER STDOUT', 'data');
+    });
+
+    this.#process.stderr.on('data', (data) => {
+      this.handleProcessOutput(data, this.logger.error, 'SERVER STDERR', 'error');
+    });
+
     this.#process.on('exit', (code) => this.emit('exit', code));
 
     return await this.getServerLocation();
@@ -91,6 +93,21 @@ export class Process extends EventEmitter {
       });
     });
   }
+
+  private handleProcessOutput = (
+    data: Buffer,
+    logFn: (msg: string, ...labels: string[]) => void,
+    label: string,
+    emitEvent: 'data' | 'error'
+  ) => {
+    const dataString: string = data.toString();
+    dataString.split('\n').forEach((line) => {
+      if (line.trim()) {
+        logFn.call(this.logger, line, label);
+      }
+    });
+    this.emit(emitEvent, dataString);
+  };
 
   dispose() {
     this.#process?.removeAllListeners();

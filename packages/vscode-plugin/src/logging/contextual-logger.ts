@@ -18,24 +18,26 @@ export class ContextualLogger {
    * Log an informational message with the context label.
    * @param message The message to log.
    */
-  info(message: string): void {
-    this.#logger.info(message, this.#label);
+  info(message: string, ...labels: string[]): void {
+    this.#logger.info(message, this.#label, ...labels);
   }
 
   /**
    * Log a warning message with the context label.
    * @param message The message to log.
+   * @param labels Additional labels to include.
    */
-  warn(message: string): void {
-    this.#logger.warn(message, this.#label);
+  warn(message: string, ...labels: string[]): void {
+    this.#logger.warn(message, this.#label, ...labels);
   }
 
   /**
    * Log an error message with the context label.
    * @param message The message to log.
+   * @param labels Additional labels to include.
    */
-  error(message: string): void {
-    this.#logger.error(message, this.#label);
+  error(message: string, ...labels: string[]): void {
+    this.#logger.error(message, this.#label, ...labels);
   }
 
   /**

@@ -40,9 +40,7 @@ export class WorkspaceFolder {
   ) {
     this.process.on('exit', async (code) => {
       this.logger.error(`Mutation server process exited with code ${code}`);
-      this.logger.info('Restarting mutation server');
       this.process.dispose();
-      await this.init();
     });
   }
 
