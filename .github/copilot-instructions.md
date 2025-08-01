@@ -98,9 +98,11 @@ For the VS Code extension (`packages/vscode-plugin/`), tests are organized in th
 - `src/test/unit/` - Unit tests for individual classes and functions
 - `src/test/integration/` - Integration tests that require VS Code APIs
 - `src/test/helpers/` - Test utilities and helper functions
+- Within each directory, follow the same structure as the source code (e.g., `src/test/unit/config/configuration.spec.ts`)
+- DO NOT import Mocha functions (`describe`, `it`, `beforeEach`, `afterEach`, etc.) - they are provided globally by the VS Code test runner
 
 **Test File Naming:**
-- Use `*.test.ts` suffix for test files (e.g., `workspaceFolder.test.ts`)
+- Use `*.spec.ts` suffix for test files (e.g., `workspaceFolder.spec.ts`)
 - Use descriptive names that match the component being tested
 
 ### Dependencies

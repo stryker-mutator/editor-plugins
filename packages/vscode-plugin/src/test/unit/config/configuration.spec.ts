@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import * as vscode from 'vscode';
-import { Configuration } from '../../config/configuration';
-import { Settings, SettingSections } from '../../config/index';
+import { Configuration } from '../../../config/configuration';
+import { Settings, SettingSections } from '../../../config/index';
 
 describe('Configuration', () => {
   let getConfigurationStub: sinon.SinonStub;
@@ -20,23 +20,6 @@ describe('Configuration', () => {
 
   afterEach(() => {
     sinon.restore();
-  });
-
-  describe('get', () => {
-    it('should call workspace.getConfiguration with correct parameters', () => {
-      const section = 'testSection';
-      const scope = {} as vscode.ConfigurationScope;
-
-      Configuration.get(section, scope);
-
-      expect(getConfigurationStub.calledWith(section, scope)).to.be.true;
-    });
-
-    it('should call workspace.getConfiguration without parameters when none provided', () => {
-      Configuration.get();
-
-      expect(getConfigurationStub.calledWith(undefined, undefined)).to.be.true;
-    });
   });
 
   describe('getSetting', () => {

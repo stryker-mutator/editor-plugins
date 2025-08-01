@@ -10,7 +10,7 @@ export class Configuration {
    * Get the configuration for the fixed section
    * @returns {WorkspaceConfiguration}
    */
-  public static get(
+  private static get(
     section?: string,
     scope?: ConfigurationScope | null | undefined,
   ): WorkspaceConfiguration {
