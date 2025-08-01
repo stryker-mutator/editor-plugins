@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { tokens } from '../../../di/tokens';
 
-describe('tokens function', () => {
+describe(tokens.name, () => {
   it('should return the same array of tokens passed as arguments', () => {
     const result = tokens('foo', 'bar', 'baz');
     

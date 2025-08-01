@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { ContextualLogger } from '../../../logging/contextual-logger';
 import { Logger } from '../../../logging/logger';
 
-describe('ContextualLogger', () => {
+describe(ContextualLogger.name, () => {
   let mockLogger: sinon.SinonStubbedInstance<Logger>;
   let contextualLogger: ContextualLogger;
   const testContext = 'TestContext';

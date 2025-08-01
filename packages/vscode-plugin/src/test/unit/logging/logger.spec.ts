@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import * as vscode from 'vscode';
 import { Logger } from '../../../logging/logger';
 
-describe('Logger', () => {
+describe(Logger.name, () => {
   let mockOutputChannel: any;
   let createOutputChannelStub: sinon.SinonStub;
   let logger: Logger;

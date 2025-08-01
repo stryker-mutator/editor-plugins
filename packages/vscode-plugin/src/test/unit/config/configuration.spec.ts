@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { Configuration } from '../../../config/configuration';
 import { Settings, SettingSections } from '../../../config/index';
 
-describe('Configuration', () => {
+describe(Configuration.name, () => {
   let getConfigurationStub: sinon.SinonStub;
   let mockWorkspaceConfig: any;
 
