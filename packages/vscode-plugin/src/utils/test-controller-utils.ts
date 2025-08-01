@@ -73,9 +73,15 @@ export const testControllerUtils = {
     uri: vscode.Uri
   ): void {
     const relativePath = vscode.workspace.asRelativePath(uri, false);
-    const directories = relativePath.split('/');
+    const directories = relativePath.split('/').filter(x => x.length > 0);
     const fileName = directories[directories.length - 1];
     const parentDirectory = directories[directories.length - 2];
+    if (!parentDirectory) {
+      // If there's no parent directory, we're at the root level
+      testController.items.delete(fileName);
+      return;
+    }
+
     let currentNodes = testController.items;
     let parent: vscode.TestItem | undefined;
 
