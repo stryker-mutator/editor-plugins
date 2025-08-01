@@ -88,9 +88,20 @@ The extension automatically detects Stryker configuration and guides users throu
 
 ### Testing
 
-- Use Mocha for testing
-- Use Sinon for mocking
-- Test files should be co-located with source files using `.test.ts` suffix
+- Use Mocha for tests with VS Code APIs
+- Use Sinon for mocking VS Code APIs and external dependencies
+- Use Chai for assertions
+
+**Test Organization:**
+For the VS Code extension (`packages/vscode-plugin/`), tests are organized in the `src/test/` directory:
+
+- `src/test/unit/` - Unit tests for individual classes and functions
+- `src/test/integration/` - Integration tests that require VS Code APIs
+- `src/test/helpers/` - Test utilities and helper functions
+
+**Test File Naming:**
+- Use `*.test.ts` suffix for test files (e.g., `workspaceFolder.test.ts`)
+- Use descriptive names that match the component being tested
 
 ### Dependencies
 
