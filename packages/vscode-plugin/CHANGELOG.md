@@ -1,6 +1,6 @@
 # Change Log
 
-All notable changes to the "mutation-testing" extension will be documented in this file.
+All notable changes to the "Stryker Mutation Testing" extension will be documented in this file.
 
 ## [Unreleased]
 
