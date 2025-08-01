@@ -1,5 +1,3 @@
-import { TestExplorer } from '../test-explorer';
-
 const injector: import('typed-inject').InjectorToken = '$injector';
 
 /**
