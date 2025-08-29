@@ -24,7 +24,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - name: Publish to VS Code Marketplace
-        run: vsce publish --azure-credential
+        run: npm run deploy --azure-credential
         working-directory: packages/vscode-plugin
         env:
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
