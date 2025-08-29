@@ -1,0 +1,22 @@
+name: Publish VS Code Extension
+
+on:
+  push:
+    tags:
+      - '**'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # environment: marketplace
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies (vscode-plugin)
+        run: npm ci
+        working-directory: packages/vscode-plugin
+      - name: Publish to VS Code Marketplace
+        run: npm run deploy
+        working-directory: packages/vscode-plugin
+        env:
+          VSCE_PAT: ${{ secrets.STRYKER_MUTATOR_NPA_KEY }}
+
