@@ -94,7 +94,7 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "test": "vscode-test",
-    "deploy": "vsce publish --azure-credential"
+    "deploy": "vsce publish --azure-credential --pre-release"
   },
   "devDependencies": {
     "@types/chai": "^5.2.2",
