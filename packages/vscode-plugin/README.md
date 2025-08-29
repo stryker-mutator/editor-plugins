@@ -26,20 +26,21 @@ Learn more about mutation testing and StrykerJS in the [official documentation](
   - Visual feedback on mutant status per folder, file, or individual mutant.
   - Quickly jump to mutant locations in your codebase.
 
-  ![test-explorer](images/test-explorer.gif)
+  ![test-explorer.gif](https://raw.githubusercontent.com/stryker-mutator/editor-plugins/refs/heads/main/packages/vscode-plugin/images/test-explorer.gif)
 
 - **Code Annotations:**
   - See mutation test results inline in your code editor.
   - Re-test mutants directly from the editor.
   - Use the code diff view to see exactly what the mutation changed.
 
-  ![code-editor](images/code-editor.gif)
+  ![code-annotations.gif](https://raw.githubusercontent.com/stryker-mutator/editor-plugins/refs/heads/main/packages/vscode-plugin/images/inline-annotations.gif)
 
 ## Requirements
 
-- You must have [StrykerJS](https://stryker-mutator.io/docs/stryker-js/introduction/) installed and configured in your project.
-- The extension will automatically detect your Stryker configuration and guide you through setup.
+- You must have [StrykerJS v9.1.0 or higher](https://stryker-mutator.io/docs/stryker-js/getting-started/) installed and configured in your project.
+- The extension will automatically detect your Stryker configuration in your project and guide you through setup (check your notifications)
 
+  ![setup-notification.png](https://raw.githubusercontent.com/stryker-mutator/editor-plugins/refs/heads/main/packages/vscode-plugin/images/setup-notification.png)
 
 ## Extension Settings
 
