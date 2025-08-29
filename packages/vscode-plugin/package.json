@@ -2,7 +2,7 @@
   "name": "stryker-mutator",
   "displayName": "Stryker Mutation Testing",
   "description": "Test your tests with mutation testing.",
-  "version": "0.0.1",
+  "version": "0.0.2-alpha.1",
   "publisher": "stryker-mutator",
   "engines": {
     "vscode": "^1.102.1"
@@ -94,7 +94,8 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "test": "vscode-test",
-    "deploy": "vsce publish --azure-credential --pre-release"
+    "deploy": "vsce publish --azure-credential",
+    "deploy:prerelease": "vsce publish --azure-credential --pre-release"
   },
   "devDependencies": {
     "@types/chai": "^5.2.2",
