@@ -22,6 +22,7 @@ Learn more about mutation testing and StrykerJS in the [official documentation](
 ## Features
 
 - **Test Explorer Integration:**
+
   - Browse and test mutants using the VS Code Test Explorer.
   - Visual feedback on mutant status per folder, file, or individual mutant.
   - Quickly jump to mutant locations in your codebase.
@@ -29,6 +30,7 @@ Learn more about mutation testing and StrykerJS in the [official documentation](
   ![test-explorer.gif](https://raw.githubusercontent.com/stryker-mutator/editor-plugins/refs/heads/main/packages/vscode-plugin/images/test-explorer.gif)
 
 - **Code Annotations:**
+
   - See mutation test results inline in your code editor.
   - Re-test mutants directly from the editor.
   - Use the code diff view to see exactly what the mutation changed.
@@ -47,21 +49,26 @@ Learn more about mutation testing and StrykerJS in the [official documentation](
 This extension contributes the following settings:
 
 - **`strykerMutator.enable`** (boolean):
+
   - Enable or disable Stryker mutation testing integration for this workspace.
 
 - **`strykerMutator.watchPattern`** (string):
+
   - Glob pattern for files to watch for changes and trigger mutation discovery. Uses [VS Code glob pattern syntax](https://code.visualstudio.com/docs/editor/glob-patterns#_glob-pattern-syntax).
   - Default: `**/*.{js,ts,jsx,tsx}`
 
 - **`strykerMutator.server.path`** (string):
+
   - Path to the Stryker server executable. Can be absolute or relative to the workspace folder.
   - Default: `node_modules/.bin/stryker`
 
 - **`strykerMutator.server.args`** (array):
+
   - Arguments to pass to the Stryker server process when starting.
   - Default: `["runServer"]`
 
 - **`strykerMutator.server.workingDirectory`** (string):
+
   - Working directory for the Stryker server process. Defaults to the workspace folder if not set.
 
 - **`strykerMutator.server.configFile`** (string):

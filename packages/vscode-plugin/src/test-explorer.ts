@@ -43,12 +43,20 @@ export class TestExplorer {
 
   processDiscoverResult(discovery: DiscoverResult) {
     Object.entries(discovery.files).forEach(([relativeFilePath, mutants]) => {
-      const fileTestItem = testControllerUtils.getTestItemForFile(this.testController, relativeFilePath);
+      const fileTestItem = testControllerUtils.getTestItemForFile(
+        this.testController,
+        relativeFilePath,
+      );
       if (fileTestItem) {
         fileTestItem.children.replace([]);
       }
       mutants.mutants.forEach((mutant) => {
-        testControllerUtils.upsertMutantTestItem(this.testController, this.workspaceFolder, relativeFilePath, mutant);
+        testControllerUtils.upsertMutantTestItem(
+          this.testController,
+          this.workspaceFolder,
+          relativeFilePath,
+          mutant,
+        );
       });
     });
   }
@@ -61,8 +69,8 @@ export class TestExplorer {
 
   async dispose() {
     this.testController.dispose();
-    // Wait for the event loop to process disposal, 
+    // Wait for the event loop to process disposal,
     // otherwise a new test controller cannot be created immediately when the workspace is reloaded.
-    await Promise.resolve(); 
+    await Promise.resolve();
   }
 }

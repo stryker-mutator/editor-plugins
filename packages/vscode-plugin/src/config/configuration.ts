@@ -1,8 +1,4 @@
-import {
-  ConfigurationScope,
-  workspace,
-  WorkspaceConfiguration,
-} from 'vscode';
+import { ConfigurationScope, workspace, WorkspaceConfiguration } from 'vscode';
 import { Settings, SettingSections } from './index';
 
 export class Configuration {
@@ -14,7 +10,6 @@ export class Configuration {
     section?: string,
     scope?: ConfigurationScope | null | undefined,
   ): WorkspaceConfiguration {
-
     return workspace.getConfiguration(section, scope);
   }
 
@@ -44,17 +39,16 @@ export class Configuration {
   public static async updateSetting(
     setting: Settings,
     value: any,
-    scope?: ConfigurationScope | null | undefined) {
+    scope?: ConfigurationScope | null | undefined,
+  ) {
     const section = SettingSections[setting];
-    await this
-      .get(section, scope)
-      .update(setting, value);
+    await this.get(section, scope).update(setting, value);
   }
 
   public static async updateSettingIfChanged<T>(
     setting: Settings,
     value: T,
-    scope?: ConfigurationScope | null | undefined
+    scope?: ConfigurationScope | null | undefined,
   ): Promise<void> {
     const current = this.getSetting<T>(setting, scope);
     if (JSON.stringify(current) !== JSON.stringify(value)) {

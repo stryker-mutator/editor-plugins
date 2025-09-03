@@ -1,12 +1,13 @@
 import * as vscode from 'vscode';
-import {
-  MutationTestResult,
-  MutantResult,
-} from 'mutation-server-protocol';
+import { MutationTestResult, MutantResult } from 'mutation-server-protocol';
 import { ContextualLogger } from './logging/index';
 import { MutationServer } from './index';
 import { commonTokens, tokens } from './di/index';
-import { locationUtils, testItemUtils, testControllerUtils } from './utils/index';
+import {
+  locationUtils,
+  testItemUtils,
+  testControllerUtils,
+} from './utils/index';
 
 export class TestRunner {
   static readonly inject = tokens(
@@ -21,15 +22,19 @@ export class TestRunner {
     private readonly workspaceFolder: vscode.WorkspaceFolder,
     private readonly testController: vscode.TestController,
     private readonly logger: ContextualLogger,
-  ) { }
+  ) {}
 
   async runMutationTests(
     request: vscode.TestRunRequest,
     testController: vscode.TestController,
-    token: vscode.CancellationToken
+    token: vscode.CancellationToken,
   ) {
     this.logger.info('Starting mutation test run');
-    const testRun = testController.createTestRun(request, 'Mutation Test', true);
+    const testRun = testController.createTestRun(
+      request,
+      'Mutation Test',
+      true,
+    );
     const queue: vscode.TestItem[] = request.include
       ? [...request.include]
       : [...testController.items].map(([_, testItem]) => testItem);
@@ -49,17 +54,30 @@ export class TestRunner {
     let progressPromises: Promise<void>[] = [];
 
     try {
-      await this.mutationServer.mutationTest(mutationTestParams, async (progress) => {
-        const progressPromise = this.processMutationTestResult(progress, testRun, queue);
-        progressPromises.push(progressPromise);
-        await progressPromise;
-      });
+      await this.mutationServer.mutationTest(
+        mutationTestParams,
+        async (progress) => {
+          const progressPromise = this.processMutationTestResult(
+            progress,
+            testRun,
+            queue,
+          );
+          progressPromises.push(progressPromise);
+          await progressPromise;
+        },
+      );
     } catch (error: Error | unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Mutation server threw an exception during mutation testing:\n${errorMessage}`);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Mutation server threw an exception during mutation testing:\n${errorMessage}`,
+      );
       queue.forEach((testItem) => {
         testControllerUtils.traverse(testItem, (item) => {
-          testRun.errored(item, new vscode.TestMessage(`Mutation Server: ${errorMessage}`));
+          testRun.errored(
+            item,
+            new vscode.TestMessage(`Mutation Server: ${errorMessage}`),
+          );
         });
       });
     } finally {
@@ -72,15 +90,21 @@ export class TestRunner {
   private async processMutationTestResult(
     mutationTestResult: MutationTestResult,
     testRun: vscode.TestRun,
-    queue: vscode.TestItem[]
+    queue: vscode.TestItem[],
   ) {
-    for (const [filePath, mutants] of Object.entries(mutationTestResult.files)) {
+    for (const [filePath, mutants] of Object.entries(
+      mutationTestResult.files,
+    )) {
       for (const mutant of mutants.mutants) {
         if (!testItemUtils.isMutantInTestTree(mutant, queue)) {
           continue;
         }
         const testItem = testControllerUtils.upsertMutantTestItem(
-          this.testController, this.workspaceFolder, filePath, mutant);
+          this.testController,
+          this.workspaceFolder,
+          filePath,
+          mutant,
+        );
         switch (mutant.status) {
           case 'Timeout':
           case 'RuntimeError':
@@ -101,12 +125,18 @@ export class TestRunner {
     }
   }
 
-  private async getTestMessage(mutant: MutantResult, filePath: string): Promise<vscode.TestMessage> {
+  private async getTestMessage(
+    mutant: MutantResult,
+    filePath: string,
+  ): Promise<vscode.TestMessage> {
     const message = new vscode.TestMessage(
-      `${mutant.mutatorName} (${mutant.location.start.line}:${mutant.location.start.column}) ${mutant.status}`
+      `${mutant.mutatorName} (${mutant.location.start.line}:${mutant.location.start.column}) ${mutant.status}`,
     );
     const uri = vscode.Uri.joinPath(this.workspaceFolder.uri, filePath);
-    message.location = new vscode.Location(uri, locationUtils.locationToRange(mutant.location));
+    message.location = new vscode.Location(
+      uri,
+      locationUtils.locationToRange(mutant.location),
+    );
     message.message = `${mutant.mutatorName} ${mutant.status}`;
     if (!mutant.replacement) {
       return message;
@@ -115,14 +145,28 @@ export class TestRunner {
       const fileBuffer = await vscode.workspace.fs.readFile(uri);
       const originalCode = fileBuffer.toString();
       const originalLines = originalCode.split('\n');
-      const codeLines = originalLines.slice(mutant.location.start.line - 1, mutant.location.end.line);
+      const codeLines = originalLines.slice(
+        mutant.location.start.line - 1,
+        mutant.location.end.line,
+      );
       message.expectedOutput = codeLines.join('\n');
       if (codeLines.length === 1) {
-        const replacedPart = codeLines[0].substring(mutant.location.start.column - 1, mutant.location.end.column - 1);
-        message.actualOutput = codeLines[0].replace(replacedPart, mutant.replacement);
+        const replacedPart = codeLines[0].substring(
+          mutant.location.start.column - 1,
+          mutant.location.end.column - 1,
+        );
+        message.actualOutput = codeLines[0].replace(
+          replacedPart,
+          mutant.replacement,
+        );
       } else {
-        const firstLine = codeLines[0].substring(0, mutant.location.start.column - 1);
-        const lastLine = codeLines[codeLines.length - 1].substring(mutant.location.end.column - 1);
+        const firstLine = codeLines[0].substring(
+          0,
+          mutant.location.start.column - 1,
+        );
+        const lastLine = codeLines[codeLines.length - 1].substring(
+          mutant.location.end.column - 1,
+        );
         message.actualOutput = firstLine + mutant.replacement + lastLine;
       }
       return message;

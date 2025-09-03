@@ -50,8 +50,8 @@ export class Workspace {
       workspaceFolders.map((folder) =>
         this.addWorkspaceFolder(folder).catch((error: any) => {
           this.#logger.error(error.message ?? error);
-        })
-      )
+        }),
+      ),
     );
   }
 
@@ -95,14 +95,22 @@ export class Workspace {
     );
   }
 
-  private async onWorkspaceFoldersChanged(event: vscode.WorkspaceFoldersChangeEvent) {
+  private async onWorkspaceFoldersChanged(
+    event: vscode.WorkspaceFoldersChangeEvent,
+  ) {
     this.#logger.info('Handling workspace folders change');
 
-    await Promise.all(event.removed.map((folder) => this.removeWorkspaceFolder(folder)));
-    await Promise.all(event.added.map((folder) => this.addWorkspaceFolder(folder)));
+    await Promise.all(
+      event.removed.map((folder) => this.removeWorkspaceFolder(folder)),
+    );
+    await Promise.all(
+      event.added.map((folder) => this.addWorkspaceFolder(folder)),
+    );
   }
 
-  private async onDidChangeConfiguration(event: vscode.ConfigurationChangeEvent) {
+  private async onDidChangeConfiguration(
+    event: vscode.ConfigurationChangeEvent,
+  ) {
     for (const wf of this.#workspaceFolders) {
       if (
         event.affectsConfiguration(Constants.AppName, wf.getWorkspaceFolder())
@@ -113,11 +121,13 @@ export class Workspace {
         await this.removeWorkspaceFolder(wf.getWorkspaceFolder());
         await this.addWorkspaceFolder(wf.getWorkspaceFolder());
       }
-    };
+    }
   }
 
   async dispose() {
     this.#logger.info('Unloading workspace');
-    await Promise.all(this.#workspaceFolders.map(async (folder) => await folder.dispose()));
+    await Promise.all(
+      this.#workspaceFolders.map(async (folder) => await folder.dispose()),
+    );
   }
 }

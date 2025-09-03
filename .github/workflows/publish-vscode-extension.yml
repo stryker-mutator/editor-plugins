@@ -7,7 +7,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     environment: marketplace
-    permissions: # Allow the workflow to request tokens 
+    permissions: # Allow the workflow to request tokens
       id-token: write
       contents: read
     steps:

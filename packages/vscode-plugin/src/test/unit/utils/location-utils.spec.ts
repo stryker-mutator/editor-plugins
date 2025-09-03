@@ -8,7 +8,7 @@ describe('locationUtils', () => {
     it('should convert Location to VS Code Range with correct position adjustments', () => {
       const location: Location = {
         start: { line: 10, column: 5 },
-        end: { line: 15, column: 20 }
+        end: { line: 15, column: 20 },
       };
 
       const range = locationUtils.locationToRange(location);
@@ -24,7 +24,7 @@ describe('locationUtils', () => {
     it('should convert VS Code Range to Location with correct position adjustments', () => {
       const range = new vscode.Range(
         new vscode.Position(9, 4),
-        new vscode.Position(14, 19)
+        new vscode.Position(14, 19),
       );
 
       const location = locationUtils.rangeToLocation(range);
@@ -40,7 +40,7 @@ describe('locationUtils', () => {
     it('should maintain consistency when converting Location -> Range -> Location', () => {
       const originalLocation: Location = {
         start: { line: 42, column: 13 },
-        end: { line: 45, column: 28 }
+        end: { line: 45, column: 28 },
       };
 
       const range = locationUtils.locationToRange(originalLocation);

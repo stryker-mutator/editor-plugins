@@ -13,7 +13,7 @@ describe(ContextualLogger.name, () => {
       info: sinon.stub(),
       warn: sinon.stub(),
       error: sinon.stub(),
-      clear: sinon.stub()
+      clear: sinon.stub(),
     } as any;
 
     contextualLogger = new ContextualLogger(mockLogger as any, testContext);
@@ -40,7 +40,9 @@ describe(ContextualLogger.name, () => {
       contextualLogger.info(message, ...additionalLabels);
 
       expect(mockLogger.info.calledOnce).to.be.true;
-      expect(mockLogger.info.calledWith(message, testContext, 'Label1', 'Label2')).to.be.true;
+      expect(
+        mockLogger.info.calledWith(message, testContext, 'Label1', 'Label2'),
+      ).to.be.true;
     });
 
     it('should handle empty additional labels', () => {
@@ -56,7 +58,15 @@ describe(ContextualLogger.name, () => {
 
       contextualLogger.info(message, 'Extra1', 'Extra2', 'Extra3');
 
-      expect(mockLogger.info.calledWith(message, testContext, 'Extra1', 'Extra2', 'Extra3')).to.be.true;
+      expect(
+        mockLogger.info.calledWith(
+          message,
+          testContext,
+          'Extra1',
+          'Extra2',
+          'Extra3',
+        ),
+      ).to.be.true;
     });
   });
 
@@ -77,7 +87,14 @@ describe(ContextualLogger.name, () => {
       contextualLogger.warn(message, ...additionalLabels);
 
       expect(mockLogger.warn.calledOnce).to.be.true;
-      expect(mockLogger.warn.calledWith(message, testContext, 'WarnLabel1', 'WarnLabel2')).to.be.true;
+      expect(
+        mockLogger.warn.calledWith(
+          message,
+          testContext,
+          'WarnLabel1',
+          'WarnLabel2',
+        ),
+      ).to.be.true;
     });
 
     it('should handle single additional label', () => {
@@ -85,7 +102,8 @@ describe(ContextualLogger.name, () => {
 
       contextualLogger.warn(message, 'SingleLabel');
 
-      expect(mockLogger.warn.calledWith(message, testContext, 'SingleLabel')).to.be.true;
+      expect(mockLogger.warn.calledWith(message, testContext, 'SingleLabel')).to
+        .be.true;
     });
   });
 
@@ -106,7 +124,14 @@ describe(ContextualLogger.name, () => {
       contextualLogger.error(message, ...additionalLabels);
 
       expect(mockLogger.error.calledOnce).to.be.true;
-      expect(mockLogger.error.calledWith(message, testContext, 'ErrorLabel1', 'ErrorLabel2')).to.be.true;
+      expect(
+        mockLogger.error.calledWith(
+          message,
+          testContext,
+          'ErrorLabel1',
+          'ErrorLabel2',
+        ),
+      ).to.be.true;
     });
 
     it('should preserve label order with context first', () => {
@@ -114,7 +139,8 @@ describe(ContextualLogger.name, () => {
 
       contextualLogger.error(message, 'Second', 'Third');
 
-      const [actualMessage, firstLabel, secondLabel, thirdLabel] = mockLogger.error.firstCall.args;
+      const [actualMessage, firstLabel, secondLabel, thirdLabel] =
+        mockLogger.error.firstCall.args;
       expect(actualMessage).to.equal(message);
       expect(firstLabel).to.equal(testContext);
       expect(secondLabel).to.equal('Second');

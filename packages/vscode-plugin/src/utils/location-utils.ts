@@ -5,7 +5,7 @@ export const locationUtils = {
   locationToRange(location: Location): vscode.Range {
     return new vscode.Range(
       new vscode.Position(location.start.line - 1, location.start.column - 1),
-      new vscode.Position(location.end.line - 1, location.end.column - 1)
+      new vscode.Position(location.end.line - 1, location.end.column - 1),
     );
   },
 
@@ -20,5 +20,5 @@ export const locationUtils = {
         column: range.end.character + 1,
       },
     };
-  }
+  },
 };

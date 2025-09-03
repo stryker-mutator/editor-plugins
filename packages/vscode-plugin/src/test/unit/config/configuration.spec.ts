@@ -13,9 +13,11 @@ describe(Configuration.name, () => {
       get: sinon.stub(),
       update: sinon.stub(),
       has: sinon.stub(),
-      inspect: sinon.stub()
+      inspect: sinon.stub(),
     };
-    getConfigurationStub = sinon.stub(vscode.workspace, 'getConfiguration').returns(mockWorkspaceConfig);
+    getConfigurationStub = sinon
+      .stub(vscode.workspace, 'getConfiguration')
+      .returns(mockWorkspaceConfig);
   });
 
   afterEach(() => {
@@ -31,7 +33,8 @@ describe(Configuration.name, () => {
 
       const result = Configuration.getSetting<boolean>(setting);
 
-      expect(getConfigurationStub.calledWith(expectedSection, undefined)).to.be.true;
+      expect(getConfigurationStub.calledWith(expectedSection, undefined)).to.be
+        .true;
       expect(mockWorkspaceConfig.get.calledWith(setting)).to.be.true;
       expect(result).to.equal(expectedValue);
     });
@@ -68,7 +71,8 @@ describe(Configuration.name, () => {
 
       Configuration.getSetting<string>(setting, scope);
 
-      expect(getConfigurationStub.calledWith(expectedSection, scope)).to.be.true;
+      expect(getConfigurationStub.calledWith(expectedSection, scope)).to.be
+        .true;
     });
   });
 
@@ -80,7 +84,7 @@ describe(Configuration.name, () => {
 
       const result = Configuration.getSettingOrDefault<string>(
         Settings.ServerPath,
-        defaultValue
+        defaultValue,
       );
 
       expect(result).to.equal(expectedValue);
@@ -92,7 +96,7 @@ describe(Configuration.name, () => {
 
       const result = Configuration.getSettingOrDefault<string>(
         Settings.ServerPath,
-        defaultValue
+        defaultValue,
       );
 
       expect(result).to.equal(defaultValue);
@@ -104,7 +108,7 @@ describe(Configuration.name, () => {
 
       const result = Configuration.getSettingOrDefault<string>(
         Settings.ServerPath,
-        defaultValue
+        defaultValue,
       );
 
       expect(result).to.equal(defaultValue);
@@ -118,7 +122,8 @@ describe(Configuration.name, () => {
 
       Configuration.getSettingOrDefault<string>(setting, defaultValue, scope);
 
-      expect(getConfigurationStub.calledWith(expectedSection, scope)).to.be.true;
+      expect(getConfigurationStub.calledWith(expectedSection, scope)).to.be
+        .true;
     });
   });
 
@@ -131,7 +136,8 @@ describe(Configuration.name, () => {
 
       await Configuration.updateSetting(setting, value);
 
-      expect(getConfigurationStub.calledWith(expectedSection, undefined)).to.be.true;
+      expect(getConfigurationStub.calledWith(expectedSection, undefined)).to.be
+        .true;
       expect(mockWorkspaceConfig.update.calledWith(setting, value)).to.be.true;
     });
 
@@ -144,7 +150,8 @@ describe(Configuration.name, () => {
 
       await Configuration.updateSetting(setting, value, scope);
 
-      expect(getConfigurationStub.calledWith(expectedSection, scope)).to.be.true;
+      expect(getConfigurationStub.calledWith(expectedSection, scope)).to.be
+        .true;
       expect(mockWorkspaceConfig.update.calledWith(setting, value)).to.be.true;
     });
 
@@ -173,7 +180,8 @@ describe(Configuration.name, () => {
 
       await Configuration.updateSettingIfChanged(setting, newValue);
 
-      expect(mockWorkspaceConfig.update.calledWith(setting, newValue)).to.be.true;
+      expect(mockWorkspaceConfig.update.calledWith(setting, newValue)).to.be
+        .true;
     });
 
     it('should not update setting when value has not changed', async () => {
@@ -194,7 +202,8 @@ describe(Configuration.name, () => {
 
       await Configuration.updateSettingIfChanged(setting, newValue);
 
-      expect(mockWorkspaceConfig.update.calledWith(setting, newValue)).to.be.true;
+      expect(mockWorkspaceConfig.update.calledWith(setting, newValue)).to.be
+        .true;
     });
 
     it('should handle complex objects', async () => {
@@ -206,7 +215,8 @@ describe(Configuration.name, () => {
 
       await Configuration.updateSettingIfChanged(setting, newValue);
 
-      expect(mockWorkspaceConfig.update.calledWith(setting, newValue)).to.be.true;
+      expect(mockWorkspaceConfig.update.calledWith(setting, newValue)).to.be
+        .true;
     });
 
     it('should not update when complex objects are the same', async () => {
@@ -229,8 +239,10 @@ describe(Configuration.name, () => {
 
       await Configuration.updateSettingIfChanged(setting, newValue, scope);
 
-      expect(getConfigurationStub.calledWith(expectedSection, scope)).to.be.true;
-      expect(mockWorkspaceConfig.update.calledWith(setting, newValue)).to.be.true;
+      expect(getConfigurationStub.calledWith(expectedSection, scope)).to.be
+        .true;
+      expect(mockWorkspaceConfig.update.calledWith(setting, newValue)).to.be
+        .true;
     });
   });
 });

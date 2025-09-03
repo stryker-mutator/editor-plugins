@@ -3,7 +3,10 @@ import { DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
 import { locationUtils } from './location-utils';
 
 export const testControllerUtils = {
-  traverse(testItem: vscode.TestItem, action: (item: vscode.TestItem) => void): void {
+  traverse(
+    testItem: vscode.TestItem,
+    action: (item: vscode.TestItem) => void,
+  ): void {
     action(testItem);
     for (const [, child] of testItem.children) {
       this.traverse(child, action);
@@ -14,7 +17,7 @@ export const testControllerUtils = {
     testController: vscode.TestController,
     workspaceFolder: vscode.WorkspaceFolder,
     mutantRelativeFilePath: string,
-    mutant: DiscoveredMutant | MutantResult
+    mutant: DiscoveredMutant | MutantResult,
   ): vscode.TestItem {
     const pathSegments = mutantRelativeFilePath.split('/');
     let currentCollection = testController.items;
@@ -26,7 +29,11 @@ export const testControllerUtils = {
 
       if (!node) {
         const uri = vscode.Uri.file(`${workspaceFolder.uri.path}${currentUri}`);
-        const newDirectory = testController.createTestItem(pathSegment, pathSegment, uri);
+        const newDirectory = testController.createTestItem(
+          pathSegment,
+          pathSegment,
+          uri,
+        );
         currentCollection.add(newDirectory);
         currentCollection = newDirectory.children;
       } else {
@@ -42,7 +49,11 @@ export const testControllerUtils = {
 
     const mutantName = `${mutant.mutatorName} (Ln ${mutant.location.start.line}, Col ${mutant.location.start.column})`;
 
-    const testItem = testController.createTestItem(mutantId, mutantName, fileUri);
+    const testItem = testController.createTestItem(
+      mutantId,
+      mutantName,
+      fileUri,
+    );
     testItem.range = locationUtils.locationToRange(mutant.location);
     currentCollection.add(testItem);
     return testItem;
@@ -50,7 +61,7 @@ export const testControllerUtils = {
 
   getTestItemForFile(
     testController: vscode.TestController,
-    relativeFilePath: string
+    relativeFilePath: string,
   ): vscode.TestItem | undefined {
     const directories = relativeFilePath.split('/');
     const fileName = directories[directories.length - 1];
@@ -70,10 +81,10 @@ export const testControllerUtils = {
 
   removeTestItemsForUri(
     testController: vscode.TestController,
-    uri: vscode.Uri
+    uri: vscode.Uri,
   ): void {
     const relativePath = vscode.workspace.asRelativePath(uri, false);
-    const directories = relativePath.split('/').filter(x => x.length > 0);
+    const directories = relativePath.split('/').filter((x) => x.length > 0);
     const fileName = directories[directories.length - 1];
     const parentDirectory = directories[directories.length - 2];
     if (!parentDirectory) {
@@ -89,7 +100,7 @@ export const testControllerUtils = {
       const node = currentNodes.get(directory);
       if (!node) {
         break;
-      };
+      }
       if (directory === parentDirectory) {
         parent = node;
         node.children.delete(fileName);
@@ -107,5 +118,5 @@ export const testControllerUtils = {
       parentParent.children.delete(parent.id);
       parent = parentParent;
     }
-  }
+  },
 };

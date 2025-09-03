@@ -16,13 +16,9 @@ export class FileSystemWatcher {
   public readonly onFilesChanged = this._onFilesChanged.event;
   public readonly onFilesDeleted = this._onFilesDeleted.event;
 
-  public static readonly inject = tokens(
-    commonTokens.workspaceFolder,
-  );
-  
-  constructor(
-    private readonly workspaceFolder: vscode.WorkspaceFolder,
-  ) {
+  public static readonly inject = tokens(commonTokens.workspaceFolder);
+
+  constructor(private readonly workspaceFolder: vscode.WorkspaceFolder) {
     this.fileChangeSubject
       .pipe(
         buffer(

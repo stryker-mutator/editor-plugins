@@ -6,6 +6,6 @@
     },
     {
       "path": "./packages/vscode-plugin"
-    },
+    }
   ]
 }

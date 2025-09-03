@@ -10,7 +10,10 @@ describe('testControllerUtils', () => {
     let actionSpy: sinon.SinonSpy;
 
     beforeEach(() => {
-      testController = vscode.tests.createTestController('test-traverse', 'Test Traverse');
+      testController = vscode.tests.createTestController(
+        'test-traverse',
+        'Test Traverse',
+      );
       actionSpy = sinon.spy();
     });
 
@@ -21,7 +24,7 @@ describe('testControllerUtils', () => {
 
     it('should call action on the root test item', () => {
       const rootItem = testController.createTestItem('root', 'Root Item');
-      
+
       testControllerUtils.traverse(rootItem, actionSpy);
 
       expect(actionSpy.calledOnce).to.be.true;
@@ -32,8 +35,14 @@ describe('testControllerUtils', () => {
       const rootItem = testController.createTestItem('root', 'Root Item');
       const child1 = testController.createTestItem('child1', 'Child 1');
       const child2 = testController.createTestItem('child2', 'Child 2');
-      const grandchild1 = testController.createTestItem('grandchild1', 'Grandchild 1');
-      const grandchild2 = testController.createTestItem('grandchild2', 'Grandchild 2');
+      const grandchild1 = testController.createTestItem(
+        'grandchild1',
+        'Grandchild 1',
+      );
+      const grandchild2 = testController.createTestItem(
+        'grandchild2',
+        'Grandchild 2',
+      );
 
       // Build the hierarchy
       rootItem.children.add(child1);
@@ -53,7 +62,7 @@ describe('testControllerUtils', () => {
 
     it('should handle empty children collection', () => {
       const rootItem = testController.createTestItem('root', 'Root Item');
-      
+
       testControllerUtils.traverse(rootItem, actionSpy);
 
       expect(actionSpy.calledOnce).to.be.true;
@@ -66,11 +75,14 @@ describe('testControllerUtils', () => {
     let workspaceFolder: vscode.WorkspaceFolder;
 
     beforeEach(() => {
-      testController = vscode.tests.createTestController('test-upsert', 'Test Upsert');
+      testController = vscode.tests.createTestController(
+        'test-upsert',
+        'Test Upsert',
+      );
       workspaceFolder = {
         uri: vscode.Uri.file('/test/workspace'),
         name: 'test-workspace',
-        index: 0
+        index: 0,
       };
     });
 
@@ -85,28 +97,36 @@ describe('testControllerUtils', () => {
         mutatorName: 'StringLiteral',
         location: {
           start: { line: 5, column: 10 },
-          end: { line: 5, column: 20 }
+          end: { line: 5, column: 20 },
         },
-        replacement: '"mutated"'
+        replacement: '"mutated"',
       };
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
         workspaceFolder,
         'src/utils/helper.ts',
-        mutant
+        mutant,
       );
 
       // Verify directory structure was created
       expect(testController.items.get('src')).to.exist;
       expect(testController.items.get('src')?.children.get('utils')).to.exist;
-      expect(testController.items.get('src')?.children.get('utils')?.children.get('helper.ts')).to.exist;
+      expect(
+        testController.items
+          .get('src')
+          ?.children.get('utils')
+          ?.children.get('helper.ts'),
+      ).to.exist;
 
       // Verify the mutant test item was created
       const expectedMutantId = 'StringLiteral(5:10-5:20) ("mutated")';
-      const helperTsItem = testController.items.get('src')?.children.get('utils')?.children.get('helper.ts');
+      const helperTsItem = testController.items
+        .get('src')
+        ?.children.get('utils')
+        ?.children.get('helper.ts');
       const mutantItem = helperTsItem?.children.get(expectedMutantId);
-      
+
       expect(mutantItem).to.exist;
       expect(mutantItem?.id).to.equal(expectedMutantId);
       expect(mutantItem?.label).to.equal('StringLiteral (Ln 5, Col 10)');
@@ -119,25 +139,25 @@ describe('testControllerUtils', () => {
         mutatorName: 'BooleanLiteral',
         location: {
           start: { line: 1, column: 1 },
-          end: { line: 1, column: 5 }
+          end: { line: 1, column: 5 },
         },
-        replacement: 'false'
+        replacement: 'false',
       };
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
         workspaceFolder,
         'index.js',
-        mutant
+        mutant,
       );
 
       // Verify file item was created directly under root
       expect(testController.items.get('index.js')).to.exist;
-      
+
       const expectedMutantId = 'BooleanLiteral(1:1-1:5) (false)';
       const fileItem = testController.items.get('index.js');
       const mutantItem = fileItem?.children.get(expectedMutantId);
-      
+
       expect(mutantItem).to.exist;
       expect(mutantItem?.label).to.equal('BooleanLiteral (Ln 1, Col 1)');
       expect(result).to.equal(mutantItem);
@@ -149,9 +169,9 @@ describe('testControllerUtils', () => {
         mutatorName: 'StringLiteral',
         location: {
           start: { line: 5, column: 10 },
-          end: { line: 5, column: 20 }
+          end: { line: 5, column: 20 },
         },
-        replacement: '"first"'
+        replacement: '"first"',
       };
 
       const mutant2: DiscoveredMutant = {
@@ -159,9 +179,9 @@ describe('testControllerUtils', () => {
         mutatorName: 'NumberLiteral',
         location: {
           start: { line: 10, column: 5 },
-          end: { line: 10, column: 7 }
+          end: { line: 10, column: 7 },
         },
-        replacement: '999'
+        replacement: '999',
       };
 
       // Create first mutant
@@ -169,7 +189,7 @@ describe('testControllerUtils', () => {
         testController,
         workspaceFolder,
         'src/utils/helper.ts',
-        mutant1
+        mutant1,
       );
 
       // Create second mutant in same file
@@ -177,18 +197,24 @@ describe('testControllerUtils', () => {
         testController,
         workspaceFolder,
         'src/utils/helper.ts',
-        mutant2
+        mutant2,
       );
 
       // Verify only one directory structure exists
       expect(testController.items.size).to.equal(1);
       expect(testController.items.get('src')?.children.size).to.equal(1);
-      expect(testController.items.get('src')?.children.get('utils')?.children.size).to.equal(1);
+      expect(
+        testController.items.get('src')?.children.get('utils')?.children.size,
+      ).to.equal(1);
 
       // Verify both mutants exist under the same file
-      const fileItem = testController.items.get('src')?.children.get('utils')?.children.get('helper.ts');
+      const fileItem = testController.items
+        .get('src')
+        ?.children.get('utils')
+        ?.children.get('helper.ts');
       expect(fileItem?.children.size).to.equal(2);
-      expect(fileItem?.children.get('StringLiteral(5:10-5:20) ("first")')).to.exist;
+      expect(fileItem?.children.get('StringLiteral(5:10-5:20) ("first")')).to
+        .exist;
       expect(fileItem?.children.get('NumberLiteral(10:5-10:7) (999)')).to.exist;
     });
 
@@ -198,16 +224,16 @@ describe('testControllerUtils', () => {
         mutatorName: 'ConditionalExpression',
         location: {
           start: { line: 3, column: 5 },
-          end: { line: 3, column: 15 }
+          end: { line: 3, column: 15 },
         },
-        replacement: 'true'
+        replacement: 'true',
       };
 
       testControllerUtils.upsertMutantTestItem(
         testController,
         workspaceFolder,
         'src/components/Button.tsx',
-        mutant
+        mutant,
       );
 
       const srcItem = testController.items.get('src');
@@ -215,8 +241,12 @@ describe('testControllerUtils', () => {
       const buttonItem = componentsItem?.children.get('Button.tsx');
 
       expect(srcItem?.uri?.fsPath).to.equal('/test/workspace/src');
-      expect(componentsItem?.uri?.fsPath).to.equal('/test/workspace/src/components');
-      expect(buttonItem?.uri?.fsPath).to.equal('/test/workspace/src/components/Button.tsx');
+      expect(componentsItem?.uri?.fsPath).to.equal(
+        '/test/workspace/src/components',
+      );
+      expect(buttonItem?.uri?.fsPath).to.equal(
+        '/test/workspace/src/components/Button.tsx',
+      );
     });
 
     it('should set correct range on mutant test item', () => {
@@ -225,16 +255,16 @@ describe('testControllerUtils', () => {
         mutatorName: 'ArithmeticOperator',
         location: {
           start: { line: 10, column: 15 },
-          end: { line: 10, column: 16 }
+          end: { line: 10, column: 16 },
         },
-        replacement: '-'
+        replacement: '-',
       };
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
         workspaceFolder,
         'math.js',
-        mutant
+        mutant,
       );
 
       // Verify range is converted from 1-based to 0-based coordinates
@@ -251,8 +281,8 @@ describe('testControllerUtils', () => {
         mutatorName: 'BlockStatement',
         location: {
           start: { line: 20, column: 1 },
-          end: { line: 25, column: 1 }
-        }
+          end: { line: 25, column: 1 },
+        },
         // No replacement property
       };
 
@@ -260,7 +290,7 @@ describe('testControllerUtils', () => {
         testController,
         workspaceFolder,
         'test.js',
-        mutant
+        mutant,
       );
 
       const expectedMutantId = 'BlockStatement(20:1-25:1) (undefined)';
@@ -274,17 +304,17 @@ describe('testControllerUtils', () => {
         mutatorName: 'EqualityOperator',
         location: {
           start: { line: 8, column: 12 },
-          end: { line: 8, column: 14 }
+          end: { line: 8, column: 14 },
         },
         replacement: '!==',
-        status: 'Killed'
+        status: 'Killed',
       };
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
         workspaceFolder,
         'comparison.ts',
-        mutantResult
+        mutantResult,
       );
 
       const expectedMutantId = 'EqualityOperator(8:12-8:14) (!==)';
@@ -298,40 +328,40 @@ describe('testControllerUtils', () => {
         mutatorName: 'LogicalOperator',
         location: {
           start: { line: 1, column: 1 },
-          end: { line: 1, column: 3 }
+          end: { line: 1, column: 3 },
         },
-        replacement: '||'
+        replacement: '||',
       };
 
       testControllerUtils.upsertMutantTestItem(
         testController,
         workspaceFolder,
         'src/app/components/ui/forms/validation/rules.ts',
-        mutant
+        mutant,
       );
 
       // Verify deep directory structure
       let currentItem = testController.items.get('src');
       expect(currentItem).to.exist;
-      
+
       currentItem = currentItem?.children.get('app');
       expect(currentItem).to.exist;
-      
+
       currentItem = currentItem?.children.get('components');
       expect(currentItem).to.exist;
-      
+
       currentItem = currentItem?.children.get('ui');
       expect(currentItem).to.exist;
-      
+
       currentItem = currentItem?.children.get('forms');
       expect(currentItem).to.exist;
-      
+
       currentItem = currentItem?.children.get('validation');
       expect(currentItem).to.exist;
-      
+
       currentItem = currentItem?.children.get('rules.ts');
       expect(currentItem).to.exist;
-      
+
       expect(currentItem?.children.size).to.equal(1);
     });
 
@@ -341,21 +371,30 @@ describe('testControllerUtils', () => {
         mutatorName: 'StringLiteral',
         location: {
           start: { line: 1, column: 1 },
-          end: { line: 1, column: 10 }
+          end: { line: 1, column: 10 },
         },
-        replacement: '"test"'
+        replacement: '"test"',
       };
 
       testControllerUtils.upsertMutantTestItem(
         testController,
         workspaceFolder,
         'special chars/file-with-dashes/test@file#1.js',
-        mutant
+        mutant,
       );
 
       expect(testController.items.get('special chars')).to.exist;
-      expect(testController.items.get('special chars')?.children.get('file-with-dashes')).to.exist;
-      expect(testController.items.get('special chars')?.children.get('file-with-dashes')?.children.get('test@file#1.js')).to.exist;
+      expect(
+        testController.items
+          .get('special chars')
+          ?.children.get('file-with-dashes'),
+      ).to.exist;
+      expect(
+        testController.items
+          .get('special chars')
+          ?.children.get('file-with-dashes')
+          ?.children.get('test@file#1.js'),
+      ).to.exist;
     });
 
     it('should return the created test item', () => {
@@ -364,16 +403,16 @@ describe('testControllerUtils', () => {
         mutatorName: 'ReturnStatement',
         location: {
           start: { line: 15, column: 8 },
-          end: { line: 15, column: 20 }
+          end: { line: 15, column: 20 },
         },
-        replacement: 'return false'
+        replacement: 'return false',
       };
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
         workspaceFolder,
         'func.js',
-        mutant
+        mutant,
       );
 
       expect(result).to.be.instanceOf(Object);
@@ -388,11 +427,14 @@ describe('testControllerUtils', () => {
     let workspaceFolder: vscode.WorkspaceFolder;
 
     beforeEach(() => {
-      testController = vscode.tests.createTestController('test-get-item', 'Test Get Item');
+      testController = vscode.tests.createTestController(
+        'test-get-item',
+        'Test Get Item',
+      );
       workspaceFolder = {
         uri: vscode.Uri.file('/test/workspace'),
         name: 'test-workspace',
-        index: 0
+        index: 0,
       };
     });
 
@@ -404,7 +446,7 @@ describe('testControllerUtils', () => {
     it('should return undefined for non-existent file', () => {
       const result = testControllerUtils.getTestItemForFile(
         testController,
-        'nonexistent/file.js'
+        'nonexistent/file.js',
       );
 
       expect(result).to.be.undefined;
@@ -417,7 +459,7 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
-        'index.js'
+        'index.js',
       );
 
       expect(result).to.equal(fileItem);
@@ -428,7 +470,10 @@ describe('testControllerUtils', () => {
       // Create directory structure: src/utils/helper.ts
       const srcItem = testController.createTestItem('src', 'Source');
       const utilsItem = testController.createTestItem('utils', 'Utils');
-      const helperItem = testController.createTestItem('helper.ts', 'Helper File');
+      const helperItem = testController.createTestItem(
+        'helper.ts',
+        'Helper File',
+      );
 
       testController.items.add(srcItem);
       srcItem.children.add(utilsItem);
@@ -436,7 +481,7 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
-        'src/utils/helper.ts'
+        'src/utils/helper.ts',
       );
 
       expect(result).to.equal(helperItem);
@@ -447,7 +492,10 @@ describe('testControllerUtils', () => {
       // Create directory structure: src/utils/helper.ts
       const srcItem = testController.createTestItem('src', 'Source');
       const utilsItem = testController.createTestItem('utils', 'Utils');
-      const helperItem = testController.createTestItem('helper.ts', 'Helper File');
+      const helperItem = testController.createTestItem(
+        'helper.ts',
+        'Helper File',
+      );
 
       testController.items.add(srcItem);
       srcItem.children.add(utilsItem);
@@ -456,17 +504,14 @@ describe('testControllerUtils', () => {
       // Try to get item for path that only partially exists
       const result = testControllerUtils.getTestItemForFile(
         testController,
-        'src/utils/nonexistent.ts'
+        'src/utils/nonexistent.ts',
       );
 
       expect(result).to.be.undefined;
     });
 
     it('should return undefined for empty file path', () => {
-      const result = testControllerUtils.getTestItemForFile(
-        testController,
-        ''
-      );
+      const result = testControllerUtils.getTestItemForFile(testController, '');
 
       expect(result).to.be.undefined;
     });
@@ -475,8 +520,14 @@ describe('testControllerUtils', () => {
       // Create structure where same filename exists at different levels
       const srcItem = testController.createTestItem('src', 'Source');
       const testItem = testController.createTestItem('test', 'Test Dir');
-      const indexSrcItem = testController.createTestItem('index.js', 'Source Index');
-      const indexTestItem = testController.createTestItem('index.js', 'Test Index');
+      const indexSrcItem = testController.createTestItem(
+        'index.js',
+        'Source Index',
+      );
+      const indexTestItem = testController.createTestItem(
+        'index.js',
+        'Test Index',
+      );
 
       testController.items.add(srcItem);
       testController.items.add(testItem);
@@ -486,7 +537,7 @@ describe('testControllerUtils', () => {
       // Should return the specific file from src directory
       const srcResult = testControllerUtils.getTestItemForFile(
         testController,
-        'src/index.js'
+        'src/index.js',
       );
 
       expect(srcResult).to.equal(indexSrcItem);
@@ -495,7 +546,7 @@ describe('testControllerUtils', () => {
       // Should return the specific file from test directory
       const testResult = testControllerUtils.getTestItemForFile(
         testController,
-        'test/index.js'
+        'test/index.js',
       );
 
       expect(testResult).to.equal(indexTestItem);
@@ -504,12 +555,15 @@ describe('testControllerUtils', () => {
 
     it('should handle root level files correctly', () => {
       // Create a root level file
-      const packageItem = testController.createTestItem('package.json', 'Package');
+      const packageItem = testController.createTestItem(
+        'package.json',
+        'Package',
+      );
       testController.items.add(packageItem);
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
-        'package.json'
+        'package.json',
       );
 
       expect(result).to.equal(packageItem);
@@ -523,7 +577,7 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
-        'src/utils/helper.ts'
+        'src/utils/helper.ts',
       );
 
       expect(result).to.be.undefined;
@@ -532,7 +586,10 @@ describe('testControllerUtils', () => {
     it('should handle case where file name matches directory name in path', () => {
       // Create structure: src/src/index.js (where directory and file have same name)
       const srcRootItem = testController.createTestItem('src', 'Source Root');
-      const srcNestedItem = testController.createTestItem('src', 'Source Nested');
+      const srcNestedItem = testController.createTestItem(
+        'src',
+        'Source Nested',
+      );
       const indexItem = testController.createTestItem('index.js', 'Index File');
 
       testController.items.add(srcRootItem);
@@ -541,7 +598,7 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
-        'src/src/index.js'
+        'src/src/index.js',
       );
 
       expect(result).to.equal(indexItem);
@@ -549,20 +606,23 @@ describe('testControllerUtils', () => {
     });
 
     it('should be case sensitive for file paths', () => {
-      const fileItem = testController.createTestItem('CamelCase.ts', 'Camel Case File');
+      const fileItem = testController.createTestItem(
+        'CamelCase.ts',
+        'Camel Case File',
+      );
       testController.items.add(fileItem);
 
       // Exact case should work
       const exactResult = testControllerUtils.getTestItemForFile(
         testController,
-        'CamelCase.ts'
+        'CamelCase.ts',
       );
       expect(exactResult).to.equal(fileItem);
 
       // Different case should not work
       const wrongCaseResult = testControllerUtils.getTestItemForFile(
         testController,
-        'camelcase.ts'
+        'camelcase.ts',
       );
       expect(wrongCaseResult).to.be.undefined;
     });
@@ -572,7 +632,10 @@ describe('testControllerUtils', () => {
     let testController: vscode.TestController;
 
     beforeEach(() => {
-      testController = vscode.tests.createTestController('test-remove', 'Test Remove');
+      testController = vscode.tests.createTestController(
+        'test-remove',
+        'Test Remove',
+      );
     });
 
     afterEach(() => {
@@ -584,7 +647,10 @@ describe('testControllerUtils', () => {
       // Manually create structure: src/utils/helper.ts
       const srcItem = testController.createTestItem('src', 'src');
       const utilsItem = testController.createTestItem('utils', 'utils');
-      const helperItem = testController.createTestItem('helper.ts', 'helper.ts');
+      const helperItem = testController.createTestItem(
+        'helper.ts',
+        'helper.ts',
+      );
 
       testController.items.add(srcItem);
       srcItem.children.add(utilsItem);
@@ -593,7 +659,12 @@ describe('testControllerUtils', () => {
       // Verify structure was created
       expect(testController.items.get('src')).to.exist;
       expect(testController.items.get('src')?.children.get('utils')).to.exist;
-      expect(testController.items.get('src')?.children.get('utils')?.children.get('helper.ts')).to.exist;
+      expect(
+        testController.items
+          .get('src')
+          ?.children.get('utils')
+          ?.children.get('helper.ts'),
+      ).to.exist;
 
       // Remove the file
       const uri = vscode.Uri.file('src/utils/helper.ts');
@@ -608,8 +679,14 @@ describe('testControllerUtils', () => {
       // Manually create structure with multiple files: src/utils/helper.ts and src/utils/calculator.ts
       const srcItem = testController.createTestItem('src', 'src');
       const utilsItem = testController.createTestItem('utils', 'utils');
-      const helperItem = testController.createTestItem('helper.ts', 'helper.ts');
-      const calculatorItem = testController.createTestItem('calculator.ts', 'calculator.ts');
+      const helperItem = testController.createTestItem(
+        'helper.ts',
+        'helper.ts',
+      );
+      const calculatorItem = testController.createTestItem(
+        'calculator.ts',
+        'calculator.ts',
+      );
 
       testController.items.add(srcItem);
       srcItem.children.add(utilsItem);
@@ -617,8 +694,18 @@ describe('testControllerUtils', () => {
       utilsItem.children.add(calculatorItem);
 
       // Verify both files exist
-      expect(testController.items.get('src')?.children.get('utils')?.children.get('helper.ts')).to.exist;
-      expect(testController.items.get('src')?.children.get('utils')?.children.get('calculator.ts')).to.exist;
+      expect(
+        testController.items
+          .get('src')
+          ?.children.get('utils')
+          ?.children.get('helper.ts'),
+      ).to.exist;
+      expect(
+        testController.items
+          .get('src')
+          ?.children.get('utils')
+          ?.children.get('calculator.ts'),
+      ).to.exist;
 
       // Remove only helper.ts
       const uri = vscode.Uri.file('/src/utils/helper.ts');
@@ -627,8 +714,18 @@ describe('testControllerUtils', () => {
       // Verify helper.ts was removed but directories and calculator.ts remain
       expect(testController.items.get('src')).to.exist;
       expect(testController.items.get('src')?.children.get('utils')).to.exist;
-      expect(testController.items.get('src')?.children.get('utils')?.children.get('helper.ts')).to.be.undefined;
-      expect(testController.items.get('src')?.children.get('utils')?.children.get('calculator.ts')).to.exist;
+      expect(
+        testController.items
+          .get('src')
+          ?.children.get('utils')
+          ?.children.get('helper.ts'),
+      ).to.be.undefined;
+      expect(
+        testController.items
+          .get('src')
+          ?.children.get('utils')
+          ?.children.get('calculator.ts'),
+      ).to.exist;
     });
 
     it('should handle removal of root-level files', () => {
@@ -651,27 +748,34 @@ describe('testControllerUtils', () => {
     it('should handle non-existent files gracefully', () => {
       // Create some structure first
       const srcItem = testController.createTestItem('src', 'Source');
-      const existingItem = testController.createTestItem('existing.ts', 'Existing File');
+      const existingItem = testController.createTestItem(
+        'existing.ts',
+        'Existing File',
+      );
 
       testController.items.add(srcItem);
       srcItem.children.add(existingItem);
 
       // Try to remove a non-existent file
       const uri = vscode.Uri.file('/src/nonexistent.ts');
-      
+
       expect(() => {
         testControllerUtils.removeTestItemsForUri(testController, uri);
       }).to.not.throw();
 
       // Verify existing structure is untouched
-      expect(testController.items.get('src')?.children.get('existing.ts')).to.exist;
+      expect(testController.items.get('src')?.children.get('existing.ts')).to
+        .exist;
     });
 
     it('should handle partial path matches gracefully', () => {
       // Create structure: src/utils/helper.ts
       const srcItem = testController.createTestItem('src', 'Source');
       const utilsItem = testController.createTestItem('utils', 'Utils');
-      const helperItem = testController.createTestItem('helper.ts', 'Helper File');
+      const helperItem = testController.createTestItem(
+        'helper.ts',
+        'Helper File',
+      );
 
       testController.items.add(srcItem);
       srcItem.children.add(utilsItem);
@@ -679,22 +783,33 @@ describe('testControllerUtils', () => {
 
       // Try to remove a file in non-existent directory
       const uri = vscode.Uri.file('/src/nonexistent/file.ts');
-      
+
       expect(() => {
         testControllerUtils.removeTestItemsForUri(testController, uri);
       }).to.not.throw();
 
       // Verify existing structure is untouched
-      expect(testController.items.get('src')?.children.get('utils')?.children.get('helper.ts')).to.exist;
+      expect(
+        testController.items
+          .get('src')
+          ?.children.get('utils')
+          ?.children.get('helper.ts'),
+      ).to.exist;
     });
 
     it('should remove multiple levels of empty directories', () => {
       // Create deep structure: src/app/components/ui/Button.tsx
       const srcItem = testController.createTestItem('src', 'Source');
       const appItem = testController.createTestItem('app', 'App');
-      const componentsItem = testController.createTestItem('components', 'Components');
+      const componentsItem = testController.createTestItem(
+        'components',
+        'Components',
+      );
       const uiItem = testController.createTestItem('ui', 'UI');
-      const buttonItem = testController.createTestItem('Button.tsx', 'Button File');
+      const buttonItem = testController.createTestItem(
+        'Button.tsx',
+        'Button File',
+      );
 
       testController.items.add(srcItem);
       srcItem.children.add(appItem);
@@ -726,10 +841,19 @@ describe('testControllerUtils', () => {
       // Create structure with shared directories: src/app/components/Button.tsx and src/app/utils/helper.ts
       const srcItem = testController.createTestItem('src', 'Source');
       const appItem = testController.createTestItem('app', 'App');
-      const componentsItem = testController.createTestItem('components', 'Components');
+      const componentsItem = testController.createTestItem(
+        'components',
+        'Components',
+      );
       const utilsItem = testController.createTestItem('utils', 'Utils');
-      const buttonItem = testController.createTestItem('Button.tsx', 'Button File');
-      const helperItem = testController.createTestItem('helper.ts', 'Helper File');
+      const buttonItem = testController.createTestItem(
+        'Button.tsx',
+        'Button File',
+      );
+      const helperItem = testController.createTestItem(
+        'helper.ts',
+        'Helper File',
+      );
 
       testController.items.add(srcItem);
       srcItem.children.add(appItem);
@@ -745,21 +869,47 @@ describe('testControllerUtils', () => {
       // Verify: components directory should be removed, but src/app should remain
       expect(testController.items.get('src')).to.exist;
       expect(testController.items.get('src')?.children.get('app')).to.exist;
-      expect(testController.items.get('src')?.children.get('app')?.children.get('components')).to.be.undefined;
-      expect(testController.items.get('src')?.children.get('app')?.children.get('utils')).to.exist;
-      expect(testController.items.get('src')?.children.get('app')?.children.get('utils')?.children.get('helper.ts')).to.exist;
+      expect(
+        testController.items
+          .get('src')
+          ?.children.get('app')
+          ?.children.get('components'),
+      ).to.be.undefined;
+      expect(
+        testController.items
+          .get('src')
+          ?.children.get('app')
+          ?.children.get('utils'),
+      ).to.exist;
+      expect(
+        testController.items
+          .get('src')
+          ?.children.get('app')
+          ?.children.get('utils')
+          ?.children.get('helper.ts'),
+      ).to.exist;
     });
 
     it('should handle files with special characters', () => {
       // Create file with special characters: special chars/test@file#1.js
-      const specialDirItem = testController.createTestItem('special chars', 'Special Directory');
-      const specialFileItem = testController.createTestItem('test@file#1.js', 'Special File');
+      const specialDirItem = testController.createTestItem(
+        'special chars',
+        'Special Directory',
+      );
+      const specialFileItem = testController.createTestItem(
+        'test@file#1.js',
+        'Special File',
+      );
 
       testController.items.add(specialDirItem);
       specialDirItem.children.add(specialFileItem);
 
       // Verify file exists
-      expect(testController.items.get('special chars')?.children.get('test@file#1.js')).to.exist;
+      expect(
+        testController.items
+          .get('special chars')
+          ?.children.get('test@file#1.js'),
+      ).to.exist;
 
       // Remove the file
       const uri = vscode.Uri.file('/special chars/test@file#1.js');
@@ -776,8 +926,14 @@ describe('testControllerUtils', () => {
 
       // Create the structure manually
       const srcItem = testController.createTestItem('src', 'Source');
-      const componentsItem = testController.createTestItem('components', 'Components');
-      const buttonItem = testController.createTestItem('Button.tsx', 'Button File');
+      const componentsItem = testController.createTestItem(
+        'components',
+        'Components',
+      );
+      const buttonItem = testController.createTestItem(
+        'Button.tsx',
+        'Button File',
+      );
 
       testController.items.add(srcItem);
       srcItem.children.add(componentsItem);
@@ -818,12 +974,21 @@ describe('testControllerUtils', () => {
     it('should handle parent relationships correctly during cleanup', () => {
       // Create structure with multiple files to test parent relationship traversal
       const srcItem = testController.createTestItem('src', 'Source');
-      const componentsItem = testController.createTestItem('components', 'Components');
+      const componentsItem = testController.createTestItem(
+        'components',
+        'Components',
+      );
       const deepItem = testController.createTestItem('deep', 'Deep');
       const nestedItem = testController.createTestItem('nested', 'Nested');
-      const componentFileItem = testController.createTestItem('Component.tsx', 'Component File');
+      const componentFileItem = testController.createTestItem(
+        'Component.tsx',
+        'Component File',
+      );
       const utilsItem = testController.createTestItem('utils', 'Utils');
-      const helperItem = testController.createTestItem('helper.ts', 'Helper File');
+      const helperItem = testController.createTestItem(
+        'helper.ts',
+        'Helper File',
+      );
 
       // Build structure: src/components/deep/nested/Component.tsx and src/utils/helper.ts
       testController.items.add(srcItem);
@@ -840,14 +1005,23 @@ describe('testControllerUtils', () => {
 
       // Verify: deep/nested/components should be cleaned up, but src and utils should remain
       expect(testController.items.get('src')).to.exist;
-      expect(testController.items.get('src')?.children.get('components')).to.be.undefined;
+      expect(testController.items.get('src')?.children.get('components')).to.be
+        .undefined;
       expect(testController.items.get('src')?.children.get('utils')).to.exist;
-      expect(testController.items.get('src')?.children.get('utils')?.children.get('helper.ts')).to.exist;
+      expect(
+        testController.items
+          .get('src')
+          ?.children.get('utils')
+          ?.children.get('helper.ts'),
+      ).to.exist;
     });
 
     it('should handle edge case where parentDirectory is undefined', () => {
       // Test case where there's no parent directory (root level file)
-      const packageItem = testController.createTestItem('package.json', 'Package File');
+      const packageItem = testController.createTestItem(
+        'package.json',
+        'Package File',
+      );
       testController.items.add(packageItem);
 
       // Remove the root file
@@ -862,7 +1036,10 @@ describe('testControllerUtils', () => {
       // Create structure: src/utils/existing.ts
       const srcItem = testController.createTestItem('src', 'Source');
       const utilsItem = testController.createTestItem('utils', 'Utils');
-      const existingItem = testController.createTestItem('existing.ts', 'Existing File');
+      const existingItem = testController.createTestItem(
+        'existing.ts',
+        'Existing File',
+      );
 
       testController.items.add(srcItem);
       srcItem.children.add(utilsItem);
@@ -870,19 +1047,27 @@ describe('testControllerUtils', () => {
 
       // Try to remove different file in same directory
       const uri = vscode.Uri.file('/src/utils/missing.ts');
-      
+
       expect(() => {
         testControllerUtils.removeTestItemsForUri(testController, uri);
       }).to.not.throw();
 
       // Verify structure is unchanged
-      expect(testController.items.get('src')?.children.get('utils')?.children.get('existing.ts')).to.exist;
+      expect(
+        testController.items
+          .get('src')
+          ?.children.get('utils')
+          ?.children.get('existing.ts'),
+      ).to.exist;
     });
 
     it('should handle multiple files in root directory', () => {
       // Create multiple root files
       const indexItem = testController.createTestItem('index.js', 'Index');
-      const packageItem = testController.createTestItem('package.json', 'Package');
+      const packageItem = testController.createTestItem(
+        'package.json',
+        'Package',
+      );
       const readmeItem = testController.createTestItem('README.md', 'Readme');
 
       testController.items.add(indexItem);
@@ -913,7 +1098,7 @@ describe('testControllerUtils', () => {
       asRelativePathStub.returns('');
 
       const uri = vscode.Uri.file('/');
-      
+
       expect(() => {
         testControllerUtils.removeTestItemsForUri(testController, uri);
       }).to.not.throw();

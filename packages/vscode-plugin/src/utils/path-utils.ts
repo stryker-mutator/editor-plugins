@@ -8,10 +8,13 @@ export const pathUtils = {
     return fs.existsSync(resolvedPath);
   },
 
-  toAbsolutePath(path: string, workspaceFolder: vscode.WorkspaceFolder): string {
+  toAbsolutePath(
+    path: string,
+    workspaceFolder: vscode.WorkspaceFolder,
+  ): string {
     if (nodePath.isAbsolute(path)) {
       return path;
     }
     return nodePath.join(workspaceFolder.uri.fsPath, path);
-  }
+  },
 };

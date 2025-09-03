@@ -98,7 +98,7 @@ export class Process extends EventEmitter {
     data: Buffer,
     logFn: (msg: string, ...labels: string[]) => void,
     label: string,
-    emitEvent: 'data' | 'error'
+    emitEvent: 'data' | 'error',
   ) => {
     const dataString: string = data.toString();
     dataString.split('\n').forEach((line) => {

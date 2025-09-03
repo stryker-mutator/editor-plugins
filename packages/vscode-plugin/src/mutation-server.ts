@@ -2,7 +2,11 @@ import { commonTokens, tokens } from './di';
 import { ServerLocation } from './domain';
 import * as net from 'net';
 import { ContextualLogger } from './logging';
-import { JSONRPCClient, JSONRPCErrorException, JSONRPCRequest } from 'json-rpc-2.0';
+import {
+  JSONRPCClient,
+  JSONRPCErrorException,
+  JSONRPCRequest,
+} from 'json-rpc-2.0';
 import { JsonRpcEventDeserializer } from './utils';
 import { promisify } from 'util';
 import {
@@ -79,7 +83,7 @@ export class MutationServer {
   public async mutationTest(
     mutationTestParams: MutationTestParams,
     onPartialResult: (partialResult: MutationTestResult) => void,
-    ): Promise<MutationTestResult> {
+  ): Promise<MutationTestResult> {
     const subscription = this.#notifications
       .pipe(
         filter(
@@ -97,7 +101,7 @@ export class MutationServer {
         mutationTestParams,
       );
       return result;
-    } catch(e: JSONRPCErrorException | any) {
+    } catch (e: JSONRPCErrorException | any) {
       return Promise.reject(e.message);
     } finally {
       subscription.unsubscribe();

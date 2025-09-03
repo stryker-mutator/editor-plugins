@@ -5,10 +5,10 @@
       "path": ".",
     },
     {
-      "path": "packages/mutation-server-protocol"
+      "path": "packages/mutation-server-protocol",
     },
     {
-      "path": "packages/vscode-plugin"
-    }
-  ]
+      "path": "packages/vscode-plugin",
+    },
+  ],
 }
