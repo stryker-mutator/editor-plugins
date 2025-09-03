@@ -7,12 +7,10 @@
   "scripts": {
     "all": "npm run clean && npm run build && npm run lint && npm run test",
     "clean": "rimraf -g packages/*/dist/ packages/*/*.tsbuildinfo",
-    "build": "npm run build:tsc",
-    "build:tsc": "tsc --build",
+    "build": "lerna run build",
     "test": "lerna run test",
-    "lint": "npm run lint:format",
-    "lint:format": "prettier . --check",
-    "lint:format:fix": "npm run lint:format -- --write",
+    "lint": "prettier . --check",
+    "lint:fix": "npm run lint -- --write",
     "release": "GH_TOKEN=$(gh auth token) lerna version"
   },
   "devDependencies": {

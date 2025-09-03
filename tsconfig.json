@@ -1,4 +1,11 @@
 {
   "files": [],
-  "references": [{ "path": "./packages/mutation-server-protocol" }]
+  "references": [
+    {
+      "path": "./packages/mutation-server-protocol"
+    },
+    {
+      "path": "./packages/vscode-plugin"
+    }
+  ]
 }

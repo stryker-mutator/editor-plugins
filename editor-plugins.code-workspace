@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "name": "parent",
+      "path": ".",
+    },
+    {
+      "path": "packages/mutation-server-protocol",
+    },
+    {
+      "path": "packages/vscode-plugin",
+    },
+  ],
+}

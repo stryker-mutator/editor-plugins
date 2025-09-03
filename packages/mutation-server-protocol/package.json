@@ -11,6 +11,7 @@
     "access": "public"
   },
   "scripts": {
+    "build": "tsc --build",
     "test": "mocha dist/**/*.spec.js"
   },
   "repository": {

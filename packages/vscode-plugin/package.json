@@ -1,0 +1,129 @@
+{
+  "name": "stryker-mutator",
+  "displayName": "Stryker Mutation Testing",
+  "description": "Test your tests with mutation testing.",
+  "version": "0.0.2",
+  "publisher": "stryker-mutator",
+  "author": "Jasper van der Veen",
+  "engines": {
+    "vscode": "^1.102.1"
+  },
+  "categories": [
+    "Testing"
+  ],
+  "keywords": [
+    "stryker",
+    "mutator",
+    "strykerjs",
+    "mutation",
+    "mutation testing",
+    "test",
+    "testing",
+    "stryker mutator",
+    "stryker-mutator",
+    "mutation server protocol",
+    "msp"
+  ],
+  "icon": "images/icon.png",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stryker-mutator/editor-plugins.git",
+    "directory": "packages/vscode-plugin"
+  },
+  "bugs": {
+    "url": "https://github.com/stryker-mutator/editor-plugins/issues"
+  },
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Stryker Mutator",
+      "properties": {
+        "strykerMutator.enable": {
+          "description": "Enable or disable Stryker mutation testing integration for this workspace.",
+          "scope": "resource",
+          "type": "boolean",
+          "default": null
+        },
+        "strykerMutator.watchPattern": {
+          "markdownDescription": "Glob pattern for files to watch for changes and trigger mutation discovery. Uses [VS Code glob pattern syntax](https://code.visualstudio.com/docs/editor/glob-patterns#_glob-pattern-syntax).",
+          "scope": "resource",
+          "type": "string",
+          "default": "**/*.{js,ts,jsx,tsx}"
+        },
+        "strykerMutator.server.path": {
+          "description": "Path to the Stryker server executable. Can be absolute or relative to the workspace folder.",
+          "scope": "resource",
+          "type": "string",
+          "default": "node_modules/.bin/stryker"
+        },
+        "strykerMutator.server.args": {
+          "description": "Arguments to pass to the Stryker server process when starting.",
+          "scope": "resource",
+          "type": "array",
+          "default": [
+            "runServer"
+          ]
+        },
+        "strykerMutator.server.workingDirectory": {
+          "description": "Working directory for the Stryker server process. Defaults to the workspace folder if not set.",
+          "scope": "resource",
+          "type": "string"
+        },
+        "strykerMutator.server.configFile": {
+          "description": "Path to the Stryker configuration file to use. Can be absolute or relative to the workspace folder.",
+          "scope": "resource",
+          "type": "string",
+          "default": "stryker.config.json"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "build": "npm run check-types && npm run lint && node esbuild.js --production",
+    "clean": "rm -rf out",
+    "compile-tests": "npm run clean && tsc -p . --outDir out",
+    "watch-tests": "npm run clean && tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "xvfb-run -a vscode-test",
+    "deploy": "vsce publish --azure-credential",
+    "deploy:prerelease": "vsce publish --azure-credential --pre-release"
+  },
+  "devDependencies": {
+    "@types/chai": "^5.2.2",
+    "@types/chai-as-promised": "^8.0.2",
+    "@types/mocha": "^10.0.9",
+    "@types/node": "24.x",
+    "@types/sinon": "^17.0.4",
+    "@types/sinon-chai": "^4.0.0",
+    "@types/vscode": "^1.95.0",
+    "@typescript-eslint/eslint-plugin": "^8.10.0",
+    "@typescript-eslint/parser": "^8.7.0",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^3.6.0",
+    "chai": "^5.2.1",
+    "chai-as-promised": "^8.0.1",
+    "esbuild": "^0.25.6",
+    "eslint": "^9.13.0",
+    "npm-run-all": "^4.1.5",
+    "sinon": "^21.0.0",
+    "sinon-chai": "^4.0.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "json-rpc-2.0": "^1.7.0",
+    "mutation-server-protocol": "^0.3.0",
+    "rxjs": "^7.8.1",
+    "typed-inject": "^5.0.0"
+  }
+}
