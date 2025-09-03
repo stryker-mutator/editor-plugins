@@ -48,28 +48,64 @@ Mutation locations and ranges are defined using a `start` and `end` position and
 - `start` is **inclusive**: the character at this position is included.
 - `end` is **exclusive**: the character at this position is not included.
 
-### File paths
+## Targeting mutants
 
-The `discover` and `mutationTest` methods accept file paths as an array of strings. A path that ends with `/` indicates a directory.
+The `discover` and `mutationTest` methods both support **targeting specific files or code regions**, using structured input in the form of `FileRange` objects.
 
-Each path can specify exactly which code blocks to mutate/discover using a mutation range. This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`. Some examples:
+- The **`discover`** method accepts an optional `files` array of [`FileRange`](#discover) objects, referring to specific files (optionally scoped by a range) or directories.
+- The **`mutationTest`** method accepts two optional fields. If both are omitted, mutation testing runs across all discovered files:
+  - **`files`**: an array of [`FileRange`](#mutationtest) objects
+  - **`mutants`**: a map of specific mutants, discovered via a prior `discover` call.
 
-- `"src/app.js:1-11"` \
-   Discover/mutation-test test lines 1 through 10 inside app.js. Line 11 is excluded.
-- `"src/app.js:5:4-6:4"` \
-   Discover/mutation-test from line 5, column 4 through line 6, column 4 inside app.js (column 4 is excluded).
-- `"src/util/"` \
-   Discover/mutation-test all files inside the util directory.
+```ts
+type FileRange = {
+  /**
+   * File or directory path. A path ending in `/` indicates a directory.
+   */
+  path: string;
 
-### Methods
+  /**
+   * Optional code range within the file to limit discovery to.
+   * If omitted, the entire file is considered.
+   */
+  range?: Location;
+};
+```
+
+### Examples
+
+Examples of how `FileRange` objects can be used in `discover` or `mutationTest` calls:
+
+```ts
+// Run on an entire file
+{
+  path: "src/app.js"
+}
+
+// Run on all files in a directory
+{
+  path: "src/components/"
+}
+
+// Run on a specific line and column range within a file
+{
+  path: "src/app.js",
+  range: {
+    start: { line: 1, column: 1 },
+    end: { line: 11, column: 1 } // exclusive
+  }
+}
+```
+
+## Methods
 
 The MSP defines the following methods:
 
-- [configure](#configure): Configure the server. Editor plugins are expected to call this on startup, but it can also be called subsequently to change the configuration.
-- [discover](#discover): Discovers mutants in the given file paths.
-- [mutationTest](#mutationtest): The method to start a mutation test run.
+- [`configure`](#configure): Configure the server. Editor plugins are expected to call this on startup, but it can also be called subsequently to change the configuration.
+- [`discover`](#discover): Discovers mutants in the given file paths.
+- [`mutationTest`](#mutationtest): The method to start a mutation test run.
 
-#### Configure
+### Configure
 
 The `configure` method is used to configure the server. The server must respond with a `ConfigureResult` message.
 
@@ -90,7 +126,7 @@ export interface ConfigureResult {
 }
 ```
 
-#### Discover
+### Discover
 
 The `discover` method is used to discover mutants in the given file paths. The server must respond with a `DiscoverResult` message.
 
@@ -99,11 +135,10 @@ The `DiscoveredMutant` type is a subset of the `MutantResult` type. The `MutantR
 ```ts
 type DiscoverParams = {
   /**
-   * The files to run discovery on, or undefined to discover all files in the current project.
-   * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
-   * This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`.
+   * The files or directories to run discovery on, or undefined to discover all files in the current project.
+   * Each scope contains a path and an optional mutation range.
    */
-  files?: string[];
+  files?: FileRange[];
 };
 
 type DiscoverResult = {
@@ -135,7 +170,7 @@ type Position = {
 };
 ```
 
-#### MutationTest
+### MutationTest
 
 The `mutationTest` method starts a mutation test run. The server must respond with a `MutationTestResult` message.
 
@@ -145,13 +180,23 @@ Whenever a partial result is in, the server is expected to send a `reportMutatio
 > The MutantResult should adhere to the [mutation testing report schema](https://github.com/stryker-mutator/mutation-testing-elements/blob/2902d56301cfdaa8ad2be59f3bca07bdf96f89b4/packages/report-schema/src/mutation-testing-report-schema.json#L37)
 
 ```ts
+/**
+ * The specific targets to run mutation testing on, or if both properties are left undefined: run mutation testing on all files in the current project.
+ * Only one of the two properties should be set.
+ * If both properties are set, the `mutants` property takes precedence.
+ */
 type MutationTestParams = {
   /**
-   * The files to run mutation testing on, or undefined to run mutation testing on all files in the current project.
-   * A file ending with a `/` indicates a directory. Each path can specify exactly which code blocks to mutate/discover using a mutation range.
-   * This can be done by postfixing your file with `:startLine[:startColumn]-endLine[:endColumn]`.
+   * Specific source files or directories to run mutation testing on, optionally scoped by range.
+   * If both `files` and `mutants` are omitted, all discovered files will be tested.
    */
-  files?: string[];
+  files?: FileRange[];
+
+  /**
+   * Specific previously discovered mutants to run mutation testing on,
+   * as returned from the `discover` step.
+   */
+  mutants?: DiscoveredFiles;
 };
 
 type MutationTestResult = {
@@ -183,6 +228,6 @@ type MutantStatus =
   | 'RuntimeError';
 ```
 
-### Error messages
+## Error messages
 
 TODO

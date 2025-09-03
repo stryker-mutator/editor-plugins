@@ -28,16 +28,108 @@ describe('Schema', () => {
   ] as const) {
     describe(name, () => {
       it('should have a files field', () => {
-        type.parse({ files: ['src/index.ts'] });
+        type.parse({ files: [{ path: 'src/index.ts' }] });
       });
-      it('should throw if files is not an array of strings', () => {
+      it('should throw if files is not an array of FileRange objects', () => {
         expect(() => type.parse({ files: [42] })).throws();
+        expect(() => type.parse({ files: ['src/index.ts'] })).throws();
       });
       it('should allow files to be undefined', () => {
         type.parse({});
       });
     });
   }
+
+  describe('MutationTestParams', () => {
+    it('should allow mutants to be undefined', () => {
+      MutationTestParams.parse({});
+    });
+
+    it('should allow a valid DiscoveredFiles object as mutants', () => {
+      MutationTestParams.parse({
+        mutants: {
+          'src/example.ts': {
+            mutants: [
+              {
+                id: '1',
+                location: {
+                  start: { line: 1, column: 0 },
+                  end: { line: 1, column: 10 },
+                },
+                mutatorName: 'arithmetic-operator',
+              },
+            ],
+          },
+        },
+      });
+    });
+
+    it('should allow both files and mutants to be defined', () => {
+      MutationTestParams.parse({
+        files: [{ path: 'src/example.ts' }],
+        mutants: {
+          'src/example.ts': {
+            mutants: [
+              {
+                id: '1',
+                location: {
+                  start: { line: 1, column: 0 },
+                  end: { line: 1, column: 10 },
+                },
+                mutatorName: 'arithmetic-operator',
+              },
+            ],
+          },
+        },
+      });
+    });
+
+    it('should throw if mutants is not a record', () => {
+      expect(() =>
+        MutationTestParams.parse({
+          mutants: 42,
+        }),
+      ).throws();
+    });
+
+    it('should throw if a mutant is missing required fields', () => {
+      expect(() =>
+        MutationTestParams.parse({
+          mutants: {
+            'src/example.ts': {
+              mutants: [
+                {
+                  id: '1',
+                  // missing location and mutatorName and replacement
+                },
+              ],
+            },
+          },
+        }),
+      ).throws();
+    });
+  });
+
+  describe('FileRange', () => {
+    it('should parse with optional range', () => {
+      const fileRange = {
+        path: 'src/example.ts',
+        range: {
+          start: { line: 1, column: 0 },
+          end: { line: 2, column: 10 },
+        },
+      };
+      DiscoverParams.parse({ files: [fileRange] });
+    });
+
+    it('should parse without optional range', () => {
+      const fileRange = {
+        path: 'src/example.ts',
+      };
+
+      DiscoverParams.parse({ files: [fileRange] });
+    });
+  });
 
   describe('DiscoverResult', () => {
     it('should have a files field', () => {
