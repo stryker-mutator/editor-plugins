@@ -123,7 +123,7 @@ For the VS Code extension (`packages/vscode-plugin/`), tests are organized in th
 
 This extension integrates with StrykerJS via the Mutation Server Protocol:
 - Spawns StrykerJS process with `runServer` command
-- Communicates via JSON-RPC over stdio
+- Communicates via JSON-RPC over sockets
 - Handles configuration, discovery, and mutation testing operations
 - Presents results in VS Code Test Explorer and inline annotations
 
@@ -132,7 +132,6 @@ This extension integrates with StrykerJS via the Mutation Server Protocol:
 - Use meaningful commit messages following conventional commits
 - Prefer explicit types over `any`
 - Follow VS Code extension development best practices
-- Handle VS Code lifecycle events properly (activation, deactivation)
 
 ## Common Patterns
 

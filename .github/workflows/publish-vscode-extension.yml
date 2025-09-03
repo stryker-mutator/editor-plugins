@@ -1,9 +1,6 @@
 name: Publish VS Code Extension
 
 on:
-  # push:
-  #   tags:
-  #     - '**'
   workflow_dispatch:
 
 jobs:

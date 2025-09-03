@@ -110,7 +110,6 @@ export class Workspace {
         this.#logger.info(
           `Configuration changed for ${wf.getWorkspaceFolder().uri.fsPath}. Reloading workspace folder`,
         );
-        // TODO: Reload only the necessary parts
         await this.removeWorkspaceFolder(wf.getWorkspaceFolder());
         await this.addWorkspaceFolder(wf.getWorkspaceFolder());
       }

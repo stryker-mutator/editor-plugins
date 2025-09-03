@@ -12,7 +12,7 @@ export enum Settings {
 // Define a mapping for the section of each setting
 export const SettingSections = {
   [Settings.FileSystemWatcherPattern]: Constants.AppName,
-  [Settings.MutationTestingEnabled]: Constants.AppName, // No section for this setting
+  [Settings.MutationTestingEnabled]: Constants.AppName,
   [Settings.ServerPath]: `${Constants.AppName}.server`,
   [Settings.ServerArgs]: `${Constants.AppName}.server`,
   [Settings.CurrentWorkingDirectory]: `${Constants.AppName}.server`,
