@@ -1,5 +1,5 @@
 import { commonTokens, tokens } from './di/index';
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { Constants } from './index';
 import { TestRunner } from './test-runner';
 import { testControllerUtils } from './utils/test-controller-utils';
@@ -41,11 +41,16 @@ export class TestExplorer {
     await this.testRunner.runMutationTests(request, this.testController, token);
   }
 
-  processDiscoverResult(discovery: DiscoverResult) {
+  processDiscoverResult(
+    discovery: DiscoverResult,
+    serverWorkingDirectory: string,
+  ) {
     Object.entries(discovery.files).forEach(([relativeFilePath, mutants]) => {
       const fileTestItem = testControllerUtils.getTestItemForFile(
         this.testController,
+        this.workspaceFolder,
         relativeFilePath,
+        serverWorkingDirectory,
       );
       if (fileTestItem) {
         fileTestItem.children.replace([]);
@@ -55,6 +60,7 @@ export class TestExplorer {
           this.testController,
           this.workspaceFolder,
           relativeFilePath,
+          serverWorkingDirectory,
           mutant,
         );
       });

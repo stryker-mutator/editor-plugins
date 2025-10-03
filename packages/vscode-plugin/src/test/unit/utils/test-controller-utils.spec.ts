@@ -5,6 +5,15 @@ import { DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
 import { testControllerUtils } from '../../../utils/test-controller-utils';
 
 describe('testControllerUtils', () => {
+  let workspaceFolderMock: vscode.WorkspaceFolder;
+
+  beforeEach(() => {
+    workspaceFolderMock = {
+      uri: vscode.Uri.file('/workspace/root'),
+      name: 'test-workspace',
+      index: 0,
+    };
+  });
   describe('traverse', () => {
     let testController: vscode.TestController;
     let actionSpy: sinon.SinonSpy;
@@ -79,11 +88,6 @@ describe('testControllerUtils', () => {
         'test-upsert',
         'Test Upsert',
       );
-      workspaceFolder = {
-        uri: vscode.Uri.file('/test/workspace'),
-        name: 'test-workspace',
-        index: 0,
-      };
     });
 
     afterEach(() => {
@@ -104,8 +108,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'src/utils/helper.ts',
+        '.',
         mutant,
       );
 
@@ -146,8 +151,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'index.js',
+        '.',
         mutant,
       );
 
@@ -187,16 +193,18 @@ describe('testControllerUtils', () => {
       // Create first mutant
       testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'src/utils/helper.ts',
+        '.',
         mutant1,
       );
 
       // Create second mutant in same file
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'src/utils/helper.ts',
+        '.',
         mutant2,
       );
 
@@ -231,8 +239,9 @@ describe('testControllerUtils', () => {
 
       testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'src/components/Button.tsx',
+        '.',
         mutant,
       );
 
@@ -262,8 +271,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'math.js',
+        '.',
         mutant,
       );
 
@@ -288,8 +298,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'test.js',
+        '.',
         mutant,
       );
 
@@ -312,8 +323,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'comparison.ts',
+        '.',
         mutantResult,
       );
 
@@ -335,8 +347,9 @@ describe('testControllerUtils', () => {
 
       testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'src/app/components/ui/forms/validation/rules.ts',
+        '.',
         mutant,
       );
 
@@ -378,8 +391,9 @@ describe('testControllerUtils', () => {
 
       testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'special chars/file-with-dashes/test@file#1.js',
+        '.',
         mutant,
       );
 
@@ -410,8 +424,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'func.js',
+        '.',
         mutant,
       );
 
@@ -424,18 +439,12 @@ describe('testControllerUtils', () => {
 
   describe('getTestItemForFile', () => {
     let testController: vscode.TestController;
-    let workspaceFolder: vscode.WorkspaceFolder;
 
     beforeEach(() => {
       testController = vscode.tests.createTestController(
         'test-get-item',
         'Test Get Item',
       );
-      workspaceFolder = {
-        uri: vscode.Uri.file('/test/workspace'),
-        name: 'test-workspace',
-        index: 0,
-      };
     });
 
     afterEach(() => {
@@ -446,7 +455,9 @@ describe('testControllerUtils', () => {
     it('should return undefined for non-existent file', () => {
       const result = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'nonexistent/file.js',
+        '.',
       );
 
       expect(result).to.be.undefined;
@@ -459,7 +470,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'index.js',
+        '.',
       );
 
       expect(result).to.equal(fileItem);
@@ -481,7 +494,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'src/utils/helper.ts',
+        '.',
       );
 
       expect(result).to.equal(helperItem);
@@ -504,14 +519,21 @@ describe('testControllerUtils', () => {
       // Try to get item for path that only partially exists
       const result = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'src/utils/nonexistent.ts',
+        '.',
       );
 
       expect(result).to.be.undefined;
     });
 
     it('should return undefined for empty file path', () => {
-      const result = testControllerUtils.getTestItemForFile(testController, '');
+      const result = testControllerUtils.getTestItemForFile(
+        testController,
+        workspaceFolderMock,
+        '',
+        '.',
+      );
 
       expect(result).to.be.undefined;
     });
@@ -537,7 +559,9 @@ describe('testControllerUtils', () => {
       // Should return the specific file from src directory
       const srcResult = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'src/index.js',
+        '.',
       );
 
       expect(srcResult).to.equal(indexSrcItem);
@@ -546,7 +570,9 @@ describe('testControllerUtils', () => {
       // Should return the specific file from test directory
       const testResult = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'test/index.js',
+        '.',
       );
 
       expect(testResult).to.equal(indexTestItem);
@@ -563,7 +589,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'package.json',
+        '.',
       );
 
       expect(result).to.equal(packageItem);
@@ -577,7 +605,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'src/utils/helper.ts',
+        '.',
       );
 
       expect(result).to.be.undefined;
@@ -598,7 +628,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'src/src/index.js',
+        '.',
       );
 
       expect(result).to.equal(indexItem);
@@ -615,14 +647,18 @@ describe('testControllerUtils', () => {
       // Exact case should work
       const exactResult = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'CamelCase.ts',
+        '.',
       );
       expect(exactResult).to.equal(fileItem);
 
       // Different case should not work
       const wrongCaseResult = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'camelcase.ts',
+        '.',
       );
       expect(wrongCaseResult).to.be.undefined;
     });

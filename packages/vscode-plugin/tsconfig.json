@@ -3,7 +3,9 @@
     "module": "CommonJS",
     "target": "ES2022",
     "lib": ["ES2022"],
+    // "noEmit": true,
     "sourceMap": true,
+    "esModuleInterop": true,
     "rootDir": "src",
     "strict": true /* enable all strict type-checking options */
     /* Additional Checks */

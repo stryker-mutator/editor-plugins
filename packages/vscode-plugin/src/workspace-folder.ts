@@ -71,6 +71,11 @@ export class WorkspaceFolder {
       this.workspaceFolder,
     );
 
+    const serverWorkspaceDirectory = Configuration.getSetting<string>(
+      Settings.CurrentWorkingDirectory,
+      this.workspaceFolder,
+    ) as string;
+
     const serverLocation = await this.process.init();
     const mutationServer = this.injector
       .provideValue(commonTokens.serverLocation, serverLocation)
@@ -95,6 +100,7 @@ export class WorkspaceFolder {
     this.#testExplorer = this.injector
       .provideFactory(commonTokens.testController, provideTestController)
       .provideValue(commonTokens.mutationServer, mutationServer)
+      .provideValue(commonTokens.serverWorkspaceDirectory, serverWorkspaceDirectory)
       .provideClass(commonTokens.testRunner, TestRunner)
       .injectClass(TestExplorer);
 
@@ -114,7 +120,7 @@ export class WorkspaceFolder {
       };
 
       const discoverResult = await mutationServer.discover(mutationTestParams);
-      this.#testExplorer!.processDiscoverResult(discoverResult);
+      this.#testExplorer!.processDiscoverResult(discoverResult, serverWorkspaceDirectory);
     });
 
     this.#fileSystemWatcher.onFilesDeleted(async (uris) => {
@@ -123,7 +129,7 @@ export class WorkspaceFolder {
 
     // Initial discovery of mutants
     const discoverResult = await mutationServer.discover({});
-    this.#testExplorer.processDiscoverResult(discoverResult);
+    this.#testExplorer.processDiscoverResult(discoverResult, serverWorkspaceDirectory);
   }
 
   /**

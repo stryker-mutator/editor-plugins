@@ -13,6 +13,7 @@ export class TestRunner {
   static readonly inject = tokens(
     commonTokens.mutationServer,
     commonTokens.workspaceFolder,
+    commonTokens.serverWorkspaceDirectory,
     commonTokens.testController,
     commonTokens.contextualLogger,
   );
@@ -20,6 +21,7 @@ export class TestRunner {
   constructor(
     private readonly mutationServer: MutationServer,
     private readonly workspaceFolder: vscode.WorkspaceFolder,
+    private readonly serverWorkspaceDirectory: string,
     private readonly testController: vscode.TestController,
     private readonly logger: ContextualLogger,
   ) {}
@@ -103,6 +105,7 @@ export class TestRunner {
           this.testController,
           this.workspaceFolder,
           filePath,
+          this.serverWorkspaceDirectory,
           mutant,
         );
         switch (mutant.status) {
@@ -120,9 +123,17 @@ export class TestRunner {
             testRun.failed(testItem, testMessage);
             break;
         }
-        testRun.appendOutput(this.createOutputMessage(mutant, filePath));
+        testRun.appendOutput(
+          this.createOutputMessage(mutant, filePath),
+          undefined,
+          testItem,
+        );
       }
     }
+  }
+
+  private getSuccessMessage(mutant: MutantResult) {
+    return `Mutant killed: \n- Hello  World\n+ Hello World`;
   }
 
   private async getTestMessage(
@@ -132,7 +143,14 @@ export class TestRunner {
     const message = new vscode.TestMessage(
       `${mutant.mutatorName} (${mutant.location.start.line}:${mutant.location.start.column}) ${mutant.status}`,
     );
-    const uri = vscode.Uri.joinPath(this.workspaceFolder.uri, filePath);
+    const uri = vscode.Uri.joinPath(
+      this.workspaceFolder.uri,
+      testItemUtils.resolveFromWorkspaceRoot(
+        this.workspaceFolder,
+        this.serverWorkspaceDirectory,
+        filePath,
+      ),
+    );
     message.location = new vscode.Location(
       uri,
       locationUtils.locationToRange(mutant.location),
