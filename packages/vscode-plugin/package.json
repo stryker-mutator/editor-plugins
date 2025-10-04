@@ -50,10 +50,10 @@
       "title": "Stryker Mutator",
       "properties": {
         "strykerMutator.enable": {
-          "description": "Enable or disable Stryker mutation testing integration for this workspace.",
+          "description": "Enable the Stryker Mutator extension.",
           "scope": "resource",
           "type": "boolean",
-          "default": null
+          "default": true
         },
         "strykerMutator.watchPattern": {
           "markdownDescription": "Glob pattern for files to watch for changes and trigger mutation discovery. Uses [VS Code glob pattern syntax](https://code.visualstudio.com/docs/editor/glob-patterns#_glob-pattern-syntax).",

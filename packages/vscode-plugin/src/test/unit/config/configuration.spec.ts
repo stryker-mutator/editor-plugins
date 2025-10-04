@@ -26,7 +26,7 @@ describe(Configuration.name, () => {
 
   describe('getSetting', () => {
     it('should get setting from correct section', () => {
-      const setting = Settings.MutationTestingEnabled;
+      const setting = Settings.enable;
       const expectedSection = SettingSections[setting];
       const expectedValue = true;
       mockWorkspaceConfig.get.returns(expectedValue);
@@ -129,7 +129,7 @@ describe(Configuration.name, () => {
 
   describe('updateSetting', () => {
     it('should update setting in correct section', async () => {
-      const setting = Settings.MutationTestingEnabled;
+      const setting = Settings.enable;
       const value = true;
       const expectedSection = SettingSections[setting];
       mockWorkspaceConfig.update.resolves();

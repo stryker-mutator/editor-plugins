@@ -3,17 +3,11 @@ import vscode from 'vscode';
 import { type BaseContext, commonTokens } from './di/index.ts';
 import { Configuration, Settings } from './config/index.ts';
 import { ContextualLogger } from './logging/index.ts';
-import {
-  Constants,
-  Process,
-  MutationServer,
-  UnsupportedServerVersionError,
-} from './index.ts';
-import { ConfigureParams, MutationTestParams } from 'mutation-server-protocol';
+import { MutationServer, TestRunner } from './index.ts';
+import { MutationTestParams } from 'mutation-server-protocol';
 import { provideTestController, TestExplorer } from './test-explorer.ts';
 import { FileSystemWatcher } from './file-system-watcher.ts';
 import fs from 'fs';
-import { TestRunner } from './test-runner.ts';
 import { pathUtils } from './utils/path-utils.ts';
 export interface WorkspaceFolderContext extends BaseContext {
   [commonTokens.loggerContext]: string;
@@ -23,80 +17,53 @@ export interface WorkspaceFolderContext extends BaseContext {
 export class WorkspaceFolder {
   private readonly injector;
   private readonly workspaceFolder;
-  private readonly process;
+  private readonly mutationServer;
   private readonly logger;
   #fileSystemWatcher?: FileSystemWatcher;
   #testExplorer?: TestExplorer;
   static readonly inject = [
     commonTokens.injector,
     commonTokens.workspaceFolder,
-    commonTokens.process,
+    commonTokens.mutationServer,
     commonTokens.contextualLogger,
   ] as const;
   constructor(
     injector: Injector<WorkspaceFolderContext>,
     workspaceFolder: vscode.WorkspaceFolder,
-    process: Process,
+    mutationServer: MutationServer,
     logger: ContextualLogger,
   ) {
     this.injector = injector;
     this.workspaceFolder = workspaceFolder;
-    this.process = process;
+    this.mutationServer = mutationServer;
     this.logger = logger;
-    this.process.on('exit', async (code) => {
-      this.logger.error(`Mutation server process exited with code ${code}`);
-      this.process.dispose();
-    });
   }
   async init() {
-    let enabled = Configuration.getSetting<boolean>(
-      Settings.MutationTestingEnabled,
+    const enabled = Configuration.getSetting<boolean>(
+      Settings.enable,
       this.workspaceFolder,
     );
-    if (enabled === null) {
-      await this.promptUserToConfigureSettings();
-      // Re-check the setting after configuration
-      enabled = Configuration.getSetting<boolean>(
-        Settings.MutationTestingEnabled,
-        this.workspaceFolder,
-      );
-    }
+
     if (!enabled) {
-      this.logger.info(
-        `Mutation testing is disabled for ${this.workspaceFolder.uri.fsPath}`,
-      );
+      this.logger.info("Setting 'enable' is false. Skipping initialization.");
       return;
     }
-    const configFilePath = Configuration.getSetting<string>(
-      Settings.ConfigFilePath,
-      this.workspaceFolder,
-    );
+
+    try {
+      await this.mutationServer.init();
+    } catch (error) {
+      this.logger.error(`Failed to initialize mutation server: ${error}`);
+      return;
+    }
 
     const serverWorkspaceDirectory = Configuration.getSetting<string>(
       Settings.CurrentWorkingDirectory,
       this.workspaceFolder,
     ) as string;
 
-    const serverLocation = await this.process.init();
-    const mutationServer = this.injector
-      .provideValue(commonTokens.serverLocation, serverLocation)
-      .injectClass(MutationServer);
-    const configureParams: ConfigureParams = {
-      configFilePath: configFilePath,
-    };
-    const configureResult = await mutationServer.configure(configureParams);
-    if (configureResult.version !== Constants.SupportedMspVersion) {
-      this.logger.error(
-        `Unsupported mutation server version: ${configureResult.version}`,
-      );
-      throw new UnsupportedServerVersionError(configureResult.version);
-    }
-    this.logger.info(
-      `Mutation server configuration handshake completed. MSP version: ${configureResult.version}`,
-    );
     this.#testExplorer = this.injector
       .provideFactory(commonTokens.testController, provideTestController)
-      .provideValue(commonTokens.mutationServer, mutationServer)
+      .provideValue(commonTokens.mutationServer, this.mutationServer)
       .provideValue(
         commonTokens.serverWorkspaceDirectory,
         serverWorkspaceDirectory,
@@ -115,7 +82,7 @@ export class WorkspaceFolder {
       const mutationTestParams: MutationTestParams = {
         files: fileRanges,
       };
-      const discoverResult = await mutationServer.discover(mutationTestParams);
+      const discoverResult = await this.mutationServer.discover(mutationTestParams);
       this.#testExplorer!.processDiscoverResult(
         discoverResult,
         serverWorkspaceDirectory,
@@ -125,7 +92,7 @@ export class WorkspaceFolder {
       this.#testExplorer!.processFileDeletions(uris);
     });
     // Initial discovery of mutants
-    const discoverResult = await mutationServer.discover({});
+    const discoverResult = await this.mutationServer.discover({});
     this.#testExplorer.processDiscoverResult(
       discoverResult,
       serverWorkspaceDirectory,
@@ -151,7 +118,7 @@ export class WorkspaceFolder {
         'User disabled the Stryker Mutator extension for this workspace folder.',
       );
       await Configuration.updateSettingIfChanged(
-        Settings.MutationTestingEnabled,
+        Settings.enable,
         false,
         this.workspaceFolder,
       );
@@ -181,7 +148,7 @@ export class WorkspaceFolder {
       this.workspaceFolder,
     );
     await Configuration.updateSettingIfChanged(
-      Settings.MutationTestingEnabled,
+      Settings.enable,
       true,
       this.workspaceFolder,
     );
@@ -242,7 +209,7 @@ export class WorkspaceFolder {
   async dispose() {
     this.#fileSystemWatcher?.dispose();
     await this.#testExplorer?.dispose();
-    this.process.dispose();
+    await this.mutationServer.dispose();
     this.logger.info(
       `Disposed workspace folder: ${this.workspaceFolder.uri.fsPath}`,
     );

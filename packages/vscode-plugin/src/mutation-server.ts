@@ -10,7 +10,6 @@ import {
 import { JsonRpcEventDeserializer } from './utils/index.ts';
 import { promisify } from 'util';
 import {
-  ConfigureParams,
   ConfigureResult,
   DiscoverParams,
   DiscoverResult,
@@ -18,6 +17,10 @@ import {
   MutationTestResult,
 } from 'mutation-server-protocol';
 import { filter, map, Subject } from 'rxjs';
+import { Settings, Configuration } from './config/index.ts';
+import vscode from 'vscode';
+import { Constants, Process } from './index.ts';
+
 const rpcMethods = Object.freeze({
   configure: 'configure',
   discover: 'discover',
@@ -26,47 +29,69 @@ const rpcMethods = Object.freeze({
 });
 export class MutationServer {
   private readonly logger;
-  #socket: net.Socket;
-  #jsonRPCClient: JSONRPCClient;
-  #notifications = new Subject<JSONRPCRequest>();
+  private readonly workspaceFolder;
+  private readonly process;
+  private socket?: net.Socket;
+  private jsonRPCClient?: JSONRPCClient;
+  private readonly notifications = new Subject<JSONRPCRequest>();
   public static readonly inject = [
     commonTokens.contextualLogger,
-    commonTokens.serverLocation,
+    commonTokens.workspaceFolder,
+    commonTokens.process,
   ] as const;
-  constructor(logger: ContextualLogger, serverLocation: ServerLocation) {
+  constructor(
+    logger: ContextualLogger,
+    workspaceFolder: vscode.WorkspaceFolder,
+    process: Process,
+  ) {
     this.logger = logger;
-    this.#socket = net.connect(serverLocation.port, serverLocation.host, () => {
-      this.logger.info('Connected to server');
+    this.workspaceFolder = workspaceFolder;
+    this.process = process;
+  }
+  public async init() {
+    const serverLocation = await this.process.init();
+    await this.connect(serverLocation);
+    const serverConfig = await this.configure();
+    if (serverConfig.version !== Constants.SupportedMspVersion) {
+      throw new Error(
+        `Mismatched server version. Expected: ${Constants.SupportedMspVersion}, got: ${serverConfig.version}`);
+    }
+  }
+  private async connect(serverLocation: ServerLocation) {
+    this.socket = net.connect(serverLocation.port, serverLocation.host, () => {
+      this.logger.info('Connected to socket of mutation server');
     });
-    this.#jsonRPCClient = new JSONRPCClient((jsonRPCRequest) => {
+    this.jsonRPCClient = new JSONRPCClient((jsonRPCRequest) => {
       const content = Buffer.from(JSON.stringify(jsonRPCRequest));
-      this.#socket.write(`Content-Length: ${content.byteLength}\r\n\r\n`);
-      this.#socket.write(content);
+      this.socket!.write(`Content-Length: ${content.byteLength}\r\n\r\n`);
+      this.socket!.write(content);
     });
     const deserializer = new JsonRpcEventDeserializer();
-    this.#socket.on('data', (data) => {
+    this.socket.on('data', (data) => {
       const events = deserializer.deserialize(data);
       for (const event of events) {
         if (event.id === undefined) {
-          this.#notifications.next(event);
+          this.notifications.next(event);
         } else {
-          this.#jsonRPCClient.receive(event);
+          this.jsonRPCClient!.receive(event);
         }
       }
     });
   }
-  public async configure(
-    configureParams: ConfigureParams,
-  ): Promise<ConfigureResult> {
-    return await this.#jsonRPCClient.request(
+  private async configure(): Promise<ConfigureResult> {
+    const configFilePath = Configuration.getSetting<string>(
+      Settings.ConfigFilePath,
+      this.workspaceFolder,
+    );
+    return await this.jsonRPCClient!.request(
       rpcMethods.configure,
-      configureParams,
+      { configFilePath },
     );
   }
   public async discover(
     discoverParams: DiscoverParams,
   ): Promise<DiscoverResult> {
-    return await this.#jsonRPCClient.request(
+    return await this.jsonRPCClient!.request(
       rpcMethods.discover,
       discoverParams,
     );
@@ -75,7 +100,7 @@ export class MutationServer {
     mutationTestParams: MutationTestParams,
     onPartialResult: (partialResult: MutationTestResult) => void,
   ): Promise<MutationTestResult> {
-    const subscription = this.#notifications
+    const subscription = this.notifications
       .pipe(
         filter(
           (notification) =>
@@ -86,7 +111,7 @@ export class MutationServer {
       )
       .subscribe(onPartialResult);
     try {
-      const result = await this.#jsonRPCClient.request(
+      const result = await this.jsonRPCClient!.request(
         rpcMethods.mutationTest,
         mutationTestParams,
       );
@@ -98,6 +123,7 @@ export class MutationServer {
     }
   }
   public async dispose() {
-    await promisify(this.#socket.end.bind(this.#socket))();
+    await promisify(this.socket!.end.bind(this.socket))();
+    this.process.dispose();
   }
 }
