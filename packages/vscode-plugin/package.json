@@ -71,7 +71,8 @@
         "strykerMutator.server.workingDirectory": {
           "description": "Working directory for the Stryker server process. Defaults to the workspace folder if not set.",
           "scope": "resource",
-          "type": "string"
+          "type": "string",
+          "default": "."
         },
         "strykerMutator.server.configFile": {
           "description": "Path to the Stryker configuration file to use. Can be absolute or relative to the workspace folder.",
@@ -87,7 +88,7 @@
     "compile": "npm run check-types && npm run lint && node esbuild.js",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
-    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "watch:tsc": "tsc --watch --noEmit",
     "build": "npm run check-types && npm run lint && node esbuild.js --production",
     "clean": "rm -rf out",
     "compile-tests": "npm run clean && tsc --outDir out",

@@ -42,11 +42,17 @@ export class TestExplorer {
   ) {
     await this.testRunner.runMutationTests(request, this.testController, token);
   }
-  processDiscoverResult(discovery: DiscoverResult) {
+
+  processDiscoverResult(
+    discovery: DiscoverResult,
+    serverWorkingDirectory: string,
+  ) {
     Object.entries(discovery.files).forEach(([relativeFilePath, mutants]) => {
       const fileTestItem = testControllerUtils.getTestItemForFile(
         this.testController,
+        this.workspaceFolder,
         relativeFilePath,
+        serverWorkingDirectory,
       );
       if (fileTestItem) {
         fileTestItem.children.replace([]);
@@ -56,6 +62,7 @@ export class TestExplorer {
           this.testController,
           this.workspaceFolder,
           relativeFilePath,
+          serverWorkingDirectory,
           mutant,
         );
       });

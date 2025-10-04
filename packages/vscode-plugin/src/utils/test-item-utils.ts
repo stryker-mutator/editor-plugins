@@ -4,10 +4,26 @@ import {
   MutantResult,
   MutationTestParams,
 } from 'mutation-server-protocol';
-import { locationUtils } from './location-utils.ts';
 import fs from 'fs';
+import path from 'path';
+import { locationUtils } from './location-utils.ts';
 
 export const testItemUtils = {
+  resolveFromWorkspaceRoot(
+    workspaceFolder: vscode.WorkspaceFolder,
+    serverWorkingDirectory: string,
+    mutantRelativeFilePath: string,
+  ) {
+    return path.relative(
+      workspaceFolder.uri.fsPath,
+      path.resolve(
+        workspaceFolder.uri.fsPath,
+        serverWorkingDirectory,
+        mutantRelativeFilePath,
+      ),
+    );
+  },
+
   isMutantInTestTree(
     mutant: MutantResult,
     testItems: vscode.TestItem[],

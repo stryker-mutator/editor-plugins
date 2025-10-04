@@ -10,6 +10,7 @@ export const commonTokens = Object.freeze({
   loggerContext: 'loggerContext',
   contextualLogger: 'contextualLogger',
   workspaceFolder: 'workspaceFolder',
+  serverWorkspaceDirectory: 'serverWorkspaceDirectory',
   process: 'process',
   serverLocation: 'serverLocation',
   mutationServer: 'mutationServer',

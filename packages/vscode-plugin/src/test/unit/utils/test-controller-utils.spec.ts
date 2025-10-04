@@ -3,8 +3,18 @@ import sinon from 'sinon';
 import vscode from 'vscode';
 import { DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
 import { testControllerUtils } from '../../../utils/test-controller-utils.ts';
+import { createDiscoveredMutant } from '../../factory.ts';
 
 describe('testControllerUtils', () => {
+  let workspaceFolderMock: vscode.WorkspaceFolder;
+
+  beforeEach(() => {
+    workspaceFolderMock = {
+      uri: vscode.Uri.file('/workspace/root'),
+      name: 'test-workspace',
+      index: 0,
+    };
+  });
   describe('traverse', () => {
     let testController: vscode.TestController;
     let actionSpy: sinon.SinonSpy;
@@ -72,18 +82,12 @@ describe('testControllerUtils', () => {
 
   describe('upsertMutantTestItem', () => {
     let testController: vscode.TestController;
-    let workspaceFolder: vscode.WorkspaceFolder;
 
     beforeEach(() => {
       testController = vscode.tests.createTestController(
         'test-upsert',
         'Test Upsert',
       );
-      workspaceFolder = {
-        uri: vscode.Uri.file('/test/workspace'),
-        name: 'test-workspace',
-        index: 0,
-      };
     });
 
     afterEach(() => {
@@ -104,8 +108,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'src/utils/helper.ts',
+        '.',
         mutant,
       );
 
@@ -146,8 +151,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'index.js',
+        '.',
         mutant,
       );
 
@@ -187,16 +193,18 @@ describe('testControllerUtils', () => {
       // Create first mutant
       testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'src/utils/helper.ts',
+        '.',
         mutant1,
       );
 
       // Create second mutant in same file
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'src/utils/helper.ts',
+        '.',
         mutant2,
       );
 
@@ -231,8 +239,9 @@ describe('testControllerUtils', () => {
 
       testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'src/components/Button.tsx',
+        '.',
         mutant,
       );
 
@@ -240,12 +249,57 @@ describe('testControllerUtils', () => {
       const componentsItem = srcItem?.children.get('components');
       const buttonItem = componentsItem?.children.get('Button.tsx');
 
-      expect(srcItem?.uri?.fsPath).to.equal('/test/workspace/src');
+      expect(srcItem?.uri?.fsPath).to.equal('/workspace/root/src');
       expect(componentsItem?.uri?.fsPath).to.equal(
-        '/test/workspace/src/components',
+        '/workspace/root/src/components',
       );
       expect(buttonItem?.uri?.fsPath).to.equal(
-        '/test/workspace/src/components/Button.tsx',
+        '/workspace/root/src/components/Button.tsx',
+      );
+    });
+
+    it('should base mutant uri on a relative server workspace directory', () => {
+      const mutant = createDiscoveredMutant();
+
+      testControllerUtils.upsertMutantTestItem(
+        testController,
+        workspaceFolderMock,
+        'src/components/Button.tsx',
+        'app',
+        mutant,
+      );
+
+      const appItem = testController.items.get('app');
+      const srcItem = appItem?.children.get('src');
+      const componentsItem = srcItem?.children.get('components');
+      const buttonItem = componentsItem?.children.get('Button.tsx');
+
+      expect(srcItem?.uri?.fsPath).to.equal('/workspace/root/app/src');
+      expect(componentsItem?.uri?.fsPath).to.equal(
+        '/workspace/root/app/src/components',
+      );
+      expect(buttonItem?.uri?.fsPath).to.equal(
+        '/workspace/root/app/src/components/Button.tsx',
+      );
+    });
+
+    it('should base mutant uri on an absolute server workspace directory', () => {
+      const mutant = createDiscoveredMutant();
+      const absoluteServerDir = '/workspace/root/app';
+      testControllerUtils.upsertMutantTestItem(
+        testController,
+        workspaceFolderMock,
+        'src/components/Button.tsx',
+        absoluteServerDir,
+        mutant,
+      );
+      const appItem = testController.items.get('app');
+      const srcItem = appItem?.children.get('src');
+      const componentsItem = srcItem?.children.get('components');
+      const buttonItem = componentsItem?.children.get('Button.tsx');
+      expect(srcItem?.uri?.fsPath).to.equal('/workspace/root/app/src');
+      expect(buttonItem?.uri?.fsPath).to.equal(
+        '/workspace/root/app/src/components/Button.tsx',
       );
     });
 
@@ -262,8 +316,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'math.js',
+        '.',
         mutant,
       );
 
@@ -288,8 +343,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'test.js',
+        '.',
         mutant,
       );
 
@@ -312,8 +368,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'comparison.ts',
+        '.',
         mutantResult,
       );
 
@@ -335,8 +392,9 @@ describe('testControllerUtils', () => {
 
       testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'src/app/components/ui/forms/validation/rules.ts',
+        '.',
         mutant,
       );
 
@@ -378,8 +436,9 @@ describe('testControllerUtils', () => {
 
       testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'special chars/file-with-dashes/test@file#1.js',
+        '.',
         mutant,
       );
 
@@ -410,32 +469,27 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.upsertMutantTestItem(
         testController,
-        workspaceFolder,
+        workspaceFolderMock,
         'func.js',
+        '.',
         mutant,
       );
 
       expect(result).to.be.instanceOf(Object);
       expect(result.id).to.equal('ReturnStatement(15:8-15:20) (return false)');
       expect(result.label).to.equal('ReturnStatement (Ln 15, Col 8)');
-      expect(result.uri?.fsPath).to.equal('/test/workspace/func.js');
+      expect(result.uri?.fsPath).to.equal('/workspace/root/func.js');
     });
   });
 
   describe('getTestItemForFile', () => {
     let testController: vscode.TestController;
-    let workspaceFolder: vscode.WorkspaceFolder;
 
     beforeEach(() => {
       testController = vscode.tests.createTestController(
         'test-get-item',
         'Test Get Item',
       );
-      workspaceFolder = {
-        uri: vscode.Uri.file('/test/workspace'),
-        name: 'test-workspace',
-        index: 0,
-      };
     });
 
     afterEach(() => {
@@ -446,7 +500,9 @@ describe('testControllerUtils', () => {
     it('should return undefined for non-existent file', () => {
       const result = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'nonexistent/file.js',
+        '.',
       );
 
       expect(result).to.be.undefined;
@@ -459,7 +515,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'index.js',
+        '.',
       );
 
       expect(result).to.equal(fileItem);
@@ -481,7 +539,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'src/utils/helper.ts',
+        '.',
       );
 
       expect(result).to.equal(helperItem);
@@ -504,14 +564,21 @@ describe('testControllerUtils', () => {
       // Try to get item for path that only partially exists
       const result = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'src/utils/nonexistent.ts',
+        '.',
       );
 
       expect(result).to.be.undefined;
     });
 
     it('should return undefined for empty file path', () => {
-      const result = testControllerUtils.getTestItemForFile(testController, '');
+      const result = testControllerUtils.getTestItemForFile(
+        testController,
+        workspaceFolderMock,
+        '',
+        '.',
+      );
 
       expect(result).to.be.undefined;
     });
@@ -537,7 +604,9 @@ describe('testControllerUtils', () => {
       // Should return the specific file from src directory
       const srcResult = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'src/index.js',
+        '.',
       );
 
       expect(srcResult).to.equal(indexSrcItem);
@@ -546,7 +615,9 @@ describe('testControllerUtils', () => {
       // Should return the specific file from test directory
       const testResult = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'test/index.js',
+        '.',
       );
 
       expect(testResult).to.equal(indexTestItem);
@@ -563,11 +634,40 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'package.json',
+        '.',
       );
 
       expect(result).to.equal(packageItem);
       expect(result?.id).to.equal('package.json');
+    });
+
+    it('should locate files correctly using a relative server workspace directory', () => {
+      // Create a root level file
+      const appItem = testController.createTestItem('app', 'app');
+      const srcItem = testController.createTestItem('src', 'Source');
+      const componentsItem = testController.createTestItem(
+        'components',
+        'Components',
+      );
+      const buttonItem = testController.createTestItem(
+        'Button.tsx',
+        'Button File',
+      );
+      appItem.children.add(srcItem);
+      srcItem.children.add(componentsItem);
+      componentsItem.children.add(buttonItem);
+      testController.items.add(appItem);
+
+      const result = testControllerUtils.getTestItemForFile(
+        testController,
+        workspaceFolderMock,
+        'src/components/Button.tsx',
+        'app',
+      );
+
+      expect(result).to.equal(buttonItem);
     });
 
     it('should return undefined when intermediate directory is missing', () => {
@@ -577,7 +677,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'src/utils/helper.ts',
+        '.',
       );
 
       expect(result).to.be.undefined;
@@ -598,7 +700,9 @@ describe('testControllerUtils', () => {
 
       const result = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'src/src/index.js',
+        '.',
       );
 
       expect(result).to.equal(indexItem);
@@ -615,14 +719,18 @@ describe('testControllerUtils', () => {
       // Exact case should work
       const exactResult = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'CamelCase.ts',
+        '.',
       );
       expect(exactResult).to.equal(fileItem);
 
       // Different case should not work
       const wrongCaseResult = testControllerUtils.getTestItemForFile(
         testController,
+        workspaceFolderMock,
         'camelcase.ts',
+        '.',
       );
       expect(wrongCaseResult).to.be.undefined;
     });

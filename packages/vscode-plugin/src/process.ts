@@ -11,6 +11,7 @@ import { Configuration, Settings } from './config/index.ts';
 import { type ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import type { ServerLocation } from './domain/index.ts';
+import path from 'path';
 export class Process extends EventEmitter {
   private readonly workspaceFolder;
   private readonly logger;
@@ -43,26 +44,36 @@ export class Process extends EventEmitter {
       [],
       this.workspaceFolder,
     );
-    const cwd = Configuration.getSettingOrDefault<string>(
+    const serverWorkingDirectory = Configuration.getSettingOrDefault<string>(
       Settings.CurrentWorkingDirectory,
       this.workspaceFolder.uri.fsPath,
       this.workspaceFolder,
     );
+    const cwd = path.resolve(
+      this.workspaceFolder.uri.fsPath,
+      serverWorkingDirectory,
+    );
+
     this.logger.info(
       `Server configuration: path=${serverPath}, args=${serverArgs}, cwd=${cwd}`,
     );
-    this.#process = spawn(serverPath, serverArgs, { cwd: cwd });
-    if (this.#process.pid === undefined) {
-      this.logger.error('Server process could not be spawned.');
-      throw new CouldNotSpawnProcessError();
-    }
-    this.logger.info(`Server process started with PID ${this.#process.pid}`);
+
+    this.#process = spawn(serverPath, serverArgs, { cwd });
+
     this.#process.stdout.on('data', (data) => {
       this.handleProcessOutput(data, this.logger.info, 'SERVER', 'data');
     });
     this.#process.stderr.on('data', (data) => {
       this.handleProcessOutput(data, this.logger.error, 'SERVER', 'error');
     });
+
+    if (this.#process.pid === undefined) {
+      this.logger.error('Server process could not be spawned.');
+      throw new CouldNotSpawnProcessError();
+    }
+
+    this.logger.info(`Server process started with PID ${this.#process.pid}`);
+
     this.#process.on('exit', (code) => this.emit('exit', code));
     return await this.getServerLocation();
   }

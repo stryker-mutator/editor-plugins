@@ -13,23 +13,29 @@ export class TestRunner {
   private readonly workspaceFolder;
   private readonly testController;
   private readonly logger;
+  private readonly serverWorkspaceDirectory;
   static readonly inject = [
     commonTokens.mutationServer,
     commonTokens.workspaceFolder,
+    commonTokens.serverWorkspaceDirectory,
     commonTokens.testController,
     commonTokens.contextualLogger,
   ] as const;
+
   constructor(
     mutationServer: MutationServer,
     workspaceFolder: vscode.WorkspaceFolder,
+    serverWorkspaceDirectory: string,
     testController: vscode.TestController,
     logger: ContextualLogger,
   ) {
+    this.serverWorkspaceDirectory = serverWorkspaceDirectory;
     this.mutationServer = mutationServer;
     this.workspaceFolder = workspaceFolder;
     this.testController = testController;
     this.logger = logger;
   }
+
   async runMutationTests(
     request: vscode.TestRunRequest,
     testController: vscode.TestController,
@@ -104,6 +110,7 @@ export class TestRunner {
           this.testController,
           this.workspaceFolder,
           filePath,
+          this.serverWorkspaceDirectory,
           mutant,
         );
         switch (mutant.status) {
@@ -121,10 +128,15 @@ export class TestRunner {
             testRun.failed(testItem, testMessage);
             break;
         }
-        testRun.appendOutput(this.createOutputMessage(mutant, filePath));
+        testRun.appendOutput(
+          this.createOutputMessage(mutant, filePath),
+          undefined,
+          testItem,
+        );
       }
     }
   }
+
   private async getTestMessage(
     mutant: MutantResult,
     filePath: string,
@@ -132,7 +144,14 @@ export class TestRunner {
     const message = new vscode.TestMessage(
       `${mutant.mutatorName} (${mutant.location.start.line}:${mutant.location.start.column}) ${mutant.status}`,
     );
-    const uri = vscode.Uri.joinPath(this.workspaceFolder.uri, filePath);
+    const uri = vscode.Uri.joinPath(
+      this.workspaceFolder.uri,
+      testItemUtils.resolveFromWorkspaceRoot(
+        this.workspaceFolder,
+        this.serverWorkspaceDirectory,
+        filePath,
+      ),
+    );
     message.location = new vscode.Location(
       uri,
       locationUtils.locationToRange(mutant.location),
