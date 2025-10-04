@@ -1,6 +1,6 @@
-import * as fs from 'fs';
+import fs from 'fs';
 import * as nodePath from 'path';
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 
 export const pathUtils = {
   fileExists(path: string, workspaceFolder: vscode.WorkspaceFolder): boolean {

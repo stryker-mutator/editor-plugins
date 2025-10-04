@@ -1,29 +1,35 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { MutationTestResult, MutantResult } from 'mutation-server-protocol';
-import { ContextualLogger } from './logging/index';
-import { MutationServer } from './index';
-import { commonTokens, tokens } from './di/index';
+import { ContextualLogger } from './logging/index.ts';
+import { MutationServer } from './index.ts';
+import { commonTokens } from './di/index.ts';
 import {
   locationUtils,
   testItemUtils,
   testControllerUtils,
-} from './utils/index';
-
+} from './utils/index.ts';
 export class TestRunner {
-  static readonly inject = tokens(
+  private readonly mutationServer;
+  private readonly workspaceFolder;
+  private readonly testController;
+  private readonly logger;
+  static readonly inject = [
     commonTokens.mutationServer,
     commonTokens.workspaceFolder,
     commonTokens.testController,
     commonTokens.contextualLogger,
-  );
-
+  ] as const;
   constructor(
-    private readonly mutationServer: MutationServer,
-    private readonly workspaceFolder: vscode.WorkspaceFolder,
-    private readonly testController: vscode.TestController,
-    private readonly logger: ContextualLogger,
-  ) {}
-
+    mutationServer: MutationServer,
+    workspaceFolder: vscode.WorkspaceFolder,
+    testController: vscode.TestController,
+    logger: ContextualLogger,
+  ) {
+    this.mutationServer = mutationServer;
+    this.workspaceFolder = workspaceFolder;
+    this.testController = testController;
+    this.logger = logger;
+  }
   async runMutationTests(
     request: vscode.TestRunRequest,
     testController: vscode.TestController,
@@ -38,21 +44,17 @@ export class TestRunner {
     const queue: vscode.TestItem[] = request.include
       ? [...request.include]
       : [...testController.items].map(([_, testItem]) => testItem);
-
     queue.forEach((testItem) => {
       testControllerUtils.traverse(testItem, (item) => {
         testRun.started(item);
       });
     });
-
     token.onCancellationRequested(async () => {
       testRun.appendOutput('Test run cancellation requested, ending test run.');
       testRun.end();
     });
-
     const mutationTestParams = testItemUtils.toMutationTestParams(queue);
     let progressPromises: Promise<void>[] = [];
-
     try {
       await this.mutationServer.mutationTest(
         mutationTestParams,
@@ -86,7 +88,6 @@ export class TestRunner {
       this.logger.info('Mutation test run finished');
     }
   }
-
   private async processMutationTestResult(
     mutationTestResult: MutationTestResult,
     testRun: vscode.TestRun,
@@ -124,7 +125,6 @@ export class TestRunner {
       }
     }
   }
-
   private async getTestMessage(
     mutant: MutantResult,
     filePath: string,
@@ -175,14 +175,12 @@ export class TestRunner {
       return message;
     }
   }
-
   private createOutputMessage(mutant: MutantResult, filePath: string): string {
     let outputMessage = '';
     const relativeFilePath = vscode.workspace.asRelativePath(filePath, false);
     const makeBold = (text: string) => `\x1b[1m${text}\x1b[0m`;
     const makeBlue = (text: string) => `\x1b[34m${text}\x1b[0m`;
     const makeYellow = (text: string) => `\x1b[33m${text}\x1b[0m`;
-
     outputMessage += `[${mutant.status}] ${mutant.mutatorName}\r\n`;
     outputMessage += `${makeBlue(relativeFilePath)}:${makeYellow(mutant.location.start.line.toString())}:${makeYellow(mutant.location.start.column.toString())}\r\n`;
     outputMessage += `${makeBold('Replacement:')} ${mutant.replacement}\r\n`;

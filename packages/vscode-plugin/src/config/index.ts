@@ -1,2 +1,2 @@
-export * from './configuration';
-export * from './settings';
+export * from './configuration.ts';
+export * from './settings.ts';
