@@ -1,10 +1,9 @@
-import { commonTokens, tokens } from './di/index';
-import * as vscode from 'vscode';
-import { Constants } from './index';
-import { TestRunner } from './test-runner';
-import { testControllerUtils } from './utils/test-controller-utils';
+import { commonTokens } from './di/index.ts';
+import vscode from 'vscode';
+import { Constants } from './index.ts';
+import { TestRunner } from './test-runner.ts';
+import { testControllerUtils } from './utils/test-controller-utils.ts';
 import { DiscoverResult } from 'mutation-server-protocol';
-
 export function provideTestController(
   workspaceFolder: vscode.WorkspaceFolder,
 ): vscode.TestController {
@@ -13,34 +12,36 @@ export function provideTestController(
     workspaceFolder.name,
   );
 }
-provideTestController.inject = tokens(commonTokens.workspaceFolder);
-
+provideTestController.inject = [commonTokens.workspaceFolder] as const;
 export class TestExplorer {
-  static readonly inject = tokens(
+  private readonly testController;
+  private readonly testRunner;
+  private readonly workspaceFolder;
+  static readonly inject = [
     commonTokens.testController,
     commonTokens.testRunner,
     commonTokens.workspaceFolder,
-  );
-
+  ] as const;
   constructor(
-    private readonly testController: vscode.TestController,
-    private readonly testRunner: TestRunner,
-    private readonly workspaceFolder: vscode.WorkspaceFolder,
+    testController: vscode.TestController,
+    testRunner: TestRunner,
+    workspaceFolder: vscode.WorkspaceFolder,
   ) {
+    this.testController = testController;
+    this.testRunner = testRunner;
+    this.workspaceFolder = workspaceFolder;
     this.testController.createRunProfile(
       Constants.TestRunProfileLabel,
       vscode.TestRunProfileKind.Run,
       this.testRunHandler.bind(this),
     );
   }
-
   async testRunHandler(
     request: vscode.TestRunRequest,
     token: vscode.CancellationToken,
   ) {
     await this.testRunner.runMutationTests(request, this.testController, token);
   }
-
   processDiscoverResult(discovery: DiscoverResult) {
     Object.entries(discovery.files).forEach(([relativeFilePath, mutants]) => {
       const fileTestItem = testControllerUtils.getTestItemForFile(
@@ -60,13 +61,11 @@ export class TestExplorer {
       });
     });
   }
-
   processFileDeletions(uris: vscode.Uri[]) {
     for (const uri of uris) {
       testControllerUtils.removeTestItemsForUri(this.testController, uri);
     }
   }
-
   async dispose() {
     this.testController.dispose();
     // Wait for the event loop to process disposal,

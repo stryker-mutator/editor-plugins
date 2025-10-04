@@ -1,11 +1,11 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import {
   FileRange,
   MutantResult,
   MutationTestParams,
 } from 'mutation-server-protocol';
-import { locationUtils } from './location-utils';
-import * as fs from 'fs';
+import { locationUtils } from './location-utils.ts';
+import fs from 'fs';
 
 export const testItemUtils = {
   isMutantInTestTree(

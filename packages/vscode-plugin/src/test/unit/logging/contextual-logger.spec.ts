@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import * as sinon from 'sinon';
-import { ContextualLogger } from '../../../logging/contextual-logger';
-import { Logger } from '../../../logging/logger';
+import sinon from 'sinon';
+import { ContextualLogger } from '../../../logging/contextual-logger.ts';
+import { Logger } from '../../../logging/logger.ts';
 
 describe(ContextualLogger.name, () => {
   let mockLogger: sinon.SinonStubbedInstance<Logger>;

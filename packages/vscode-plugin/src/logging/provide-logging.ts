@@ -1,6 +1,6 @@
-import { Injector } from 'typed-inject';
-import { commonTokens } from '../di/index';
-import { Logger } from './index';
+import type { Injector } from 'typed-inject';
+import { commonTokens } from '../di/index.ts';
+import { Logger } from './index.ts';
 
 export function provideLogger(injector: Injector) {
   return injector.provideValue(

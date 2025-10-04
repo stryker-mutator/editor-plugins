@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { JsonRpcEventDeserializer } from '../../../utils/json-rpc-event-deserializer.js';
+import { JsonRpcEventDeserializer } from '../../../utils/json-rpc-event-deserializer.ts';
 
 describe(JsonRpcEventDeserializer.name, () => {
   let sut: JsonRpcEventDeserializer;

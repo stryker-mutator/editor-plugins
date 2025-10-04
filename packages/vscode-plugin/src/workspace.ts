@@ -1,19 +1,19 @@
-import * as vscode from 'vscode';
-import { commonTokens } from './di/tokens';
-import { ContextualLogger, provideLogger } from './logging/index';
-import { WorkspaceFolder, Constants, Process } from './index';
-import { BaseContext } from './di/index';
-import { createInjector, Injector } from 'typed-inject';
-
+import vscode from 'vscode';
+import { commonTokens } from './di/tokens.ts';
+import { ContextualLogger, provideLogger } from './logging/index.ts';
+import { WorkspaceFolder, Constants, Process } from './index.ts';
+import type { BaseContext } from './di/index.ts';
+import { createInjector, type Injector } from 'typed-inject';
 export class Workspace {
+  private readonly injectorFactory;
   #logger: ContextualLogger;
   #baseContextProvider: Injector<BaseContext>;
   #workspaceFolders: WorkspaceFolder[] = [];
-
   constructor(
     context: vscode.ExtensionContext,
-    private readonly injectorFactory = createInjector,
+    injectorFactory = createInjector,
   ) {
+    this.injectorFactory = injectorFactory;
     const rootInjector = this.injectorFactory();
     this.#baseContextProvider = provideLogger(rootInjector).provideValue(
       commonTokens.context,
@@ -31,7 +31,6 @@ export class Workspace {
       ),
     );
   }
-
   async init() {
     this.#logger.info('(Re)loading workspace');
     await Promise.all(
@@ -39,13 +38,11 @@ export class Workspace {
         this.removeWorkspaceFolder(wf.getWorkspaceFolder()),
       ),
     );
-
     const workspaceFolders = vscode.workspace.workspaceFolders || [];
     if (workspaceFolders.length === 0) {
       this.#logger.info('No workspace (folder) is opened');
       return;
     }
-
     await Promise.all(
       workspaceFolders.map((folder) =>
         this.addWorkspaceFolder(folder).catch((error: any) => {
@@ -54,7 +51,6 @@ export class Workspace {
       ),
     );
   }
-
   private async removeWorkspaceFolder(folder: vscode.WorkspaceFolder) {
     const index = this.#workspaceFolders.findIndex(
       (wf) => wf.getWorkspaceFolder() === folder,
@@ -68,38 +64,31 @@ export class Workspace {
       `Workspace folder could not be removed: ${folder.uri.fsPath}`,
     );
   }
-
   private async addWorkspaceFolder(folder: vscode.WorkspaceFolder) {
     if (this.workspaceFolderExists(folder)) {
       return;
     }
-
     const workspaceFolderInjector = this.#baseContextProvider.provideValue(
       commonTokens.workspaceFolder,
       folder,
     );
-
     const workspaceFolder = workspaceFolderInjector
       .provideValue(commonTokens.loggerContext, folder.name)
       .provideClass(commonTokens.contextualLogger, ContextualLogger)
       .provideClass(commonTokens.process, Process)
       .injectClass(WorkspaceFolder);
-
     await workspaceFolder.init();
     this.#workspaceFolders.push(workspaceFolder);
   }
-
   private workspaceFolderExists(folder: vscode.WorkspaceFolder) {
     return this.#workspaceFolders.some(
       (wf) => wf.getWorkspaceFolder() === folder,
     );
   }
-
   private async onWorkspaceFoldersChanged(
     event: vscode.WorkspaceFoldersChangeEvent,
   ) {
     this.#logger.info('Handling workspace folders change');
-
     await Promise.all(
       event.removed.map((folder) => this.removeWorkspaceFolder(folder)),
     );
@@ -107,7 +96,6 @@ export class Workspace {
       event.added.map((folder) => this.addWorkspaceFolder(folder)),
     );
   }
-
   private async onDidChangeConfiguration(
     event: vscode.ConfigurationChangeEvent,
   ) {
@@ -123,7 +111,6 @@ export class Workspace {
       }
     }
   }
-
   async dispose() {
     this.#logger.info('Unloading workspace');
     await Promise.all(

@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 
 export class Logger {
   private outputChannel: vscode.OutputChannel;

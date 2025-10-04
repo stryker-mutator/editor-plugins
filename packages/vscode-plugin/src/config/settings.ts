@@ -1,13 +1,13 @@
-import { Constants } from '../constants';
-
-export enum Settings {
-  MutationTestingEnabled = 'enable',
-  ServerPath = 'path',
-  ServerArgs = 'args',
-  CurrentWorkingDirectory = 'workingDirectory',
-  ConfigFilePath = 'configFile',
-  FileSystemWatcherPattern = 'watchPattern',
-}
+import { Constants } from '../constants.ts';
+export const Settings = {
+  MutationTestingEnabled: 'enable',
+  ServerPath: 'path',
+  ServerArgs: 'args',
+  CurrentWorkingDirectory: 'workingDirectory',
+  ConfigFilePath: 'configFile',
+  FileSystemWatcherPattern: 'watchPattern',
+} as const;
+export type Settings = (typeof Settings)[keyof typeof Settings];
 
 // Define a mapping for the section of each setting
 export const SettingSections = {

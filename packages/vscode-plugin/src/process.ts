@@ -1,44 +1,43 @@
-import { commonTokens, tokens } from './di/index';
+import { commonTokens } from './di/index.ts';
 import {
   Constants,
   MissingServerPathError,
   CouldNotSpawnProcessError,
   ServerStartupTimeoutError,
-} from './index';
-import * as vscode from 'vscode';
-import { ContextualLogger } from './logging/index';
-import { Configuration, Settings } from './config/index';
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import { EventEmitter } from 'stream';
-import { ServerLocation } from './domain/index';
-
+} from './index.ts';
+import vscode from 'vscode';
+import { ContextualLogger } from './logging/index.ts';
+import { Configuration, Settings } from './config/index.ts';
+import { type ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import { EventEmitter } from 'events';
+import type { ServerLocation } from './domain/index.ts';
 export class Process extends EventEmitter {
+  private readonly workspaceFolder;
+  private readonly logger;
   #process: ChildProcessWithoutNullStreams | undefined;
-
-  static readonly inject = tokens(
+  static readonly inject = [
     commonTokens.workspaceFolder,
     commonTokens.contextualLogger,
-  );
+  ] as const;
   constructor(
-    private readonly workspaceFolder: vscode.WorkspaceFolder,
-    private readonly logger: ContextualLogger,
+    workspaceFolder: vscode.WorkspaceFolder,
+    logger: ContextualLogger,
   ) {
     super();
+    this.workspaceFolder = workspaceFolder;
+    this.logger = logger;
   }
-
   async init(): Promise<ServerLocation> {
     const serverPath = Configuration.getSetting<string>(
       Settings.ServerPath,
       this.workspaceFolder,
     );
-
     if (!serverPath) {
       this.logger.error(
         'Cannot start server. Missing server path configuration.',
       );
       throw new MissingServerPathError();
     }
-
     const serverArgs = Configuration.getSettingOrDefault<string[]>(
       Settings.ServerArgs,
       [],
@@ -49,38 +48,29 @@ export class Process extends EventEmitter {
       this.workspaceFolder.uri.fsPath,
       this.workspaceFolder,
     );
-
     this.logger.info(
       `Server configuration: path=${serverPath}, args=${serverArgs}, cwd=${cwd}`,
     );
-
     this.#process = spawn(serverPath, serverArgs, { cwd: cwd });
     if (this.#process.pid === undefined) {
       this.logger.error('Server process could not be spawned.');
       throw new CouldNotSpawnProcessError();
     }
-
     this.logger.info(`Server process started with PID ${this.#process.pid}`);
-
     this.#process.stdout.on('data', (data) => {
       this.handleProcessOutput(data, this.logger.info, 'SERVER', 'data');
     });
-
     this.#process.stderr.on('data', (data) => {
       this.handleProcessOutput(data, this.logger.error, 'SERVER', 'error');
     });
-
     this.#process.on('exit', (code) => this.emit('exit', code));
-
     return await this.getServerLocation();
   }
-
   private async getServerLocation(): Promise<ServerLocation> {
     return await new Promise<ServerLocation>((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         reject(new ServerStartupTimeoutError());
       }, Constants.ServerStartupTimeoutMs);
-
       this.on('data', (data) => {
         try {
           const dataString: string = data.toString();
@@ -93,7 +83,6 @@ export class Process extends EventEmitter {
       });
     });
   }
-
   private handleProcessOutput = (
     data: Buffer,
     logFn: (msg: string, ...labels: string[]) => void,
@@ -108,7 +97,6 @@ export class Process extends EventEmitter {
     });
     this.emit(emitEvent, dataString);
   };
-
   dispose() {
     this.#process?.removeAllListeners();
     this.#process?.kill();

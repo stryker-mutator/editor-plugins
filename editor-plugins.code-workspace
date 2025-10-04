@@ -2,13 +2,23 @@
   "folders": [
     {
       "name": "parent",
-      "path": ".",
+      "path": "."
     },
     {
-      "path": "packages/mutation-server-protocol",
+      "name": "mutation-server-protocol",
+      "path": "packages/mutation-server-protocol"
     },
     {
-      "path": "packages/vscode-plugin",
-    },
+      "name": "vscode-plugin",
+      "path": "packages/vscode-plugin"
+    }
   ],
+  "settings": {
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/bower_components": true,
+      "**/*.code-search": true,
+      "**/.vscode-test": true,
+    },
+  },
 }

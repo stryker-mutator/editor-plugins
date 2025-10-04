@@ -1,8 +1,8 @@
 import { expect } from 'chai';
-import * as sinon from 'sinon';
-import * as fs from 'fs';
-import * as vscode from 'vscode';
-import { pathUtils } from '../../../utils/path-utils';
+import sinon from 'sinon';
+import fs from 'fs';
+import vscode from 'vscode';
+import { pathUtils } from '../../../utils/path-utils.ts';
 
 describe('pathUtils', () => {
   let mockWorkspaceFolder: vscode.WorkspaceFolder;
