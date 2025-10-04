@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import vscode from 'vscode';
 import { DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
 import { testControllerUtils } from '../../../utils/test-controller-utils.ts';
+import { createDiscoveredMutant } from '../../factory.ts';
 
 describe('testControllerUtils', () => {
   let workspaceFolderMock: vscode.WorkspaceFolder;
@@ -81,7 +82,6 @@ describe('testControllerUtils', () => {
 
   describe('upsertMutantTestItem', () => {
     let testController: vscode.TestController;
-    let workspaceFolder: vscode.WorkspaceFolder;
 
     beforeEach(() => {
       testController = vscode.tests.createTestController(
@@ -257,6 +257,51 @@ describe('testControllerUtils', () => {
         '/workspace/root/src/components/Button.tsx',
       );
     });
+
+     it('should base mutant uri on a relative server workspace directory', () => {
+       const mutant = createDiscoveredMutant();
+
+       testControllerUtils.upsertMutantTestItem(
+         testController,
+         workspaceFolderMock,
+         'src/components/Button.tsx',
+         'app',
+         mutant,
+       );
+
+       const appItem = testController.items.get('app');
+       const srcItem = appItem?.children.get('src');
+       const componentsItem = srcItem?.children.get('components');
+       const buttonItem = componentsItem?.children.get('Button.tsx');
+
+       expect(srcItem?.uri?.fsPath).to.equal('/workspace/root/app/src');
+       expect(componentsItem?.uri?.fsPath).to.equal(
+         '/workspace/root/app/src/components',
+       );
+       expect(buttonItem?.uri?.fsPath).to.equal(
+         '/workspace/root/app/src/components/Button.tsx',
+       );
+     });
+
+     it('should base mutant uri on an absolute server workspace directory', () => {
+        const mutant = createDiscoveredMutant();
+        const absoluteServerDir = '/workspace/root/app';
+        testControllerUtils.upsertMutantTestItem(
+          testController,
+          workspaceFolderMock,
+          'src/components/Button.tsx',
+          absoluteServerDir,
+          mutant,
+        );
+        const appItem = testController.items.get('app');
+        const srcItem = appItem?.children.get('src');
+        const componentsItem = srcItem?.children.get('components');
+        const buttonItem = componentsItem?.children.get('Button.tsx');
+        expect(srcItem?.uri?.fsPath).to.equal('/workspace/root/app/src');
+        expect(buttonItem?.uri?.fsPath).to.equal(
+          '/workspace/root/app/src/components/Button.tsx',
+        );
+     });
 
     it('should set correct range on mutant test item', () => {
       const mutant: DiscoveredMutant = {
