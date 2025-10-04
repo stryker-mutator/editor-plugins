@@ -1,7 +1,6 @@
 import { createInjector } from 'typed-inject';
-import * as vscode from 'vscode';
-import { Workspace } from './index';
-
+import vscode from 'vscode';
+import { Workspace } from './index.ts';
 let workspace: Workspace | undefined;
 
 export async function activate(context: vscode.ExtensionContext) {

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { Location } from 'mutation-server-protocol';
-import { locationUtils } from '../../../utils/location-utils';
+import { locationUtils } from '../../../utils/location-utils.ts';
 
 describe('locationUtils', () => {
   describe('locationToRange', () => {

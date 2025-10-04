@@ -1,1 +1,1 @@
-export * from './server-location';
+export * from './server-location.ts';

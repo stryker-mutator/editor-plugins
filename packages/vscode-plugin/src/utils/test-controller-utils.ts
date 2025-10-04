@@ -1,6 +1,7 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
-import { locationUtils } from './location-utils';
+import { testItemUtils } from './test-item-utils.ts';
+import { locationUtils } from './location-utils.ts';
 
 export const testControllerUtils = {
   traverse(
@@ -17,9 +18,16 @@ export const testControllerUtils = {
     testController: vscode.TestController,
     workspaceFolder: vscode.WorkspaceFolder,
     mutantRelativeFilePath: string,
+    serverWorkingDirectory: string,
     mutant: DiscoveredMutant | MutantResult,
   ): vscode.TestItem {
-    const pathSegments = mutantRelativeFilePath.split('/');
+    const mutantRelativeFilePathFromWorkspaceRoot =
+      testItemUtils.resolveFromWorkspaceRoot(
+        workspaceFolder,
+        serverWorkingDirectory,
+        mutantRelativeFilePath,
+      );
+    const pathSegments = mutantRelativeFilePathFromWorkspaceRoot.split('/');
     let currentCollection = testController.items;
     let currentUri = '';
 
@@ -61,9 +69,17 @@ export const testControllerUtils = {
 
   getTestItemForFile(
     testController: vscode.TestController,
-    relativeFilePath: string,
+    workspaceFolder: vscode.WorkspaceFolder,
+    mutantRelativeFilePath: string,
+    serverWorkingDirectory: string,
   ): vscode.TestItem | undefined {
-    const directories = relativeFilePath.split('/');
+    const mutantRelativeFilePathFromWorkspaceRoot =
+      testItemUtils.resolveFromWorkspaceRoot(
+        workspaceFolder,
+        serverWorkingDirectory,
+        mutantRelativeFilePath,
+      );
+    const directories = mutantRelativeFilePathFromWorkspaceRoot.split('/');
     const fileName = directories[directories.length - 1];
     let currentCollection = testController.items;
 

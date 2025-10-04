@@ -5,10 +5,20 @@
       "path": ".",
     },
     {
+      "name": "mutation-server-protocol",
       "path": "packages/mutation-server-protocol",
     },
     {
+      "name": "vscode-plugin",
       "path": "packages/vscode-plugin",
     },
   ],
+  "settings": {
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/bower_components": true,
+      "**/*.code-search": true,
+      "**/.vscode-test": true,
+    },
+  },
 }

@@ -1,5 +1,9 @@
-import { ConfigurationScope, workspace, WorkspaceConfiguration } from 'vscode';
-import { Settings, SettingSections } from './index';
+import {
+  type ConfigurationScope,
+  workspace,
+  type WorkspaceConfiguration,
+} from 'vscode';
+import { Settings, SettingSections } from './index.ts';
 
 export class Configuration {
   /**

@@ -1,14 +1,14 @@
-import { commonTokens, tokens } from '../di/index';
-import { Logger } from './index';
+import { commonTokens } from '../di/index.ts';
+import { Logger } from './index.ts';
 
 export class ContextualLogger {
   #logger: Logger;
   #label: string;
 
-  public static readonly inject = tokens(
+  public static readonly inject = [
     commonTokens.logger,
     commonTokens.loggerContext,
-  );
+  ] as const;
   constructor(logger: Logger, loggerContext: string) {
     this.#logger = logger;
     this.#label = loggerContext;

@@ -10,6 +10,7 @@ export const commonTokens = Object.freeze({
   loggerContext: 'loggerContext',
   contextualLogger: 'contextualLogger',
   workspaceFolder: 'workspaceFolder',
+  serverWorkspaceDirectory: 'serverWorkspaceDirectory',
   process: 'process',
   serverLocation: 'serverLocation',
   mutationServer: 'mutationServer',
@@ -17,16 +18,3 @@ export const commonTokens = Object.freeze({
   testController: 'testController',
   testRunner: 'testRunner',
 });
-
-/**
- * Helper method to create string literal tuple type.
- * @example
- * ```ts
- * const inject = tokens('foo', 'bar');
- * const inject2: ['foo', 'bar'] = ['foo', 'bar'];
- * ```
- * @param tokens The tokens as args
- */
-export function tokens<TS extends string[]>(...tokensList: TS): TS {
-  return tokensList;
-}

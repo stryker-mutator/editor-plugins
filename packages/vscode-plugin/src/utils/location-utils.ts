@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { Location } from 'mutation-server-protocol';
 
 export const locationUtils = {
