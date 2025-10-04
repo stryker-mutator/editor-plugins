@@ -5,7 +5,6 @@
     "lib": ["ES2022"],
     // "noEmit": true,
     "sourceMap": true,
-    "esModuleInterop": true,
     "rootDir": "src",
     "strict": true,
     "allowImportingTsExtensions": true,

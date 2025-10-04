@@ -249,12 +249,12 @@ describe('testControllerUtils', () => {
       const componentsItem = srcItem?.children.get('components');
       const buttonItem = componentsItem?.children.get('Button.tsx');
 
-      expect(srcItem?.uri?.fsPath).to.equal('/test/workspace/src');
+      expect(srcItem?.uri?.fsPath).to.equal('/workspace/root/src');
       expect(componentsItem?.uri?.fsPath).to.equal(
-        '/test/workspace/src/components',
+        '/workspace/root/src/components',
       );
       expect(buttonItem?.uri?.fsPath).to.equal(
-        '/test/workspace/src/components/Button.tsx',
+        '/workspace/root/src/components/Button.tsx',
       );
     });
 
@@ -433,7 +433,7 @@ describe('testControllerUtils', () => {
       expect(result).to.be.instanceOf(Object);
       expect(result.id).to.equal('ReturnStatement(15:8-15:20) (return false)');
       expect(result.label).to.equal('ReturnStatement (Ln 15, Col 8)');
-      expect(result.uri?.fsPath).to.equal('/test/workspace/func.js');
+      expect(result.uri?.fsPath).to.equal('/workspace/root/func.js');
     });
   });
 
