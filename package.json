@@ -9,8 +9,9 @@
     "clean": "rimraf -g packages/*/dist/ packages/*/*.tsbuildinfo",
     "build": "lerna run build",
     "test": "lerna run test",
-    "lint": "prettier . --check && lerna run lint",
-    "lint:fix": "npm run lint -- --write",
+    "lint": "lerna run lint && npm run format",
+    "format": "prettier . --check",
+    "format:fix": "npm run format -- --write",
     "release": "GH_TOKEN=$(gh auth token) lerna version"
   },
   "devDependencies": {

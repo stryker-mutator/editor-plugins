@@ -2,10 +2,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import vscode from 'vscode';
 import fs from 'fs';
-import {
-  MutantResult,
-  MutationTestParams,
-} from 'mutation-server-protocol';
+import { MutantResult, MutationTestParams } from 'mutation-server-protocol';
 import { testItemUtils } from '../../../utils/test-item-utils.ts';
 
 describe('testItemUtils', () => {
