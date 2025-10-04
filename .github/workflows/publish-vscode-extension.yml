@@ -12,9 +12,10 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - name: Install dependencies (vscode-plugin)
+      - name: Install dependencies
         run: npm ci
-        working-directory: packages/vscode-plugin
+      - name: Build packages
+        run: npm run build
       - uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
