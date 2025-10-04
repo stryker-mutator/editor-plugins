@@ -6,7 +6,7 @@
   "publisher": "stryker-mutator",
   "author": "Jasper van der Veen",
   "engines": {
-    "vscode": "^1.102.1"
+    "vscode": "^1.104.3"
   },
   "categories": [
     "Testing"
