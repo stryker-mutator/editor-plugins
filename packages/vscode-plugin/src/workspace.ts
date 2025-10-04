@@ -20,7 +20,7 @@ export class Workspace {
       commonTokens.context,
       context,
     );
-    
+
     this.#logger = this.#baseContextProvider
       .provideValue(commonTokens.loggerContext, this.constructor.name)
       .injectClass(ContextualLogger);

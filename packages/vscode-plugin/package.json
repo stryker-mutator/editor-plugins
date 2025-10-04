@@ -39,7 +39,7 @@
   },
   "main": "./dist/extension.js",
   "contributes": {
-     "commands": [
+    "commands": [
       {
         "category": "Stryker Mutator",
         "command": "strykerMutator.reload",
