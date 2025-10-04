@@ -258,50 +258,50 @@ describe('testControllerUtils', () => {
       );
     });
 
-     it('should base mutant uri on a relative server workspace directory', () => {
-       const mutant = createDiscoveredMutant();
+    it('should base mutant uri on a relative server workspace directory', () => {
+      const mutant = createDiscoveredMutant();
 
-       testControllerUtils.upsertMutantTestItem(
-         testController,
-         workspaceFolderMock,
-         'src/components/Button.tsx',
-         'app',
-         mutant,
-       );
+      testControllerUtils.upsertMutantTestItem(
+        testController,
+        workspaceFolderMock,
+        'src/components/Button.tsx',
+        'app',
+        mutant,
+      );
 
-       const appItem = testController.items.get('app');
-       const srcItem = appItem?.children.get('src');
-       const componentsItem = srcItem?.children.get('components');
-       const buttonItem = componentsItem?.children.get('Button.tsx');
+      const appItem = testController.items.get('app');
+      const srcItem = appItem?.children.get('src');
+      const componentsItem = srcItem?.children.get('components');
+      const buttonItem = componentsItem?.children.get('Button.tsx');
 
-       expect(srcItem?.uri?.fsPath).to.equal('/workspace/root/app/src');
-       expect(componentsItem?.uri?.fsPath).to.equal(
-         '/workspace/root/app/src/components',
-       );
-       expect(buttonItem?.uri?.fsPath).to.equal(
-         '/workspace/root/app/src/components/Button.tsx',
-       );
-     });
+      expect(srcItem?.uri?.fsPath).to.equal('/workspace/root/app/src');
+      expect(componentsItem?.uri?.fsPath).to.equal(
+        '/workspace/root/app/src/components',
+      );
+      expect(buttonItem?.uri?.fsPath).to.equal(
+        '/workspace/root/app/src/components/Button.tsx',
+      );
+    });
 
-     it('should base mutant uri on an absolute server workspace directory', () => {
-        const mutant = createDiscoveredMutant();
-        const absoluteServerDir = '/workspace/root/app';
-        testControllerUtils.upsertMutantTestItem(
-          testController,
-          workspaceFolderMock,
-          'src/components/Button.tsx',
-          absoluteServerDir,
-          mutant,
-        );
-        const appItem = testController.items.get('app');
-        const srcItem = appItem?.children.get('src');
-        const componentsItem = srcItem?.children.get('components');
-        const buttonItem = componentsItem?.children.get('Button.tsx');
-        expect(srcItem?.uri?.fsPath).to.equal('/workspace/root/app/src');
-        expect(buttonItem?.uri?.fsPath).to.equal(
-          '/workspace/root/app/src/components/Button.tsx',
-        );
-     });
+    it('should base mutant uri on an absolute server workspace directory', () => {
+      const mutant = createDiscoveredMutant();
+      const absoluteServerDir = '/workspace/root/app';
+      testControllerUtils.upsertMutantTestItem(
+        testController,
+        workspaceFolderMock,
+        'src/components/Button.tsx',
+        absoluteServerDir,
+        mutant,
+      );
+      const appItem = testController.items.get('app');
+      const srcItem = appItem?.children.get('src');
+      const componentsItem = srcItem?.children.get('components');
+      const buttonItem = componentsItem?.children.get('Button.tsx');
+      expect(srcItem?.uri?.fsPath).to.equal('/workspace/root/app/src');
+      expect(buttonItem?.uri?.fsPath).to.equal(
+        '/workspace/root/app/src/components/Button.tsx',
+      );
+    });
 
     it('should set correct range on mutant test item', () => {
       const mutant: DiscoveredMutant = {
@@ -641,6 +641,33 @@ describe('testControllerUtils', () => {
 
       expect(result).to.equal(packageItem);
       expect(result?.id).to.equal('package.json');
+    });
+
+    it('should locate files correctly using a relative server workspace directory', () => {
+      // Create a root level file
+      const appItem = testController.createTestItem('app', 'app');
+      const srcItem = testController.createTestItem('src', 'Source');
+      const componentsItem = testController.createTestItem(
+        'components',
+        'Components',
+      );
+      const buttonItem = testController.createTestItem(
+        'Button.tsx',
+        'Button File',
+      );
+      appItem.children.add(srcItem);
+      srcItem.children.add(componentsItem);
+      componentsItem.children.add(buttonItem);
+      testController.items.add(appItem);
+
+      const result = testControllerUtils.getTestItemForFile(
+        testController,
+        workspaceFolderMock,
+        'src/components/Button.tsx',
+        'app',
+      );
+
+      expect(result).to.equal(buttonItem);
     });
 
     it('should return undefined when intermediate directory is missing', () => {
