@@ -118,10 +118,23 @@ export class Workspace {
         this.#logger.info(
           `Configuration changed for ${wf.getWorkspaceFolder().uri.fsPath}. Reloading workspace folder`,
         );
-        await this.removeWorkspaceFolder(wf.getWorkspaceFolder());
-        await this.addWorkspaceFolder(wf.getWorkspaceFolder());
+        await this.reloadWorkspaceFolder(wf.getWorkspaceFolder());
       }
     }
+  }
+
+  public async reload() {
+    this.#logger.info('Reloading workspace');
+    await Promise.all(
+      this.#workspaceFolders.map(async (folder) => {
+        await this.reloadWorkspaceFolder(folder.getWorkspaceFolder());
+      }),
+    );
+  }
+
+  private async reloadWorkspaceFolder(workspaceFolder: vscode.WorkspaceFolder) {
+    await this.removeWorkspaceFolder(workspaceFolder);
+    await this.addWorkspaceFolder(workspaceFolder);
   }
 
   async dispose() {
