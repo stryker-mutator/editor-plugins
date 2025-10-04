@@ -35,7 +35,7 @@ export class TestRunner {
     this.testController = testController;
     this.logger = logger;
   }
-  
+
   async runMutationTests(
     request: vscode.TestRunRequest,
     testController: vscode.TestController,
