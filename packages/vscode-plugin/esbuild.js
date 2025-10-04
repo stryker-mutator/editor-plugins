@@ -29,7 +29,7 @@ async function main() {
   const ctx = await context({
     entryPoints: ['src/extension.ts'],
     bundle: true,
-    format: 'esm',
+    format: 'cjs',
     minify: production,
     sourcemap: !production,
     sourcesContent: false,
