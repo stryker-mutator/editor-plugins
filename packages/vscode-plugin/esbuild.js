@@ -1,4 +1,4 @@
-import { context } from 'esbuild';
+const { context } = require('esbuild');
 
 const production = process.argv.includes('--production');
 const watch = process.argv.includes('--watch');
