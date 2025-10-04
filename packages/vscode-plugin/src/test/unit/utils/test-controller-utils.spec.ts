@@ -1,8 +1,8 @@
 import { expect } from 'chai';
-import * as sinon from 'sinon';
-import * as vscode from 'vscode';
+import sinon from 'sinon';
+import vscode from 'vscode';
 import { DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
-import { testControllerUtils } from '../../../utils/test-controller-utils';
+import { testControllerUtils } from '../../../utils/test-controller-utils.ts';
 
 describe('testControllerUtils', () => {
   let workspaceFolderMock: vscode.WorkspaceFolder;

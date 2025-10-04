@@ -1,55 +1,58 @@
-import { Injector, tokens } from 'typed-inject';
-import * as vscode from 'vscode';
-import { BaseContext, commonTokens } from './di/index';
-import { Configuration, Settings } from './config/index';
-import { ContextualLogger } from './logging/index';
+import { type Injector } from 'typed-inject';
+import vscode from 'vscode';
+import { type BaseContext, commonTokens } from './di/index.ts';
+import { Configuration, Settings } from './config/index.ts';
+import { ContextualLogger } from './logging/index.ts';
 import {
   Constants,
   Process,
   MutationServer,
   UnsupportedServerVersionError,
-} from './index';
+} from './index.ts';
 import { ConfigureParams, MutationTestParams } from 'mutation-server-protocol';
-import { provideTestController, TestExplorer } from './test-explorer';
-import { FileSystemWatcher } from './file-system-watcher';
-import * as fs from 'fs';
-import { TestRunner } from './test-runner';
-import { pathUtils } from './utils/path-utils';
-
+import { provideTestController, TestExplorer } from './test-explorer.ts';
+import { FileSystemWatcher } from './file-system-watcher.ts';
+import fs from 'fs';
+import { TestRunner } from './test-runner.ts';
+import { pathUtils } from './utils/path-utils.ts';
 export interface WorkspaceFolderContext extends BaseContext {
   [commonTokens.loggerContext]: string;
   [commonTokens.contextualLogger]: ContextualLogger;
   [commonTokens.workspaceFolder]: vscode.WorkspaceFolder;
 }
-
 export class WorkspaceFolder {
+  private readonly injector;
+  private readonly workspaceFolder;
+  private readonly process;
+  private readonly logger;
   #fileSystemWatcher?: FileSystemWatcher;
   #testExplorer?: TestExplorer;
-
-  static readonly inject = tokens(
+  static readonly inject = [
     commonTokens.injector,
     commonTokens.workspaceFolder,
     commonTokens.process,
     commonTokens.contextualLogger,
-  );
+  ] as const;
   constructor(
-    private readonly injector: Injector<WorkspaceFolderContext>,
-    private readonly workspaceFolder: vscode.WorkspaceFolder,
-    private readonly process: Process,
-    private readonly logger: ContextualLogger,
+    injector: Injector<WorkspaceFolderContext>,
+    workspaceFolder: vscode.WorkspaceFolder,
+    process: Process,
+    logger: ContextualLogger,
   ) {
+    this.injector = injector;
+    this.workspaceFolder = workspaceFolder;
+    this.process = process;
+    this.logger = logger;
     this.process.on('exit', async (code) => {
       this.logger.error(`Mutation server process exited with code ${code}`);
       this.process.dispose();
     });
   }
-
   async init() {
     let enabled = Configuration.getSetting<boolean>(
       Settings.MutationTestingEnabled,
       this.workspaceFolder,
     );
-
     if (enabled === null) {
       await this.promptUserToConfigureSettings();
       // Re-check the setting after configuration
@@ -58,14 +61,12 @@ export class WorkspaceFolder {
         this.workspaceFolder,
       );
     }
-
     if (!enabled) {
       this.logger.info(
         `Mutation testing is disabled for ${this.workspaceFolder.uri.fsPath}`,
       );
       return;
     }
-
     const configFilePath = Configuration.getSetting<string>(
       Settings.ConfigFilePath,
       this.workspaceFolder,
@@ -80,11 +81,9 @@ export class WorkspaceFolder {
     const mutationServer = this.injector
       .provideValue(commonTokens.serverLocation, serverLocation)
       .injectClass(MutationServer);
-
     const configureParams: ConfigureParams = {
       configFilePath: configFilePath,
     };
-
     const configureResult = await mutationServer.configure(configureParams);
     if (configureResult.version !== Constants.SupportedMspVersion) {
       this.logger.error(
@@ -92,20 +91,16 @@ export class WorkspaceFolder {
       );
       throw new UnsupportedServerVersionError(configureResult.version);
     }
-
     this.logger.info(
       `Mutation server configuration handshake completed. MSP version: ${configureResult.version}`,
     );
-
     this.#testExplorer = this.injector
       .provideFactory(commonTokens.testController, provideTestController)
       .provideValue(commonTokens.mutationServer, mutationServer)
       .provideValue(commonTokens.serverWorkspaceDirectory, serverWorkspaceDirectory)
       .provideClass(commonTokens.testRunner, TestRunner)
       .injectClass(TestExplorer);
-
     this.#fileSystemWatcher = this.injector.injectClass(FileSystemWatcher);
-
     this.#fileSystemWatcher.onFilesChanged(async (uris) => {
       // if uri is directory. add / to the end of the uri
       const fileRanges = uris.map((uri) => {
@@ -114,24 +109,19 @@ export class WorkspaceFolder {
           : uri.fsPath;
         return { path: filePath };
       });
-
       const mutationTestParams: MutationTestParams = {
         files: fileRanges,
       };
-
       const discoverResult = await mutationServer.discover(mutationTestParams);
       this.#testExplorer!.processDiscoverResult(discoverResult, serverWorkspaceDirectory);
     });
-
     this.#fileSystemWatcher.onFilesDeleted(async (uris) => {
       this.#testExplorer!.processFileDeletions(uris);
     });
-
     // Initial discovery of mutants
     const discoverResult = await mutationServer.discover({});
     this.#testExplorer.processDiscoverResult(discoverResult, serverWorkspaceDirectory);
   }
-
   /**
    * Scans for StrykerJs configuration and prompts the user to configure the workspace settings if found.
    */
@@ -139,13 +129,11 @@ export class WorkspaceFolder {
     this.logger.info(
       `Checking for StrykerJS configuration in workspace folder: ${this.workspaceFolder.uri.fsPath}`,
     );
-
     const configFiles = await this.findStrykerConfigFiles();
     if (configFiles.length === 0) {
       this.logger.info('No Stryker configuration files found.');
       return;
     }
-
     this.logger.info(
       `Found Stryker configuration files: ${configFiles.map((f) => f.path).join(', ')}`,
     );
@@ -160,7 +148,6 @@ export class WorkspaceFolder {
       );
       return;
     }
-
     const defaultConfigFilePath = vscode.workspace.asRelativePath(
       configFiles[0],
       false,
@@ -169,7 +156,6 @@ export class WorkspaceFolder {
       defaultConfigFilePath,
     );
     const strykerBinaryPath = await this.promptStrykerBinaryPath();
-
     await Configuration.updateSettingIfChanged(
       Settings.ServerPath,
       strykerBinaryPath,
@@ -191,7 +177,6 @@ export class WorkspaceFolder {
       this.workspaceFolder,
     );
   }
-
   private async findStrykerConfigFiles(): Promise<vscode.Uri[]> {
     return vscode.workspace.findFiles(
       new vscode.RelativePattern(
@@ -201,7 +186,6 @@ export class WorkspaceFolder {
       '**/node_modules/**',
     );
   }
-
   private async promptEnableStrykerSupport(): Promise<boolean> {
     this.logger.info(
       `Prompting user to enable StrykerJS support for workspace folder: ${this.workspaceFolder.uri.path}`,
@@ -213,7 +197,6 @@ export class WorkspaceFolder {
     );
     return enable === 'Yes';
   }
-
   private async promptConfigFilePath(
     defaultPath: string,
   ): Promise<string | undefined> {
@@ -230,7 +213,6 @@ export class WorkspaceFolder {
       },
     });
   }
-
   private async promptStrykerBinaryPath(): Promise<string | undefined> {
     return vscode.window.showInputBox({
       prompt: `Please enter the path to your Stryker binary (relative to workspace folder or absolute path).`,
@@ -245,11 +227,9 @@ export class WorkspaceFolder {
       },
     });
   }
-
   getWorkspaceFolder(): vscode.WorkspaceFolder {
     return this.workspaceFolder;
   }
-
   async dispose() {
     this.#fileSystemWatcher?.dispose();
     await this.#testExplorer?.dispose();

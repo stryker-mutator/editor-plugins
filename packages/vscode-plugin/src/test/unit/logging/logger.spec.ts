@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import * as sinon from 'sinon';
-import * as vscode from 'vscode';
-import { Logger } from '../../../logging/logger';
+import sinon from 'sinon';
+import vscode from 'vscode';
+import { Logger } from '../../../logging/logger.ts';
 
 describe(Logger.name, () => {
   let mockOutputChannel: any;

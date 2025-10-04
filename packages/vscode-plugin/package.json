@@ -6,11 +6,12 @@
   "publisher": "stryker-mutator",
   "author": "Jasper van der Veen",
   "engines": {
-    "vscode": "^1.102.1"
+    "vscode": "^1.104.3"
   },
   "categories": [
     "Testing"
   ],
+  "type": "commonjs",
   "keywords": [
     "stryker",
     "mutator",
@@ -90,12 +91,13 @@
     "watch:tsc": "tsc --watch --noEmit",
     "build": "npm run check-types && npm run lint && node esbuild.js --production",
     "clean": "rm -rf out",
-    "compile-tests": "npm run clean && tsc -p . --outDir out",
-    "watch-tests": "npm run clean && tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "compile-tests": "npm run clean && tsc --outDir out",
+    "watch-tests": "npm run clean && tsc -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
-    "test": "vscode-test",
+    "test": "xvfb-run -a vscode-test",
+    "test:local": "vscode-test",
     "deploy": "vsce publish --azure-credential",
     "deploy:prerelease": "vsce publish --azure-credential --pre-release"
   },
@@ -106,20 +108,20 @@
     "@types/node": "24.x",
     "@types/sinon": "^17.0.4",
     "@types/sinon-chai": "^4.0.0",
-    "@types/vscode": "^1.103.0",
-    "@typescript-eslint/eslint-plugin": "^8.42.0",
-    "@typescript-eslint/parser": "^8.42.0",
+    "@types/vscode": "^1.104.0",
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.45.0",
     "@vscode/test-cli": "^0.0.11",
     "@vscode/test-electron": "^2.5.2",
-    "@vscode/vsce": "^3.6.0",
-    "chai": "^5.3.3",
+    "@vscode/vsce": "^3.6.2",
+    "chai": "^6.2.0",
     "chai-as-promised": "^8.0.2",
-    "esbuild": "^0.25.9",
-    "eslint": "^9.34.0",
+    "esbuild": "^0.25.10",
+    "eslint": "^9.37.0",
     "npm-run-all": "^4.1.5",
     "sinon": "^21.0.0",
     "sinon-chai": "^4.0.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "json-rpc-2.0": "^1.7.1",

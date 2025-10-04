@@ -1,3 +1,3 @@
-export * from './contextual-logger';
-export * from './logger';
-export * from './provide-logging';
+export * from './contextual-logger.ts';
+export * from './logger.ts';
+export * from './provide-logging.ts';

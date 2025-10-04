@@ -1,8 +1,8 @@
 import { expect } from 'chai';
-import * as sinon from 'sinon';
-import * as vscode from 'vscode';
-import { Configuration } from '../../../config/configuration';
-import { Settings, SettingSections } from '../../../config/index';
+import sinon from 'sinon';
+import vscode from 'vscode';
+import { Configuration } from '../../../config/configuration.ts';
+import { Settings, SettingSections } from '../../../config/index.ts';
 
 describe(Configuration.name, () => {
   let getConfigurationStub: sinon.SinonStub;

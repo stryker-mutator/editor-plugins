@@ -1,7 +1,7 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
-import { locationUtils } from './location-utils';
-import { testItemUtils } from './test-item-utils';
+import { testItemUtils } from './test-item-utils.ts';
+import { locationUtils } from './location-utils.ts';
 
 export const testControllerUtils = {
   traverse(

@@ -1,13 +1,9 @@
 import { expect } from 'chai';
-import * as sinon from 'sinon';
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import {
-  MutantResult,
-  FileRange,
-  MutationTestParams,
-} from 'mutation-server-protocol';
-import { testItemUtils } from '../../../utils/test-item-utils';
+import sinon from 'sinon';
+import vscode from 'vscode';
+import fs from 'fs';
+import { MutantResult, MutationTestParams } from 'mutation-server-protocol';
+import { testItemUtils } from '../../../utils/test-item-utils.ts';
 
 describe('testItemUtils', () => {
   let testController: vscode.TestController;
