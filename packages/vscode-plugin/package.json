@@ -2,7 +2,7 @@
   "name": "stryker-mutator",
   "displayName": "Stryker Mutation Testing",
   "description": "Test your tests with mutation testing.",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "publisher": "stryker-mutator",
   "author": "Jasper van der Veen",
   "engines": {
@@ -39,6 +39,13 @@
   },
   "main": "./dist/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "category": "Stryker Mutator",
+        "command": "strykerMutator.reload",
+        "title": "Reload Workspace"
+      }
+    ],
     "configuration": {
       "title": "Stryker Mutator",
       "properties": {

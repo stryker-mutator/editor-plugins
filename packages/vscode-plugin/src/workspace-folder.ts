@@ -243,5 +243,8 @@ export class WorkspaceFolder {
     this.#fileSystemWatcher?.dispose();
     await this.#testExplorer?.dispose();
     this.process.dispose();
+    this.logger.info(
+      `Disposed workspace folder: ${this.workspaceFolder.uri.fsPath}`,
+    );
   }
 }
