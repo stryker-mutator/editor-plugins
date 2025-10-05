@@ -10,6 +10,7 @@ import {
 import { JsonRpcEventDeserializer } from './utils/index.ts';
 import { promisify } from 'util';
 import {
+  ConfigureParams,
   ConfigureResult,
   DiscoverParams,
   DiscoverResult,
@@ -83,9 +84,11 @@ export class MutationServer {
       Settings.ConfigFilePath,
       this.workspaceFolder,
     );
+
+    const configureParams: ConfigureParams = { configFilePath: configFilePath };
     return await this.jsonRPCClient!.request(
       rpcMethods.configure,
-      { configFilePath },
+      configureParams,
     );
   }
   public async discover(

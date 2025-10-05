@@ -65,8 +65,7 @@ This extension contributes the following settings:
   - Working directory for the Stryker server process. Defaults to the workspace folder if not set.
 
 - **`strykerMutator.server.configFile`** (string):
-  - Path to the Stryker configuration file to use. Can be absolute or relative to the workspace folder.
-  - Default: `stryker.config.json`
+  - Optional path to your project's configuration file which will be passed to the server.
 
 ## Troubleshooting & Feedback
 

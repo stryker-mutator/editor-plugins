@@ -8,7 +8,6 @@ import { MutationTestParams } from 'mutation-server-protocol';
 import { provideTestController, TestExplorer } from './test-explorer.ts';
 import { FileSystemWatcher } from './file-system-watcher.ts';
 import fs from 'fs';
-import { pathUtils } from './utils/path-utils.ts';
 export interface WorkspaceFolderContext extends BaseContext {
   [commonTokens.loggerContext]: string;
   [commonTokens.contextualLogger]: ContextualLogger;
@@ -97,111 +96,6 @@ export class WorkspaceFolder {
       discoverResult,
       serverWorkspaceDirectory,
     );
-  }
-  /**
-   * Scans for StrykerJs configuration and prompts the user to configure the workspace settings if found.
-   */
-  async promptUserToConfigureSettings(): Promise<void> {
-    this.logger.info(
-      `Checking for StrykerJS configuration in workspace folder: ${this.workspaceFolder.uri.fsPath}`,
-    );
-    const configFiles = await this.findStrykerConfigFiles();
-    if (configFiles.length === 0) {
-      this.logger.info('No Stryker configuration files found.');
-      return;
-    }
-    this.logger.info(
-      `Found Stryker configuration files: ${configFiles.map((f) => f.path).join(', ')}`,
-    );
-    if (!(await this.promptEnableStrykerSupport())) {
-      this.logger.info(
-        'User disabled the Stryker Mutator extension for this workspace folder.',
-      );
-      await Configuration.updateSettingIfChanged(
-        Settings.enable,
-        false,
-        this.workspaceFolder,
-      );
-      return;
-    }
-    const defaultConfigFilePath = vscode.workspace.asRelativePath(
-      configFiles[0],
-      false,
-    );
-    const configFilePath = await this.promptConfigFilePath(
-      defaultConfigFilePath,
-    );
-    const strykerBinaryPath = await this.promptStrykerBinaryPath();
-    await Configuration.updateSettingIfChanged(
-      Settings.ServerPath,
-      strykerBinaryPath,
-      this.workspaceFolder,
-    );
-    await Configuration.updateSettingIfChanged(
-      Settings.ConfigFilePath,
-      configFilePath,
-      this.workspaceFolder,
-    );
-    await Configuration.updateSettingIfChanged(
-      Settings.ServerArgs,
-      ['runServer'],
-      this.workspaceFolder,
-    );
-    await Configuration.updateSettingIfChanged(
-      Settings.enable,
-      true,
-      this.workspaceFolder,
-    );
-  }
-  private async findStrykerConfigFiles(): Promise<vscode.Uri[]> {
-    return vscode.workspace.findFiles(
-      new vscode.RelativePattern(
-        this.workspaceFolder,
-        '{stryker.conf.js,stryker.conf.json,stryker.conf.ts,stryker.config.js,stryker.config.json,stryker.config.ts}',
-      ),
-      '**/node_modules/**',
-    );
-  }
-  private async promptEnableStrykerSupport(): Promise<boolean> {
-    this.logger.info(
-      `Prompting user to enable StrykerJS support for workspace folder: ${this.workspaceFolder.uri.path}`,
-    );
-    const enable = await vscode.window.showInformationMessage(
-      `Do you want to enable the Stryker Mutator extension for workspace folder ${this.workspaceFolder.name}?`,
-      'Yes',
-      'No',
-    );
-    return enable === 'Yes';
-  }
-  private async promptConfigFilePath(
-    defaultPath: string,
-  ): Promise<string | undefined> {
-    return vscode.window.showInputBox({
-      prompt: `Enter the path to your Stryker configuration file (relative to workspace folder or absolute path).`,
-      value: defaultPath,
-      title: 'Stryker Mutator Configuration File Path',
-      ignoreFocusOut: true,
-      validateInput: (input) => {
-        if (!pathUtils.fileExists(input, this.workspaceFolder)) {
-          return 'The specified file does not exist. Please provide a valid path.';
-        }
-        return null;
-      },
-    });
-  }
-  private async promptStrykerBinaryPath(): Promise<string | undefined> {
-    return vscode.window.showInputBox({
-      prompt: `Please enter the path to your Stryker binary (relative to workspace folder or absolute path).`,
-      value: 'node_modules/.bin/stryker',
-      title: 'Stryker Mutator Binary Path',
-      ignoreFocusOut: true,
-      validateInput: (input) => {
-        if (!pathUtils.fileExists(input, this.workspaceFolder)) {
-          return 'The specified binary does not exist. Please provide a valid path.';
-        }
-        return null;
-      },
-    });
   }
   getWorkspaceFolder(): vscode.WorkspaceFolder {
     return this.workspaceFolder;

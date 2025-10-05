@@ -62,13 +62,13 @@
           "default": "**/*.{js,ts,jsx,tsx}"
         },
         "strykerMutator.server.path": {
-          "description": "Path to the Stryker server executable. Can be absolute or relative to the workspace folder.",
+          "description": "Path to the mutation server executable.",
           "scope": "resource",
           "type": "string",
           "default": "node_modules/.bin/stryker"
         },
         "strykerMutator.server.args": {
-          "description": "Arguments to pass to the Stryker server process when starting.",
+          "description": "Arguments to pass to the mutation server process when starting.",
           "scope": "resource",
           "type": "array",
           "default": [
@@ -82,10 +82,10 @@
           "default": "."
         },
         "strykerMutator.server.configFile": {
-          "description": "Path to the Stryker configuration file to use. Can be absolute or relative to the workspace folder.",
+          "description": "Optional path to your project's configuration file which will be passed to the server.",
           "scope": "resource",
           "type": "string",
-          "default": "stryker.config.json"
+          "default": null
         }
       }
     }
