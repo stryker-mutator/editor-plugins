@@ -38,12 +38,6 @@ describe(WorkspaceFolder.name, () => {
     // Create the stub once here
     getSettingStub = sandbox.stub(Configuration, "getSetting");
 
-    // Setup injector chaining like in the Stryker example
-    injectorMock.provideFactory.returnsThis();
-    injectorMock.provideValue.returnsThis();
-    injectorMock.provideClass.returnsThis();
-    injectorMock.injectClass.returns({} as any);
-
     sut = new WorkspaceFolder(
       injectorMock as Injector<WorkspaceFolderContext>,
       workspaceFolderMock,
