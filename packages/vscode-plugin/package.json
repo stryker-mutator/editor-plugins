@@ -82,10 +82,9 @@
           "default": "."
         },
         "strykerMutator.server.configFile": {
-          "description": "Optional path to your project's configuration file which will be passed to the server.",
+          "description": "Optional path to your project's configuration file which will be passed to the server. When not provided, the mutation testing framework will use the default configuration file.",
           "scope": "resource",
-          "type": "string",
-          "default": null
+          "type": "string"
         }
       }
     }
