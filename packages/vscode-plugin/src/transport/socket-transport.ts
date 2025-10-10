@@ -1,32 +1,24 @@
 import * as net from 'net';
-import { Subject } from 'rxjs';
-import { JSONRPCRequest, JSONRPCResponse } from 'json-rpc-2.0';
 import { promisify } from 'util';
-import { JsonRpcEventDeserializer } from '../utils/index.ts';
 import { ContextualLogger } from '../logging/index.ts';
-import { ITransport, SocketTransportConfig } from './index.ts';
+import { SocketTransportConfig } from './index.ts';
+import { BaseTransport } from './base-transport.ts';
 import { commonTokens } from '../di/index.ts';
 
 /**
  * Socket-based transport implementation
  */
-export class SocketTransport implements ITransport {
+export class SocketTransport extends BaseTransport {
   private socket?: net.Socket;
-  private connected = false;
-  private readonly deserializer = new JsonRpcEventDeserializer();
-
-  public readonly notifications = new Subject<JSONRPCRequest>();
-  public readonly messages = new Subject<JSONRPCResponse>();
-
-  private readonly logger: ContextualLogger;
   private readonly config: SocketTransportConfig;
 
   public static readonly inject = [
     commonTokens.contextualLogger,
     commonTokens.transportConfig,
   ] as const;
+  
   constructor(logger: ContextualLogger, config: SocketTransportConfig) {
-    this.logger = logger;
+    super(logger);
     this.config = config;
   }
 
@@ -73,10 +65,6 @@ export class SocketTransport implements ITransport {
     this.socket.write(content);
   }
 
-  isConnected(): boolean {
-    return this.connected;
-  }
-
   async dispose(): Promise<void> {
     if (this.socket) {
       this.connected = false;
@@ -84,28 +72,6 @@ export class SocketTransport implements ITransport {
       this.socket = undefined;
     }
 
-    this.notifications.complete();
-    this.messages.complete();
-  }
-
-  // TODO: move to base transport class
-  private handleIncomingData(data: Buffer): void {
-    try {
-      const events = this.deserializer.deserialize(data);
-      for (const event of events) {
-        if (event.id === undefined) {
-          // Notification (no id)
-          this.notifications.next(event);
-        } else {
-          // Request or Response (has id)
-          this.messages.next(event);
-        }
-      }
-    } catch (error) {
-      this.logger.error(
-        `Error processing incoming data: ${error}`,
-        SocketTransport.name,
-      );
-    }
+    this.completeSubjects();
   }
 }
