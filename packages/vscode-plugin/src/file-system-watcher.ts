@@ -14,7 +14,7 @@ export class FileSystemWatcher {
   private readonly fileChangeSubject = new Subject<vscode.Uri>();
   private readonly fileDeleteSubject = new Subject<vscode.Uri>();
   public static readonly inject = [
-    commonTokens.workspaceFolder, 
+    commonTokens.workspaceFolder,
     commonTokens.fileChangeHandler,
     commonTokens.contextualLogger] as const;
   constructor(
@@ -35,11 +35,7 @@ export class FileSystemWatcher {
         ),
       )
       .subscribe(async (uris) => {
-        try {
-          await this.fileChangeHandler.handleFilesChanged(uris);
-        } catch (error) {
-          this.logger.error(`Failed to handle file changes: ${error}`, 'FileSystemWatcher');
-        }
+        await this.fileChangeHandler.handleFilesChanged(uris);
       });
     this.fileDeleteSubject
       .pipe(
@@ -50,11 +46,7 @@ export class FileSystemWatcher {
         ),
       )
       .subscribe((uris) => {
-        try {
-          this.fileChangeHandler.handleFilesDeleted(uris);
-        } catch (error) {
-          this.logger.error(`Failed to handle file deletions: ${error}`, 'FileSystemWatcher');
-        }
+        this.fileChangeHandler.handleFilesDeleted(uris);
       });
     const configuredPattern = Configuration.getSettingOrDefault<string>(
       Settings.FileSystemWatcherPattern,
