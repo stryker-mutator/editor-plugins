@@ -6,3 +6,4 @@ export * from './workspace.ts';
 export * from './mutation-server.ts';
 export * from './errors.ts';
 export * from './test-explorer.ts';
+export * from './test-runner.ts';
