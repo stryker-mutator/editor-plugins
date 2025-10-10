@@ -150,7 +150,7 @@ describe(FileChangeHandler.name, () => {
 
       // Assert
       expect(contextualLoggerMock.warn).calledWith(
-        'Could not resolve file /path/to/failing-file.ts: Error: File not found',
+        'Could not stat file /path/to/failing-file.ts: Error: File not found',
         'FileChangeHandler'
       );
       
