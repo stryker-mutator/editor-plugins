@@ -27,13 +27,13 @@ When using stdio transport:
 1. The server reads JSON-RPC requests from standard input
 2. The server writes JSON-RPC responses and notifications to standard output
 
-The server must not write any logging or debugging information to standard output. The channel should exclusively be used for JSON-RPC message exchange.
+The server must not write any logging or debugging information to standard output. The channel should exclusively be used for JSON-RPC message exchange. Logging and debugging information should be written to standard error (stderr) instead.
 
 ### Socket Transport
 
 When using socket transport:
 
-1. The server opens a socket on a **host and port** specified via command line argument. If only a port is provided, the server defaults to `localhost` as the host.
+1. The server opens a socket on the **host and port** specified via command line arguments (`--port` and `--address`). If no address is provided, the server defaults to `localhost` as the host.
 2. If the specified port is already in use, the server must exit with an error.
 3. The server accepts incoming client connections on this socket.
 4. JSON-RPC messages are exchanged over the socket connection.
@@ -42,8 +42,9 @@ When using socket transport:
 
 Mutation servers must support the following command line options:
 
-- `--listen <port>` or `--listen <host:port>` - Start server in socket mode on the specified port or host:port combination. If only a port is provided, the server must default to `localhost` as the host.
-- If no `--listen` option is provided, the server must default to stdio mode
+- `serve <channel>` - Specify the transport channel: `stdio` or `socket`
+- `--port <port>` - Port number for socket transport (required when using `socket` channel)
+- `--address <address>` - Host address for socket transport (optional, defaults to `localhost` when using `socket` channel)
 
 > [!TIP]
 > Locations are reported as part of the messages are always 1-based. The first line in a file is 1, and the first column in a line is 1.
@@ -98,7 +99,7 @@ type FileRange = {
 
 The server must gracefully handle non-existent files or directories by ignoring them without returning errors. Files that cannot be mutated should also be ignored during discovery and mutation testing operations.
 
-### Examples
+### FileRange Examples
 
 Examples of how `FileRange` objects can be used in `discover` or `mutationTest` calls:
 
