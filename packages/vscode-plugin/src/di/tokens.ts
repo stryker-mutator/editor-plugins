@@ -12,10 +12,10 @@ export const commonTokens = Object.freeze({
   workspaceFolder: 'workspaceFolder',
   serverWorkspaceDirectory: 'serverWorkspaceDirectory',
   process: 'process',
-  serverLocation: 'serverLocation',
   mutationServer: 'mutationServer',
   testExplorer: 'testExplorer',
   testController: 'testController',
   testRunner: 'testRunner',
   fileChangeHandler: 'fileChangeHandler',
+  transport: 'transport',
 });
