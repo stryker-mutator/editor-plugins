@@ -17,4 +17,5 @@ export const commonTokens = Object.freeze({
   testExplorer: 'testExplorer',
   testController: 'testController',
   testRunner: 'testRunner',
+  fileChangeHandler: 'fileChangeHandler',
 });

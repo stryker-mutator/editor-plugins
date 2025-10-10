@@ -4,10 +4,9 @@ import { type BaseContext, commonTokens } from './di/index.ts';
 import { Configuration, Settings } from './config/index.ts';
 import { ContextualLogger } from './logging/index.ts';
 import { MutationServer, TestRunner } from './index.ts';
-import { MutationTestParams } from 'mutation-server-protocol';
 import { provideTestController, TestExplorer } from './test-explorer.ts';
 import { FileSystemWatcher } from './file-system-watcher.ts';
-import fs from 'fs';
+import { FileChangeHandler } from './file-change-handler.ts';
 export interface WorkspaceFolderContext extends BaseContext {
   [commonTokens.loggerContext]: string;
   [commonTokens.contextualLogger]: ContextualLogger;
@@ -38,8 +37,9 @@ export class WorkspaceFolder {
     this.logger = logger;
   }
   async init() {
-    const enabled = Configuration.getSetting<boolean>(
+    const enabled = Configuration.getSettingOrDefault<boolean>(
       Settings.enable,
+      true,
       this.workspaceFolder,
     );
 
@@ -60,36 +60,21 @@ export class WorkspaceFolder {
       this.workspaceFolder,
     ) as string;
 
-    this.#testExplorer = this.injector
+    let workspaceScopedInjector = this.injector
+    .provideValue(commonTokens.mutationServer, this.mutationServer)
+    .provideValue(commonTokens.serverWorkspaceDirectory, serverWorkspaceDirectory)
+
+    this.#testExplorer = workspaceScopedInjector
       .provideFactory(commonTokens.testController, provideTestController)
-      .provideValue(commonTokens.mutationServer, this.mutationServer)
-      .provideValue(
-        commonTokens.serverWorkspaceDirectory,
-        serverWorkspaceDirectory,
-      )
       .provideClass(commonTokens.testRunner, TestRunner)
       .injectClass(TestExplorer);
-    this.#fileSystemWatcher = this.injector.injectClass(FileSystemWatcher);
-    this.#fileSystemWatcher.onFilesChanged(async (uris) => {
-      // if uri is directory. add / to the end of the uri
-      const fileRanges = uris.map((uri) => {
-        const filePath = fs.lstatSync(uri.fsPath).isDirectory()
-          ? `${uri.fsPath}/`
-          : uri.fsPath;
-        return { path: filePath };
-      });
-      const mutationTestParams: MutationTestParams = {
-        files: fileRanges,
-      };
-      const discoverResult = await this.mutationServer.discover(mutationTestParams);
-      this.#testExplorer!.processDiscoverResult(
-        discoverResult,
-        serverWorkspaceDirectory,
-      );
-    });
-    this.#fileSystemWatcher.onFilesDeleted(async (uris) => {
-      this.#testExplorer!.processFileDeletions(uris);
-    });
+
+    this.#fileSystemWatcher = workspaceScopedInjector
+      .provideValue(commonTokens.testExplorer, this.#testExplorer)
+      .provideClass(commonTokens.fileChangeHandler, FileChangeHandler)
+      .injectClass(FileSystemWatcher);
+    this.#fileSystemWatcher.init();
+
     // Initial discovery of mutants
     const discoverResult = await this.mutationServer.discover({});
     this.#testExplorer.processDiscoverResult(

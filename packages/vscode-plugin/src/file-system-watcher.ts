@@ -3,18 +3,29 @@ import { Constants } from './index.ts';
 import { commonTokens } from './di/index.ts';
 import { Configuration, Settings } from './config/index.ts';
 import { Subject, buffer, debounceTime } from 'rxjs';
+import { FileChangeHandler } from './file-change-handler.ts';
+import { ContextualLogger } from './logging/contextual-logger.ts';
 export class FileSystemWatcher {
   private readonly workspaceFolder;
+  private readonly fileChangeHandler;
+  private readonly logger;
+
   #watcher?: vscode.FileSystemWatcher;
   private readonly fileChangeSubject = new Subject<vscode.Uri>();
   private readonly fileDeleteSubject = new Subject<vscode.Uri>();
-  private readonly _onFilesChanged = new vscode.EventEmitter<vscode.Uri[]>();
-  private readonly _onFilesDeleted = new vscode.EventEmitter<vscode.Uri[]>();
-  public readonly onFilesChanged = this._onFilesChanged.event;
-  public readonly onFilesDeleted = this._onFilesDeleted.event;
-  public static readonly inject = [commonTokens.workspaceFolder] as const;
-  constructor(workspaceFolder: vscode.WorkspaceFolder) {
+  public static readonly inject = [
+    commonTokens.workspaceFolder, 
+    commonTokens.fileChangeHandler,
+    commonTokens.contextualLogger] as const;
+  constructor(
+    workspaceFolder: vscode.WorkspaceFolder,
+    fileChangeHandler: FileChangeHandler,
+    logger: ContextualLogger) {
     this.workspaceFolder = workspaceFolder;
+    this.fileChangeHandler = fileChangeHandler;
+    this.logger = logger;
+  }
+  init() {
     this.fileChangeSubject
       .pipe(
         buffer(
@@ -23,7 +34,13 @@ export class FileSystemWatcher {
           ),
         ),
       )
-      .subscribe((uris) => this._onFilesChanged.fire(uris));
+      .subscribe(async (uris) => {
+        try {
+          await this.fileChangeHandler.handleFilesChanged(uris);
+        } catch (error) {
+          this.logger.error(`Failed to handle file changes: ${error}`, 'FileSystemWatcher');
+        }
+      });
     this.fileDeleteSubject
       .pipe(
         buffer(
@@ -32,7 +49,13 @@ export class FileSystemWatcher {
           ),
         ),
       )
-      .subscribe((uris) => this._onFilesDeleted.fire(uris));
+      .subscribe((uris) => {
+        try {
+          this.fileChangeHandler.handleFilesDeleted(uris);
+        } catch (error) {
+          this.logger.error(`Failed to handle file deletions: ${error}`, 'FileSystemWatcher');
+        }
+      });
     const configuredPattern = Configuration.getSettingOrDefault<string>(
       Settings.FileSystemWatcherPattern,
       Constants.DefaultFileSystemWatcherPattern,
@@ -49,8 +72,6 @@ export class FileSystemWatcher {
   }
   dispose() {
     this.#watcher?.dispose();
-    this._onFilesChanged.dispose();
-    this._onFilesDeleted.dispose();
     this.fileChangeSubject.complete();
     this.fileDeleteSubject.complete();
   }
