@@ -12,7 +12,7 @@ This document describes the mutation server protocol.
 The base protocol exchanges [JSON-RPC 2.0](https://www.jsonrpc.org/) messages between the client and the server. The protocol supports two transport modes:
 
 1. **Standard Input/Output (stdio)**
-2. **Socket connection**
+2. **TCP/IP Socket connection**
 
 The server must answer each request from the client with a response. The server may also send notifications to the client. The protocol is designed to be language agnostic and can be used with any programming language.
 
