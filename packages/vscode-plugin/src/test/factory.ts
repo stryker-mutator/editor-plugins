@@ -43,8 +43,7 @@ export function workspaceFolder(): sinon.SinonStubbedInstance<vscode.WorkspaceFo
 
 export function testController(): sinon.SinonStubbedInstance<vscode.TestController> {
   return sinon.createStubInstance(TestControllerMock);
-};
-
+}
 
 export class WorkspaceFolderMock implements vscode.WorkspaceFolder {
   uri: sinon.SinonStubbedInstance<vscode.Uri>;
@@ -52,7 +51,8 @@ export class WorkspaceFolderMock implements vscode.WorkspaceFolder {
   index: sinon.SinonStubbedInstance<number>;
 
   constructor() {
-    this.uri = sinon.stub() as unknown as sinon.SinonStubbedInstance<vscode.Uri>;
+    this.uri =
+      sinon.stub() as unknown as sinon.SinonStubbedInstance<vscode.Uri>;
     this.name = sinon.stub() as unknown as sinon.SinonStubbedInstance<string>;
     this.index = sinon.stub() as unknown as sinon.SinonStubbedInstance<number>;
   }
@@ -73,11 +73,19 @@ export class TestControllerMock implements vscode.TestController {
   createRunProfile = sinon.stub<any>();
   resolveHandler = sinon.stub<any>();
   createTestItem = sinon.stub<any>();
-  refreshHandler: ((token: vscode.CancellationToken) => Thenable<void> | void) | undefined = sinon.stub<any>();
-  createTestRun(request: vscode.TestRunRequest, name?: string, persist?: boolean): vscode.TestRun {
+  refreshHandler:
+    | ((token: vscode.CancellationToken) => Thenable<void> | void)
+    | undefined = sinon.stub<any>();
+  createTestRun(
+    request: vscode.TestRunRequest,
+    name?: string,
+    persist?: boolean,
+  ): vscode.TestRun {
     return sinon.stub() as unknown as vscode.TestRun;
   }
-  invalidateTestResults(items?: vscode.TestItem | readonly vscode.TestItem[]): void {
+  invalidateTestResults(
+    items?: vscode.TestItem | readonly vscode.TestItem[],
+  ): void {
     return;
   }
   dispose = sinon.stub<any>();

@@ -57,13 +57,16 @@ export class WorkspaceFolder {
 
     const serverWorkspaceDirectory = Configuration.getSettingOrDefault<string>(
       Settings.CurrentWorkingDirectory,
-      ".",
+      '.',
       this.workspaceFolder,
     ) as string;
 
     let workspaceScopedInjector = this.injector
       .provideValue(commonTokens.mutationServer, this.mutationServer)
-      .provideValue(commonTokens.serverWorkspaceDirectory, serverWorkspaceDirectory);
+      .provideValue(
+        commonTokens.serverWorkspaceDirectory,
+        serverWorkspaceDirectory,
+      );
 
     this.#testExplorer = workspaceScopedInjector
       .provideFactory(commonTokens.testController, provideTestController)

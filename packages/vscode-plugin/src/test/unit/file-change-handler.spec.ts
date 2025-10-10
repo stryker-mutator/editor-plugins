@@ -42,14 +42,18 @@ describe(FileChangeHandler.name, () => {
       // Arrange
       const mockUri1 = { fsPath: '/path/to/file1.ts' } as vscode.Uri;
       const mockUri2 = { fsPath: '/path/to/file2.js' } as vscode.Uri;
-      
-      fsStub.withArgs('/path/to/file1.ts').resolves({ isDirectory: () => false });
-      fsStub.withArgs('/path/to/file2.js').resolves({ isDirectory: () => false });
-      
+
+      fsStub
+        .withArgs('/path/to/file1.ts')
+        .resolves({ isDirectory: () => false });
+      fsStub
+        .withArgs('/path/to/file2.js')
+        .resolves({ isDirectory: () => false });
+
       const expectedDiscoverResult = {
         files: {
-          '/path/to/file1.ts': { mutants: [factory.createDiscoveredMutant()] }
-        }
+          '/path/to/file1.ts': { mutants: [factory.createDiscoveredMutant()] },
+        },
       };
       mutationServerMock.discover.resolves(expectedDiscoverResult);
 
@@ -58,28 +62,27 @@ describe(FileChangeHandler.name, () => {
 
       // Assert
       const expectedParams = {
-        files: [
-          { path: '/path/to/file1.ts' },
-          { path: '/path/to/file2.js' }
-        ]
+        files: [{ path: '/path/to/file1.ts' }, { path: '/path/to/file2.js' }],
       };
       expect(mutationServerMock.discover).calledOnceWithExactly(expectedParams);
       expect(testExplorerMock.processDiscoverResult).calledOnceWithExactly(
         expectedDiscoverResult,
-        serverWorkspaceDirectory
+        serverWorkspaceDirectory,
       );
     });
 
     it('should handle file changes for directories by adding trailing slash', async () => {
       // Arrange
       const mockUri = { fsPath: '/path/to/directory' } as vscode.Uri;
-      
-      fsStub.withArgs('/path/to/directory').resolves({ isDirectory: () => true });
-      
+
+      fsStub
+        .withArgs('/path/to/directory')
+        .resolves({ isDirectory: () => true });
+
       const expectedDiscoverResult = {
         files: {
-          '/path/to/directory/': { mutants: [] }
-        }
+          '/path/to/directory/': { mutants: [] },
+        },
       };
       mutationServerMock.discover.resolves(expectedDiscoverResult);
 
@@ -88,12 +91,12 @@ describe(FileChangeHandler.name, () => {
 
       // Assert
       const expectedParams = {
-        files: [{ path: '/path/to/directory/' }]
+        files: [{ path: '/path/to/directory/' }],
       };
       expect(mutationServerMock.discover).calledOnceWithExactly(expectedParams);
       expect(testExplorerMock.processDiscoverResult).calledOnceWithExactly(
         expectedDiscoverResult,
-        serverWorkspaceDirectory
+        serverWorkspaceDirectory,
       );
     });
 
@@ -101,15 +104,17 @@ describe(FileChangeHandler.name, () => {
       // Arrange
       const fileUri = { fsPath: '/path/to/file.ts' } as vscode.Uri;
       const dirUri = { fsPath: '/path/to/dir' } as vscode.Uri;
-      
-      fsStub.withArgs('/path/to/file.ts').resolves({ isDirectory: () => false });
+
+      fsStub
+        .withArgs('/path/to/file.ts')
+        .resolves({ isDirectory: () => false });
       fsStub.withArgs('/path/to/dir').resolves({ isDirectory: () => true });
-      
+
       const expectedDiscoverResult = {
         files: {
           '/path/to/file.ts': { mutants: [factory.createDiscoveredMutant()] },
-          '/path/to/dir/': { mutants: [] }
-        }
+          '/path/to/dir/': { mutants: [] },
+        },
       };
       mutationServerMock.discover.resolves(expectedDiscoverResult);
 
@@ -118,15 +123,12 @@ describe(FileChangeHandler.name, () => {
 
       // Assert
       const expectedParams = {
-        files: [
-          { path: '/path/to/file.ts' },
-          { path: '/path/to/dir/' }
-        ]
+        files: [{ path: '/path/to/file.ts' }, { path: '/path/to/dir/' }],
       };
       expect(mutationServerMock.discover).calledOnceWithExactly(expectedParams);
       expect(testExplorerMock.processDiscoverResult).calledOnceWithExactly(
         expectedDiscoverResult,
-        serverWorkspaceDirectory
+        serverWorkspaceDirectory,
       );
     });
 
@@ -134,14 +136,20 @@ describe(FileChangeHandler.name, () => {
       // Arrange
       const workingUri = { fsPath: '/path/to/working-file.ts' } as vscode.Uri;
       const failingUri = { fsPath: '/path/to/failing-file.ts' } as vscode.Uri;
-      
-      fsStub.withArgs('/path/to/working-file.ts').resolves({ isDirectory: () => false });
-      fsStub.withArgs('/path/to/failing-file.ts').rejects(new Error('File not found'));
-      
+
+      fsStub
+        .withArgs('/path/to/working-file.ts')
+        .resolves({ isDirectory: () => false });
+      fsStub
+        .withArgs('/path/to/failing-file.ts')
+        .rejects(new Error('File not found'));
+
       const expectedDiscoverResult = {
         files: {
-          '/path/to/working-file.ts': { mutants: [factory.createDiscoveredMutant()] }
-        }
+          '/path/to/working-file.ts': {
+            mutants: [factory.createDiscoveredMutant()],
+          },
+        },
       };
       mutationServerMock.discover.resolves(expectedDiscoverResult);
 
@@ -151,17 +159,17 @@ describe(FileChangeHandler.name, () => {
       // Assert
       expect(contextualLoggerMock.warn).calledWith(
         'Could not stat file /path/to/failing-file.ts: Error: File not found',
-        'FileChangeHandler'
+        'FileChangeHandler',
       );
-      
+
       // Only the working file should be included in the discovery params
       const expectedParams = {
-        files: [{ path: '/path/to/working-file.ts' }]
+        files: [{ path: '/path/to/working-file.ts' }],
       };
       expect(mutationServerMock.discover).calledOnceWithExactly(expectedParams);
       expect(testExplorerMock.processDiscoverResult).calledOnceWithExactly(
         expectedDiscoverResult,
-        serverWorkspaceDirectory
+        serverWorkspaceDirectory,
       );
     });
 
@@ -178,10 +186,14 @@ describe(FileChangeHandler.name, () => {
       // Arrange
       const failingUri1 = { fsPath: '/path/to/failing1.ts' } as vscode.Uri;
       const failingUri2 = { fsPath: '/path/to/failing2.ts' } as vscode.Uri;
-      
-      fsStub.withArgs('/path/to/failing1.ts').rejects(new Error('File not found'));
-      fsStub.withArgs('/path/to/failing2.ts').rejects(new Error('Permission denied'));
-      
+
+      fsStub
+        .withArgs('/path/to/failing1.ts')
+        .rejects(new Error('File not found'));
+      fsStub
+        .withArgs('/path/to/failing2.ts')
+        .rejects(new Error('Permission denied'));
+
       const expectedDiscoverResult = { files: {} };
       mutationServerMock.discover.resolves(expectedDiscoverResult);
 
@@ -196,8 +208,10 @@ describe(FileChangeHandler.name, () => {
     it('should not propagate mutation server discover errors', async () => {
       // Arrange
       const mockUri = { fsPath: '/path/to/file.ts' } as vscode.Uri;
-      fsStub.withArgs('/path/to/file.ts').resolves({ isDirectory: () => false });
-      
+      fsStub
+        .withArgs('/path/to/file.ts')
+        .resolves({ isDirectory: () => false });
+
       const discoveryError = new Error('Mutation server discovery failed');
       mutationServerMock.discover.rejects(discoveryError);
 
@@ -207,7 +221,7 @@ describe(FileChangeHandler.name, () => {
       // Assert
       expect(contextualLoggerMock.error).calledWith(
         `Failed to process file changes: Error: Mutation server discovery failed for ${[{ path: '/path/to/file.ts' }]}`,
-        'FileChangeHandler'
+        'FileChangeHandler',
       );
       expect(testExplorerMock.processDiscoverResult).not.called;
     });
@@ -223,7 +237,10 @@ describe(FileChangeHandler.name, () => {
       sut.handleFilesDeleted([mockUri1, mockUri2]);
 
       // Assert
-      expect(testExplorerMock.processFileDeletions).calledOnceWithExactly([mockUri1, mockUri2]);
+      expect(testExplorerMock.processFileDeletions).calledOnceWithExactly([
+        mockUri1,
+        mockUri2,
+      ]);
     });
 
     it('should handle empty deletion array', () => {

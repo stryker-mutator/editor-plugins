@@ -55,7 +55,8 @@ export class MutationServer {
     const serverConfig = await this.configure();
     if (serverConfig.version !== Constants.SupportedMspVersion) {
       throw new Error(
-        `Mismatched server version. Expected: ${Constants.SupportedMspVersion}, got: ${serverConfig.version}`);
+        `Mismatched server version. Expected: ${Constants.SupportedMspVersion}, got: ${serverConfig.version}`,
+      );
     }
   }
   private async connect(serverLocation: ServerLocation) {

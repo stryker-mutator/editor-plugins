@@ -24,7 +24,7 @@ describe(FileSystemWatcher.name, () => {
     fileChangeHandlerMock = sinon.createStubInstance(FileChangeHandler);
     workspaceFolderMock = factory.workspaceFolder();
     contextualLoggerMock = sinon.createStubInstance(ContextualLogger);
-    
+
     // Create mock for VS Code FileSystemWatcher
     vscodeFileSystemWatcherMock = {
       onDidCreate: sandbox.stub(),
@@ -34,14 +34,18 @@ describe(FileSystemWatcher.name, () => {
     } as any;
 
     // Stub VS Code workspace API
-    createFileSystemWatcherStub = sandbox.stub(vscode.workspace, 'createFileSystemWatcher')
+    createFileSystemWatcherStub = sandbox
+      .stub(vscode.workspace, 'createFileSystemWatcher')
       .returns(vscodeFileSystemWatcherMock);
-    
+
     // Stub RelativePattern constructor
     relativePatternStub = sandbox.stub(vscode, 'RelativePattern' as any);
-    
+
     // Stub Configuration
-    getSettingOrDefaultStub = sandbox.stub(Configuration, 'getSettingOrDefault');
+    getSettingOrDefaultStub = sandbox.stub(
+      Configuration,
+      'getSettingOrDefault',
+    );
 
     sut = new FileSystemWatcher(
       workspaceFolderMock,
@@ -57,7 +61,11 @@ describe(FileSystemWatcher.name, () => {
   describe('init', () => {
     beforeEach(() => {
       getSettingOrDefaultStub
-        .withArgs(Settings.FileSystemWatcherPattern, Constants.DefaultFileSystemWatcherPattern, workspaceFolderMock)
+        .withArgs(
+          Settings.FileSystemWatcherPattern,
+          Constants.DefaultFileSystemWatcherPattern,
+          workspaceFolderMock,
+        )
         .returns('**/*.{js,ts,jsx,tsx}');
     });
 
@@ -68,7 +76,7 @@ describe(FileSystemWatcher.name, () => {
       // Assert
       expect(relativePatternStub).calledOnceWithExactly(
         workspaceFolderMock,
-        '**/*.{js,ts,jsx,tsx}'
+        '**/*.{js,ts,jsx,tsx}',
       );
       expect(createFileSystemWatcherStub).calledOnce;
     });
@@ -86,7 +94,11 @@ describe(FileSystemWatcher.name, () => {
     it('should use default pattern when no configuration is provided', () => {
       // Arrange
       getSettingOrDefaultStub
-        .withArgs(Settings.FileSystemWatcherPattern, Constants.DefaultFileSystemWatcherPattern, workspaceFolderMock)
+        .withArgs(
+          Settings.FileSystemWatcherPattern,
+          Constants.DefaultFileSystemWatcherPattern,
+          workspaceFolderMock,
+        )
         .returns(Constants.DefaultFileSystemWatcherPattern);
 
       // Act
@@ -95,7 +107,7 @@ describe(FileSystemWatcher.name, () => {
       // Assert
       expect(relativePatternStub).calledOnceWithExactly(
         workspaceFolderMock,
-        Constants.DefaultFileSystemWatcherPattern
+        Constants.DefaultFileSystemWatcherPattern,
       );
     });
 
@@ -132,7 +144,9 @@ describe(FileSystemWatcher.name, () => {
 
         // Assert - use setTimeout to allow for debouncing
         setTimeout(() => {
-          expect(fileChangeHandlerMock.handleFilesChanged).calledWith([mockUri]);
+          expect(fileChangeHandlerMock.handleFilesChanged).calledWith([
+            mockUri,
+          ]);
           done();
         }, Constants.FileSystemWatcherDebounceMs + 10);
       });
@@ -147,7 +161,9 @@ describe(FileSystemWatcher.name, () => {
 
         // Assert - use setTimeout to allow for debouncing
         setTimeout(() => {
-          expect(fileChangeHandlerMock.handleFilesChanged).calledWith([mockUri]);
+          expect(fileChangeHandlerMock.handleFilesChanged).calledWith([
+            mockUri,
+          ]);
           done();
         }, Constants.FileSystemWatcherDebounceMs + 10);
       });
@@ -161,7 +177,9 @@ describe(FileSystemWatcher.name, () => {
 
         // Assert - use setTimeout to allow for debouncing
         setTimeout(() => {
-          expect(fileChangeHandlerMock.handleFilesDeleted).calledWith([mockUri]);
+          expect(fileChangeHandlerMock.handleFilesDeleted).calledWith([
+            mockUri,
+          ]);
           done();
         }, Constants.FileSystemWatcherDebounceMs + 10);
       });
@@ -181,7 +199,11 @@ describe(FileSystemWatcher.name, () => {
         // Assert - should be batched into a single call
         setTimeout(() => {
           expect(fileChangeHandlerMock.handleFilesChanged).calledOnce;
-          expect(fileChangeHandlerMock.handleFilesChanged).calledWith([mockUri1, mockUri2, mockUri3]);
+          expect(fileChangeHandlerMock.handleFilesChanged).calledWith([
+            mockUri1,
+            mockUri2,
+            mockUri3,
+          ]);
           done();
         }, Constants.FileSystemWatcherDebounceMs + 10);
       });
@@ -198,7 +220,10 @@ describe(FileSystemWatcher.name, () => {
         // Assert - should be batched into a single call
         setTimeout(() => {
           expect(fileChangeHandlerMock.handleFilesDeleted).calledOnce;
-          expect(fileChangeHandlerMock.handleFilesDeleted).calledWith([mockUri1, mockUri2]);
+          expect(fileChangeHandlerMock.handleFilesDeleted).calledWith([
+            mockUri1,
+            mockUri2,
+          ]);
           done();
         }, Constants.FileSystemWatcherDebounceMs + 10);
       });

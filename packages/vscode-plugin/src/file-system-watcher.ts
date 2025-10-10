@@ -16,11 +16,13 @@ export class FileSystemWatcher {
   public static readonly inject = [
     commonTokens.workspaceFolder,
     commonTokens.fileChangeHandler,
-    commonTokens.contextualLogger] as const;
+    commonTokens.contextualLogger,
+  ] as const;
   constructor(
     workspaceFolder: vscode.WorkspaceFolder,
     fileChangeHandler: FileChangeHandler,
-    logger: ContextualLogger) {
+    logger: ContextualLogger,
+  ) {
     this.workspaceFolder = workspaceFolder;
     this.fileChangeHandler = fileChangeHandler;
     this.logger = logger;

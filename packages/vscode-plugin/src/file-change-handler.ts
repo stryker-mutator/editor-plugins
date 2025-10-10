@@ -30,33 +30,43 @@ export class FileChangeHandler {
     this.#logger = logger;
   }
   async handleFilesChanged(uris: vscode.Uri[]): Promise<void> {
-    const fileRanges = (await Promise.all(
-      uris.map(async (uri) => {
-        try {
-          return await this.toFileRange(uri);
-        } catch (statError) {
-          this.#logger.warn(
-            `Could not stat file ${uri.fsPath}: ${statError}`,
-            'FileChangeHandler',
-          );
-          return undefined;
-        }
-      })
-    )).filter((fr): fr is FileRange => fr !== undefined);
+    const fileRanges = (
+      await Promise.all(
+        uris.map(async (uri) => {
+          try {
+            return await this.toFileRange(uri);
+          } catch (statError) {
+            this.#logger.warn(
+              `Could not stat file ${uri.fsPath}: ${statError}`,
+              'FileChangeHandler',
+            );
+            return undefined;
+          }
+        }),
+      )
+    ).filter((fr): fr is FileRange => fr !== undefined);
 
     if (fileRanges.length === 0) {
-      this.#logger.info('No valid file changes to process.', 'FileChangeHandler');
+      this.#logger.info(
+        'No valid file changes to process.',
+        'FileChangeHandler',
+      );
       return;
     }
 
     try {
-      const discoverResult = await this.#mutationServer.discover({ files: fileRanges });
+      const discoverResult = await this.#mutationServer.discover({
+        files: fileRanges,
+      });
       this.#testExplorer.processDiscoverResult(
         discoverResult,
         this.#serverWorkspaceDirectory,
       );
     } catch (error) {
-      this.#logger.error(`Failed to process file changes: ${error} for ${fileRanges}`, 'FileChangeHandler');
+      this.#logger.error(
+        `Failed to process file changes: ${error} for ${fileRanges}`,
+        'FileChangeHandler',
+      );
     }
   }
   handleFilesDeleted(uris: vscode.Uri[]): void {

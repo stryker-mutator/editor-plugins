@@ -81,7 +81,7 @@ export class Process extends EventEmitter {
         this.logger.error(`Server process exited with code ${code}`);
       }
     });
-    
+
     return await this.getServerLocation();
   }
   private async getServerLocation(): Promise<ServerLocation> {

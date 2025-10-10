@@ -1,7 +1,12 @@
 import vscode from 'vscode';
 import { commonTokens } from './di/tokens.ts';
 import { ContextualLogger, provideLogger } from './logging/index.ts';
-import { WorkspaceFolder, Constants, Process, MutationServer } from './index.ts';
+import {
+  WorkspaceFolder,
+  Constants,
+  Process,
+  MutationServer,
+} from './index.ts';
 import type { BaseContext } from './di/index.ts';
 import { createInjector, type Injector } from 'typed-inject';
 
