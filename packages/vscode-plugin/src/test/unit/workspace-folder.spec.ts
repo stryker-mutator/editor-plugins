@@ -18,10 +18,9 @@ describe(WorkspaceFolder.name, () => {
   let mutationServerMock: sinon.SinonStubbedInstance<MutationServer>;
   let workspaceFolderMock: sinon.SinonStubbedInstance<vscode.WorkspaceFolder>;
   let contextualLoggerMock: sinon.SinonStubbedInstance<ContextualLogger>;
-  let testControllerMock: sinon.SinonStubbedInstance<vscode.TestController>;
   let testExplorerMock: sinon.SinonStubbedInstance<TestExplorer>;
   let fileSystemWatcherMock: sinon.SinonStubbedInstance<FileSystemWatcher>;
-  let getSettingStub: sinon.SinonStub;
+  let getSettingOrDefaultStub: sinon.SinonStub;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
@@ -31,12 +30,11 @@ describe(WorkspaceFolder.name, () => {
     mutationServerMock = sinon.createStubInstance(MutationServer);
     workspaceFolderMock = factory.workspaceFolder();
     contextualLoggerMock = sinon.createStubInstance(ContextualLogger);
-    testControllerMock = factory.testController();
     testExplorerMock = sinon.createStubInstance(TestExplorer);
     fileSystemWatcherMock = sinon.createStubInstance(FileSystemWatcher);
 
     // Create the stub once here
-    getSettingStub = sandbox.stub(Configuration, "getSetting");
+    getSettingOrDefaultStub = sandbox.stub(Configuration, "getSettingOrDefault");
 
     sut = new WorkspaceFolder(
       injectorMock as Injector<WorkspaceFolderContext>,
@@ -53,7 +51,7 @@ describe(WorkspaceFolder.name, () => {
   describe('init', () => {
     describe('when setting "enable" is false', () => {
       beforeEach(() => {
-        getSettingStub.withArgs(Settings.enable, workspaceFolderMock).returns(false);
+        getSettingOrDefaultStub.withArgs(Settings.enable, true, workspaceFolderMock).returns(false);
       });
 
       it('should not init mutation server', async () => {
@@ -67,7 +65,24 @@ describe(WorkspaceFolder.name, () => {
 
     describe('when setting "enable" is true', () => {
       beforeEach(() => {
-        getSettingStub.withArgs(Settings.enable, workspaceFolderMock).returns(true);
+        getSettingOrDefaultStub.withArgs(Settings.enable, true, workspaceFolderMock).returns(true);
+        getSettingOrDefaultStub
+          .withArgs(Settings.CurrentWorkingDirectory, ".", workspaceFolderMock)
+          .returns('/foo/bar/server');
+
+        injectorMock.injectClass
+          .withArgs(TestExplorer)
+          .returns(testExplorerMock)
+          .withArgs(FileSystemWatcher)
+          .returns(fileSystemWatcherMock);
+
+        fileSystemWatcherMock.init.returns();
+
+        mutationServerMock.discover.resolves({
+          files: {
+            '/foo/bar/server/file1.js': { mutants: [factory.createDiscoveredMutant()] }
+          }
+        });
       });
 
       it('should init mutation server', async () => {
@@ -78,35 +93,116 @@ describe(WorkspaceFolder.name, () => {
         sinon.assert.calledOnce(mutationServerMock.init);
       });
 
-      it('should discover for all files', async () => {
-        // Arrange
-        getSettingStub.withArgs(Settings.CurrentWorkingDirectory, workspaceFolderMock).returns('/foo/bar/server');
-
-        injectorMock.injectClass
-          .withArgs(TestExplorer)
-          .returns(testExplorerMock)
-          .withArgs(FileSystemWatcher)
-          .returns(fileSystemWatcherMock);
-
+      it('should discover for all files and process results', async () => {
         // Act
         await sut.init();
 
         // Assert
-        expect(injectorMock.provideFactory).calledWithExactly(
+        expect(injectorMock.provideFactory).calledOnceWithExactly(
           commonTokens.testController,
           provideTestController
         );
-        expect(injectorMock.provideValue).calledWithExactly(
+        expect(injectorMock.provideValue).calledWith(
           commonTokens.mutationServer,
           mutationServerMock
         );
-        expect(injectorMock.provideValue).calledWithExactly(
+        expect(injectorMock.provideValue).calledWith(
           commonTokens.serverWorkspaceDirectory,
           '/foo/bar/server'
         );
-        expect(mutationServerMock.discover).calledOnce;
-        expect(testExplorerMock.processDiscoverResult).calledOnce;
+        expect(mutationServerMock.discover).calledOnceWithExactly({});
+        expect(
+          testExplorerMock.processDiscoverResult.calledOnceWithExactly(
+            {
+              files: {
+                '/foo/bar/server/file1.js': { mutants: [factory.createDiscoveredMutant()] }
+              }
+            },
+            '/foo/bar/server'
+          )
+        ).to.be.true;
       });
+
+      it('should init file system watcher', async () => {
+        // Act
+        await sut.init();
+
+        // Assert
+        expect(fileSystemWatcherMock.init.calledOnce).to.be.true;
+      });
+    });
+
+    describe('when mutation server initialization fails', () => {
+      beforeEach(() => {
+        getSettingOrDefaultStub.withArgs(Settings.enable, true, workspaceFolderMock).returns(true);
+        mutationServerMock.init.rejects(new Error('Server initialization failed'));
+      });
+
+      it('should log error and not proceed with component setup', async () => {
+        // Act
+        await sut.init();
+
+        // Assert
+        expect(mutationServerMock.init.calledOnce).to.be.true;
+        expect(contextualLoggerMock.error.calledWith(
+          'Failed to initialize mutation server: Error: Server initialization failed'
+        )).to.be.true;
+        
+        // Should not proceed with setting up other components
+        expect(injectorMock.provideFactory.called).to.be.false;
+        expect(injectorMock.injectClass.called).to.be.false;
+        expect(mutationServerMock.discover.called).to.be.false;
+      });
+    });
+  });
+
+  describe('dispose', () => {
+    it('should dispose all resources when components are initialized', async () => {
+      // Arrange
+      getSettingOrDefaultStub.withArgs(Settings.enable, true, workspaceFolderMock).returns(true);
+      getSettingOrDefaultStub
+        .withArgs(Settings.CurrentWorkingDirectory, ".", workspaceFolderMock)
+        .returns('/foo/bar/server');
+
+      injectorMock.injectClass
+        .withArgs(TestExplorer)
+        .returns(testExplorerMock)
+        .withArgs(FileSystemWatcher)
+        .returns(fileSystemWatcherMock);
+
+      fileSystemWatcherMock.init.returns();
+      mutationServerMock.discover.resolves({
+        files: {
+          '/foo/bar/server/file1.js': { mutants: [factory.createDiscoveredMutant()] }
+        }
+      });
+
+      await sut.init();
+
+      // Act
+      await sut.dispose();
+
+      // Assert
+      expect(fileSystemWatcherMock.dispose.calledOnce).to.be.true;
+      expect(testExplorerMock.dispose.calledOnce).to.be.true;
+      expect(mutationServerMock.dispose.calledOnce).to.be.true;
+      expect(contextualLoggerMock.info.calledWith(
+        `Disposed workspace folder: ${workspaceFolderMock.uri.fsPath}`
+      )).to.be.true;
+    });
+
+    it('should handle disposal when components are not initialized', async () => {
+      // Act (dispose without init)
+      await sut.dispose();
+
+      // Assert
+      expect(mutationServerMock.dispose.calledOnce).to.be.true;
+      expect(contextualLoggerMock.info.calledWith(
+        `Disposed workspace folder: ${workspaceFolderMock.uri.fsPath}`
+      )).to.be.true;
+      // FileSystemWatcher and TestExplorer dispose should not be called since they weren't initialized
+      expect(fileSystemWatcherMock.dispose.called).to.be.false;
+      expect(testExplorerMock.dispose.called).to.be.false;
     });
   });
 });
