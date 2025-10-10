@@ -1,11 +1,7 @@
 import { commonTokens } from './di/index.ts';
 import { ContextualLogger } from './logging/index.ts';
 import { JSONRPCClient, JSONRPCErrorException } from 'json-rpc-2.0';
-import {
-  ITransport,
-  TransportMode,
-  SocketTransportConfig,
-} from './transport/index.ts';
+import { ITransport } from './transport/index.ts';
 import {
   ConfigureParams,
   ConfigureResult,
@@ -58,13 +54,16 @@ export class MutationServer {
 
   public async init() {
     await this.process.init();
-    // TODO: get server config from configuration
-
     // TODO: fix temp fix
     // Wait a bit for the server to be fully ready to accept connections
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    await this.connect();
+    await this.transport.connect();
+
+    // Handle incoming messages (responses and requests with id)
+    this.transport.messages.subscribe((event) => {
+      this.jsonRPCClient.receive(event);
+    });
 
     const configResult = await this.configure();
 
@@ -73,24 +72,6 @@ export class MutationServer {
         `Mismatched server version. Expected: ${Constants.SupportedMspVersion}, got: ${configResult.version}`,
       );
     }
-  }
-
-  private async connect() {
-    // Connect the transport
-    // TODO: make this configurable
-    const transportConfig: SocketTransportConfig = {
-      mode: TransportMode.Socket,
-      host: 'localhost',
-      port: 3000,
-      process: this.process,
-    };
-
-    await this.transport.connect(transportConfig);
-
-    // Handle incoming messages (responses and requests with id)
-    this.transport.messages.subscribe((event) => {
-      this.jsonRPCClient.receive(event as any);
-    });
   }
 
   private async configure(): Promise<ConfigureResult> {

@@ -18,4 +18,5 @@ export const commonTokens = Object.freeze({
   testRunner: 'testRunner',
   fileChangeHandler: 'fileChangeHandler',
   transport: 'transport',
+  transportConfig: 'transportConfig',
 });

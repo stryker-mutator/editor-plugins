@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs';
-import { JSONRPCRequest } from 'json-rpc-2.0';
+import { JSONRPCRequest, JSONRPCResponse } from 'json-rpc-2.0';
 
 /**
  * Transport mode for mutation server communication
@@ -16,7 +16,6 @@ export type TransportMode = (typeof TransportMode)[keyof typeof TransportMode];
  */
 export interface TransportConfig {
   mode: TransportMode;
-  process: any; // Using any to avoid circular dependency with child_process
 }
 
 export interface SocketTransportConfig extends TransportConfig {
@@ -32,7 +31,7 @@ export interface ITransport {
   /**
    * Initialize and connect the transport
    */
-  connect(config: TransportConfig): Promise<void>;
+  connect(): Promise<void>;
 
   /**
    * Send a JSON-RPC message
@@ -45,9 +44,9 @@ export interface ITransport {
   readonly notifications: Subject<JSONRPCRequest>;
 
   /**
-   * Observable stream of incoming JSON-RPC responses and requests (messages with id)
+   * Observable stream of incoming JSON-RPC responses
    */
-  readonly messages: Subject<JSONRPCRequest>;
+  readonly messages: Subject<JSONRPCResponse>;
 
   /**
    * Check if transport is connected
