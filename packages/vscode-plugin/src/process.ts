@@ -1,10 +1,16 @@
 import { commonTokens } from './di/index.ts';
-import { MissingServerPathError, CouldNotSpawnProcessError } from './index.ts';
+import {
+  Constants,
+  MissingServerPathError,
+  CouldNotSpawnProcessError,
+  ServerStartupTimeoutError,
+} from './index.ts';
 import vscode from 'vscode';
 import { ContextualLogger } from './logging/index.ts';
 import { Configuration, Settings } from './config/index.ts';
 import { type ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { EventEmitter } from 'events';
+import type { ServerLocation } from './domain/index.ts';
 import path from 'path';
 export class Process extends EventEmitter {
   private readonly workspaceFolder;
@@ -22,7 +28,7 @@ export class Process extends EventEmitter {
     this.workspaceFolder = workspaceFolder;
     this.logger = logger;
   }
-  async init() {
+  async init(): Promise<ServerLocation> {
     const serverPath = Configuration.getSetting<string>(
       Settings.ServerPath,
       this.workspaceFolder,
@@ -75,8 +81,26 @@ export class Process extends EventEmitter {
         this.logger.error(`Server process exited with code ${code}`);
       }
     });
-  }
 
+    return await this.getServerLocation();
+  }
+  private async getServerLocation(): Promise<ServerLocation> {
+    return await new Promise<ServerLocation>((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        reject(new ServerStartupTimeoutError());
+      }, Constants.ServerStartupTimeoutMs);
+      this.on('data', (data) => {
+        try {
+          const dataString: string = data.toString();
+          const location: ServerLocation = JSON.parse(dataString);
+          clearTimeout(timeoutId);
+          resolve(location);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+  }
   private handleProcessOutput = (
     data: Buffer,
     logFn: (msg: string, ...labels: string[]) => void,

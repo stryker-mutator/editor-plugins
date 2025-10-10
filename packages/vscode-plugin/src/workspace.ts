@@ -9,7 +9,6 @@ import {
 } from './index.ts';
 import type { BaseContext } from './di/index.ts';
 import { createInjector, type Injector } from 'typed-inject';
-import { SocketTransport } from './transport/socket-transport.ts';
 
 export class Workspace {
   private readonly injectorFactory;
@@ -90,7 +89,6 @@ export class Workspace {
       .provideValue(commonTokens.loggerContext, folder.name)
       .provideClass(commonTokens.contextualLogger, ContextualLogger)
       .provideClass(commonTokens.process, Process)
-      .provideClass(commonTokens.transport, SocketTransport) // TODO: make transport configurable and use stdio by default
       .provideClass(commonTokens.mutationServer, MutationServer)
       .injectClass(WorkspaceFolder);
 

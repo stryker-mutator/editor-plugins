@@ -1,11 +1,14 @@
 import { commonTokens } from './di/index.ts';
+import type { ServerLocation } from './domain/index.ts';
+import * as net from 'net';
 import { ContextualLogger } from './logging/index.ts';
-import { JSONRPCClient, JSONRPCErrorException } from 'json-rpc-2.0';
 import {
-  ITransport,
-  TransportMode,
-  SocketTransportConfig,
-} from './transport/index.ts';
+  JSONRPCClient,
+  JSONRPCErrorException,
+  type JSONRPCRequest,
+} from 'json-rpc-2.0';
+import { JsonRpcEventDeserializer } from './utils/index.ts';
+import { promisify } from 'util';
 import {
   ConfigureParams,
   ConfigureResult,
@@ -14,10 +17,11 @@ import {
   MutationTestParams,
   MutationTestResult,
 } from 'mutation-server-protocol';
-import { filter, map } from 'rxjs';
+import { filter, map, Subject } from 'rxjs';
+import { Settings, Configuration } from './config/index.ts';
 import vscode from 'vscode';
-import { Configuration, Settings } from './config/index.ts';
 import { Constants, Process } from './index.ts';
+
 const rpcMethods = Object.freeze({
   configure: 'configure',
   discover: 'discover',
@@ -28,71 +32,54 @@ export class MutationServer {
   private readonly logger;
   private readonly workspaceFolder;
   private readonly process;
-  private transport: ITransport;
-  private jsonRPCClient: JSONRPCClient;
-
+  private socket?: net.Socket;
+  private jsonRPCClient?: JSONRPCClient;
+  private readonly notifications = new Subject<JSONRPCRequest>();
   public static readonly inject = [
     commonTokens.contextualLogger,
     commonTokens.workspaceFolder,
     commonTokens.process,
-    commonTokens.transport,
   ] as const;
-
   constructor(
     logger: ContextualLogger,
     workspaceFolder: vscode.WorkspaceFolder,
     process: Process,
-    transport: ITransport,
   ) {
     this.logger = logger;
     this.workspaceFolder = workspaceFolder;
     this.process = process;
-    this.transport = transport;
-
-    // Setup JSON-RPC client with transport
-    this.jsonRPCClient = new JSONRPCClient((jsonRPCRequest) => {
-      const message = JSON.stringify(jsonRPCRequest);
-      this.transport.send(message);
-    });
   }
-
   public async init() {
-    await this.process.init();
-    // TODO: get server config from configuration
-
-    // TODO: fix temp fix
-    // Wait a bit for the server to be fully ready to accept connections
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    await this.connect();
-
-    const configResult = await this.configure();
-
-    if (configResult.version !== Constants.SupportedMspVersion) {
+    const serverLocation = await this.process.init();
+    await this.connect(serverLocation);
+    const serverConfig = await this.configure();
+    if (serverConfig.version !== Constants.SupportedMspVersion) {
       throw new Error(
-        `Mismatched server version. Expected: ${Constants.SupportedMspVersion}, got: ${configResult.version}`,
+        `Mismatched server version. Expected: ${Constants.SupportedMspVersion}, got: ${serverConfig.version}`,
       );
     }
   }
-
-  private async connect() {
-    // Connect the transport
-    // TODO: make this configurable
-    const transportConfig: SocketTransportConfig = {
-      mode: TransportMode.Socket,
-      host: 'localhost',
-      port: 3000,
-      process: this.process,
-    };
-
-    await this.transport.connect(transportConfig);
-
-    // Handle incoming messages (responses and requests with id)
-    this.transport.messages.subscribe((event) => {
-      this.jsonRPCClient.receive(event as any);
+  private async connect(serverLocation: ServerLocation) {
+    this.socket = net.connect(serverLocation.port, serverLocation.host, () => {
+      this.logger.info('Connected to socket of mutation server');
+    });
+    this.jsonRPCClient = new JSONRPCClient((jsonRPCRequest) => {
+      const content = Buffer.from(JSON.stringify(jsonRPCRequest));
+      this.socket!.write(`Content-Length: ${content.byteLength}\r\n\r\n`);
+      this.socket!.write(content);
+    });
+    const deserializer = new JsonRpcEventDeserializer();
+    this.socket.on('data', (data) => {
+      const events = deserializer.deserialize(data);
+      for (const event of events) {
+        if (event.id === undefined) {
+          this.notifications.next(event);
+        } else {
+          this.jsonRPCClient!.receive(event);
+        }
+      }
     });
   }
-
   private async configure(): Promise<ConfigureResult> {
     const configFilePath = Configuration.getSetting<string>(
       Settings.ConfigFilePath,
@@ -100,7 +87,7 @@ export class MutationServer {
     );
 
     const configureParams: ConfigureParams = { configFilePath: configFilePath };
-    return await this.jsonRPCClient.request(
+    return await this.jsonRPCClient!.request(
       rpcMethods.configure,
       configureParams,
     );
@@ -108,17 +95,16 @@ export class MutationServer {
   public async discover(
     discoverParams: DiscoverParams,
   ): Promise<DiscoverResult> {
-    return await this.jsonRPCClient.request(
+    return await this.jsonRPCClient!.request(
       rpcMethods.discover,
       discoverParams,
     );
   }
-
   public async mutationTest(
     mutationTestParams: MutationTestParams,
     onPartialResult: (partialResult: MutationTestResult) => void,
   ): Promise<MutationTestResult> {
-    const subscription = this.transport.notifications
+    const subscription = this.notifications
       .pipe(
         filter(
           (notification) =>
@@ -129,7 +115,7 @@ export class MutationServer {
       )
       .subscribe(onPartialResult);
     try {
-      const result = await this.jsonRPCClient.request(
+      const result = await this.jsonRPCClient!.request(
         rpcMethods.mutationTest,
         mutationTestParams,
       );
@@ -140,9 +126,8 @@ export class MutationServer {
       subscription.unsubscribe();
     }
   }
-
   public async dispose() {
-    await this.transport.dispose();
+    await promisify(this.socket!.end.bind(this.socket))();
     this.process.dispose();
   }
 }
