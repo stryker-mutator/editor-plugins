@@ -24,7 +24,7 @@ Mutation server implementations must support both transport modes to ensure cons
 
 When using stdio transport:
 
-1. The server reads JSON-RPC messages from standard input
+1. The server reads JSON-RPC requests from standard input
 2. The server writes JSON-RPC responses and notifications to standard output
 
 The server must not write any logging or debugging information to standard output. The channel should exclusively be used for JSON-RPC message exchange.
@@ -63,7 +63,7 @@ Content-Length: ...\r\n
 }
 ```
 
-The message above shows the standard format for both stdio and socket transports. Each message contains a `Content-Length` header that specifies the length of the JSON content part. The message is encoded as UTF-8.
+The message above shows the standard format for all transport modes. Each message contains a `Content-Length` header that specifies the length of the JSON content part. The message is encoded as UTF-8.
 
 ## Position and Location Semantics
 
