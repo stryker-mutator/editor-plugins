@@ -40,11 +40,16 @@ When using socket transport:
 
 ### Server Startup Options
 
-Mutation servers must support the following command line options:
+Mutation servers must support the following command-line format:
 
-- `serve <channel>` - Specify the transport channel: `stdio` or `socket`
+```bash
+./server serve <channel> [--port <port>] [--address <address>] [-- <args>]
+```
+
+- `<channel>` - Specify the transport channel: `stdio` or `socket`. (required)
 - `--port <port>` - Port number for socket transport (required when using `socket` channel)
 - `--address <address>` - Host address for socket transport (optional, defaults to `localhost` when using `socket` channel)
+- `[-- <args>]` - Add other arguments here (mutation server specific).
 
 > [!TIP]
 > Locations are reported as part of the messages are always 1-based. The first line in a file is 1, and the first column in a line is 1.
