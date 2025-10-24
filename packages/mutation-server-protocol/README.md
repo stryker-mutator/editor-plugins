@@ -1,6 +1,6 @@
 # Mutation Server Protocol Specification
 
-The Mutation Server Protocol (MSP) provides endpoints for IDEs to run mutation testing and report the progress.
+The Mutation Server Protocol (MSP) provides a unified way for IDEs and other tools to communicate with mutation testing frameworks to run mutation testing and report the progress.
 
 > [!NOTE]  
 > Inspired by the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/)
@@ -9,22 +9,52 @@ This document describes the mutation server protocol.
 
 ## Base Protocol
 
-The base protocol exchanges [JSON-RPC 2.0](https://www.jsonrpc.org/) messages between the client and the server via a socket connection. The server must answer each request from the client with a response. The server may also send notifications to the client. The protocol is designed to be language agnostic and can be used with any programming language.
+The base protocol exchanges [JSON-RPC 2.0](https://www.jsonrpc.org/) messages between the client and the server. The protocol supports two transport modes:
 
-The mutation server must:
+1. **Standard Input/Output (stdio)**
+2. **TCP/IP Socket connection**
 
-1. Open a socket to accept incoming client connections.
-2. Provide a method such as command argument to configure a static port number. If a static port number is provided it must be used. If the static port number is already in use the server must exist with an error. If a port number is not provided the server must automatically select an available port.
-3. Write connection details to the standard output as the first message, in the following JSON format:
+The server must answer each request from the client with a response. The server may also send notifications to the client. The protocol is designed to be language agnostic and can be used with any programming language.
 
-```json
-{ "port": <port_number> }
+### Transport Requirements
+
+Mutation server implementations must support both transport modes to ensure consistency and guarantee that all clients and servers can communicate reliably.
+
+### stdio Transport
+
+When using stdio transport:
+
+1. The server reads JSON-RPC requests from standard input
+2. The server writes JSON-RPC responses and notifications to standard output
+
+The server must not write any logging or debugging information to standard output. The channel should exclusively be used for JSON-RPC message exchange. Logging and debugging information should be written to standard error (stderr) instead.
+
+### Socket Transport
+
+When using socket transport:
+
+1. The server opens a socket on the **host and port** specified via command line arguments (`--port` and `--address`). If no address is provided, the server defaults to `localhost` as the host.
+2. If the specified port is already in use, the server must exit with an error.
+3. The server accepts incoming client connections on this socket.
+4. JSON-RPC messages are exchanged over the socket connection.
+
+### Server Startup Options
+
+Mutation servers must support the following command-line format:
+
+```bash
+./server serve <channel> [--port <port>] [--address <address>] [-- <args>]
 ```
+
+- `<channel>` - Specify the transport channel: `stdio` or `socket`. (required)
+- `--port <port>` - Port number for socket transport (required when using `socket` channel)
+- `--address <address>` - Host address for socket transport (optional, defaults to `localhost` when using `socket` channel)
+- `[-- <args>]` - Add other arguments here (mutation server specific).
 
 > [!TIP]
 > Locations are reported as part of the messages are always 1-based. The first line in a file is 1, and the first column in a line is 1.
 
-### Example
+### Message Format Example
 
 ```
 Content-Length: ...\r\n
@@ -39,7 +69,7 @@ Content-Length: ...\r\n
 }
 ```
 
-The message above is a request to the server or from the server to the client. Each message contains a `Content-Length` header that specifies the length of the content part. The message is encoded as UTF-8.
+The message above shows the standard format for all transport modes. Each message contains a `Content-Length` header that specifies the length of the JSON content part. The message is encoded as UTF-8.
 
 ## Position and Location Semantics
 
@@ -72,7 +102,9 @@ type FileRange = {
 };
 ```
 
-### Examples
+The server must gracefully handle non-existent files or directories by ignoring them without returning errors. Files that cannot be mutated should also be ignored during discovery and mutation testing operations.
+
+### FileRange Examples
 
 Examples of how `FileRange` objects can be used in `discover` or `mutationTest` calls:
 
