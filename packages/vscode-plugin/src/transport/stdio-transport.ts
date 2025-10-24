@@ -42,8 +42,7 @@ export class StdioTransport extends BaseTransport {
     }
 
     const content = Buffer.from(message);
-    this.process.write(`Content-Length: ${content.byteLength}\r\n\r\n`);
-    this.process.write(content);
+    this.process.write(`Content-Length: ${content.byteLength}\r\n\r\n${content}`);
   }
 
   async dispose(): Promise<void> {
