@@ -4,7 +4,7 @@ export class Logger {
   private outputChannel: vscode.OutputChannel;
 
   constructor(channelName: string) {
-    this.outputChannel = vscode.window.createOutputChannel(channelName);
+    this.outputChannel = vscode.window.createOutputChannel(channelName, { log: true });
   }
 
   /**
@@ -21,7 +21,6 @@ export class Logger {
    */
   warn(message: string, ...labels: string[]): void {
     this.log('WARN', message, ...labels);
-    this.outputChannel.show(true);
   }
 
   /**
@@ -30,7 +29,6 @@ export class Logger {
    */
   error(message: string, ...labels: string[]): void {
     this.log('ERROR', message, ...labels);
-    this.outputChannel.show(true);
   }
   /**
    * Log a message with a custom log level.
@@ -39,12 +37,15 @@ export class Logger {
    * @param label An optional label to identify the source of the log message.
    */
   private log(level: string, message: string, ...labels: string[]): void {
+    // Strip trailing newlines from the message
+    const cleanedMessage = message.replace(/\n+$/, '');
+
     const levelPart = level ? `[${level}] ` : '';
     const labelPart =
       labels && labels.length > 0
         ? labels.map((label) => `[${label}]`).join(' ') + ' '
         : '';
-    this.outputChannel.appendLine(`${labelPart}${levelPart}${message}`);
+    this.outputChannel.appendLine(`${labelPart}${levelPart}${cleanedMessage}`);
   }
 
   /**
@@ -52,5 +53,9 @@ export class Logger {
    */
   clear(): void {
     this.outputChannel.clear();
+  }
+
+  dispose(): void {
+    this.outputChannel.dispose();
   }
 }

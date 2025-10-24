@@ -72,7 +72,7 @@
           "scope": "resource",
           "type": "array",
           "default": [
-            "runServer"
+            "serve", "stdio"
           ]
         },
         "strykerMutator.server.workingDirectory": {

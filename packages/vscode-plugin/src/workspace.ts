@@ -9,8 +9,7 @@ import {
 } from './index.ts';
 import type { BaseContext } from './di/index.ts';
 import { createInjector, type Injector } from 'typed-inject';
-import { SocketTransport } from './transport/socket-transport.ts';
-import { SocketTransportConfig, TransportMode } from './transport/transport.ts';
+import { StdioTransport } from './transport/stdio-transport.ts';
 
 export class Workspace {
   private readonly injectorFactory;
@@ -88,18 +87,11 @@ export class Workspace {
       folder,
     );
 
-    let transportConfig: SocketTransportConfig = {
-      mode: TransportMode.Socket,
-      host: 'localhost',
-      port: 3000,
-    };
-
     const workspaceFolder = workspaceFolderInjector
       .provideValue(commonTokens.loggerContext, folder.name)
       .provideClass(commonTokens.contextualLogger, ContextualLogger)
       .provideClass(commonTokens.process, Process)
-      .provideValue(commonTokens.transportConfig, transportConfig)
-      .provideClass(commonTokens.transport, SocketTransport) // TODO: make transport configurable and use stdio by default
+      .provideClass(commonTokens.transport, StdioTransport)
       .provideClass(commonTokens.mutationServer, MutationServer)
       .injectClass(WorkspaceFolder);
 
@@ -160,5 +152,6 @@ export class Workspace {
     await Promise.all(
       this.#workspaceFolders.map(async (folder) => await folder.dispose()),
     );
+    this.#logger.dispose();
   }
 }

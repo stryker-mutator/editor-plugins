@@ -20,7 +20,7 @@ export abstract class BaseTransport implements ITransport {
     this.logger = logger;
   }
 
-  abstract connect(): Promise<void>;
+  abstract init(): Promise<void>;
   abstract send(message: string): void;
   abstract dispose(): Promise<void>;
 

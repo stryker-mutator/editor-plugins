@@ -55,10 +55,10 @@ export class Process extends EventEmitter {
     this.#process = spawn(serverPath, serverArgs, { cwd });
 
     this.#process.stdout.on('data', (data) => {
-      this.handleProcessOutput(data, this.logger.info, 'SERVER', 'data');
+      this.emit('stdout', data);
     });
     this.#process.stderr.on('data', (data) => {
-      this.handleProcessOutput(data, this.logger.error, 'SERVER', 'error');
+      this.emit('stderr', data);
     });
 
     if (this.#process.pid === undefined) {
@@ -76,21 +76,12 @@ export class Process extends EventEmitter {
       }
     });
   }
-
-  private handleProcessOutput = (
-    data: Buffer,
-    logFn: (msg: string, ...labels: string[]) => void,
-    label: string,
-    emitEvent: 'data' | 'error',
-  ) => {
-    const dataString: string = data.toString();
-    dataString.split('\n').forEach((line) => {
-      if (line.trim()) {
-        logFn.call(this.logger, line, label);
-      }
-    });
-    this.emit(emitEvent, dataString);
-  };
+  write(data: string | Buffer) {
+    if (!this.#process?.stdin) {
+      throw new Error('Process stdin is not available');
+    }
+    this.#process.stdin.write(data);
+  }
   dispose() {
     this.#process?.removeAllListeners();
     this.#process?.kill();

@@ -54,11 +54,7 @@ export class MutationServer {
 
   public async init() {
     await this.process.init();
-    // TODO: fix temp fix
-    // Wait a bit for the server to be fully ready to accept connections
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    await this.transport.connect();
+    await this.transport.init();
 
     // Handle incoming messages (responses and requests with id)
     this.transport.messages.subscribe((event) => {
