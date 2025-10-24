@@ -21,26 +21,22 @@ const rpcMethods = Object.freeze({
   reportMutationTestProgressNotification: 'reportMutationTestProgress',
 });
 export class MutationServer {
-  private readonly logger;
   private readonly workspaceFolder;
   private readonly process;
   private transport: ITransport;
   private jsonRPCClient: JSONRPCClient;
 
   public static readonly inject = [
-    commonTokens.contextualLogger,
     commonTokens.workspaceFolder,
     commonTokens.process,
     commonTokens.transport,
   ] as const;
 
   constructor(
-    logger: ContextualLogger,
     workspaceFolder: vscode.WorkspaceFolder,
     process: Process,
     transport: ITransport,
   ) {
-    this.logger = logger;
     this.workspaceFolder = workspaceFolder;
     this.process = process;
     this.transport = transport;
