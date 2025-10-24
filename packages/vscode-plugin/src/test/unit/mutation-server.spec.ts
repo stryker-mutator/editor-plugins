@@ -5,7 +5,11 @@ import vscode from 'vscode';
 import { MutationServer } from '../../mutation-server.ts';
 import { Process } from '../../process.ts';
 import { ContextualLogger } from '../../logging/index.ts';
-import { JSONRPCErrorResponse, JSONRPCRequest, JSONRPCResponse } from 'json-rpc-2.0';
+import {
+  JSONRPCErrorResponse,
+  JSONRPCRequest,
+  JSONRPCResponse,
+} from 'json-rpc-2.0';
 import { Configuration } from '../../config/index.ts';
 import { Constants } from '../../constants.ts';
 import {
@@ -57,7 +61,7 @@ describe(MutationServer.name, () => {
     sut = new MutationServer(
       workspaceFolderMock,
       processMock,
-      transportMock as any
+      transportMock as any,
     );
   });
 
@@ -120,10 +124,15 @@ describe(MutationServer.name, () => {
       await sut.init();
 
       // Assert
-      expect(transportMock.send.calledWithMatch((message: string) => {
-        const request = JSON.parse(message);
-        return request.method === 'configure' && request.params.configFilePath === undefined;
-      })).to.be.true;
+      expect(
+        transportMock.send.calledWithMatch((message: string) => {
+          const request = JSON.parse(message);
+          return (
+            request.method === 'configure' &&
+            request.params.configFilePath === undefined
+          );
+        }),
+      ).to.be.true;
     });
 
     it('should call configure with config file path from settings if set', async () => {
@@ -152,10 +161,15 @@ describe(MutationServer.name, () => {
       await sut.init();
 
       // Assert
-      expect(transportMock.send.calledWithMatch((message: string) => {
-        const request = JSON.parse(message);
-        return request.method === 'configure' && request.params.configFilePath === configFilePath;
-      })).to.be.true;
+      expect(
+        transportMock.send.calledWithMatch((message: string) => {
+          const request = JSON.parse(message);
+          return (
+            request.method === 'configure' &&
+            request.params.configFilePath === configFilePath
+          );
+        }),
+      ).to.be.true;
     });
 
     it('should throw error when server version mismatch', async () => {
@@ -180,7 +194,7 @@ describe(MutationServer.name, () => {
 
       // Act & Assert
       await expect(sut.init()).to.eventually.be.rejectedWith(
-        `Mismatched server version. Expected: ${Constants.SupportedMspVersion}, got: 0.0.0`
+        `Mismatched server version. Expected: ${Constants.SupportedMspVersion}, got: 0.0.0`,
       );
     });
   });
@@ -216,7 +230,10 @@ describe(MutationServer.name, () => {
             mutants: [
               {
                 id: '1',
-                location: { start: { line: 1, column: 0 }, end: { line: 1, column: 10 } },
+                location: {
+                  start: { line: 1, column: 0 },
+                  end: { line: 1, column: 10 },
+                },
                 mutatorName: 'EqualityOperator',
                 replacement: '!==',
               },
@@ -282,7 +299,10 @@ describe(MutationServer.name, () => {
               createMutantResult({
                 id: '2',
                 status: 'Survived',
-                location: { start: { line: 2, column: 0 }, end: { line: 2, column: 5 } },
+                location: {
+                  start: { line: 2, column: 0 },
+                  end: { line: 2, column: 5 },
+                },
                 mutatorName: 'BooleanLiteral',
                 replacement: 'false',
               }),
@@ -318,7 +338,10 @@ describe(MutationServer.name, () => {
       });
 
       // Act
-      const result = await sut.mutationTest(mutationTestParams, progressCallback);
+      const result = await sut.mutationTest(
+        mutationTestParams,
+        progressCallback,
+      );
 
       // Assert
       expect(capturedParams).to.deep.equal(mutationTestParams);
@@ -351,8 +374,9 @@ describe(MutationServer.name, () => {
       const progressCallback = sandbox.stub();
 
       // Act & Assert
-      await expect(sut.mutationTest(mutationTestParams, progressCallback))
-        .to.eventually.be.rejectedWith(errorMessage);
+      await expect(
+        sut.mutationTest(mutationTestParams, progressCallback),
+      ).to.eventually.be.rejectedWith(errorMessage);
     });
   });
   describe('dispose', () => {

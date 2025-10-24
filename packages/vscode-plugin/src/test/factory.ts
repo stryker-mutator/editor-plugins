@@ -1,10 +1,14 @@
-import { DiscoveredMutant, MutationTestResult, MutantResult } from 'mutation-server-protocol';
+import {
+  DiscoveredMutant,
+  MutationTestResult,
+  MutantResult,
+} from 'mutation-server-protocol';
 import sinon from 'sinon';
 import { Injector } from 'typed-inject';
 import vscode from 'vscode';
 
 export function createMutantResult(
-  overrides?: Partial<MutantResult>
+  overrides?: Partial<MutantResult>,
 ): MutantResult {
   return {
     id: '1',
@@ -18,7 +22,7 @@ export function createMutantResult(
 }
 
 export function createMutationTestResult(
-  overrides?: Partial<MutationTestResult>
+  overrides?: Partial<MutationTestResult>,
 ): MutationTestResult {
   return {
     files: {

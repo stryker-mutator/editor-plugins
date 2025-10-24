@@ -4,7 +4,10 @@ import vscode from 'vscode';
 import { Process } from '../../process.ts';
 import { ContextualLogger } from '../../logging/index.ts';
 import { Configuration, Settings } from '../../config/index.ts';
-import { MissingServerPathError, CouldNotSpawnProcessError } from '../../errors.ts';
+import {
+  MissingServerPathError,
+  CouldNotSpawnProcessError,
+} from '../../errors.ts';
 import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
@@ -33,7 +36,10 @@ describe(`${Process.name} (Integration)`, () => {
     };
 
     configurationGetSettingStub = sandbox.stub(Configuration, 'getSetting');
-    configurationGetSettingOrDefaultStub = sandbox.stub(Configuration, 'getSettingOrDefault');
+    configurationGetSettingOrDefaultStub = sandbox.stub(
+      Configuration,
+      'getSettingOrDefault',
+    );
 
     sut = new Process(workspaceFolderMock, loggerMock);
   });
@@ -53,11 +59,19 @@ describe(`${Process.name} (Integration)`, () => {
   describe('init', () => {
     it('should throw MissingServerPathError when server path is not configured', async () => {
       // Arrange
-      configurationGetSettingStub.withArgs(Settings.ServerPath, workspaceFolderMock).returns(undefined);
+      configurationGetSettingStub
+        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .returns(undefined);
 
       // Act & Assert
-      await expect(sut.init()).to.eventually.be.rejectedWith(MissingServerPathError);
-      expect(loggerMock.error.calledWith('Cannot start server. Missing server path configuration.')).to.be.true;
+      await expect(sut.init()).to.eventually.be.rejectedWith(
+        MissingServerPathError,
+      );
+      expect(
+        loggerMock.error.calledWith(
+          'Cannot start server. Missing server path configuration.',
+        ),
+      ).to.be.true;
     });
 
     it('should throw CouldNotSpawnProcessError when server path does not exist', async () => {
@@ -70,25 +84,39 @@ describe(`${Process.name} (Integration)`, () => {
         .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
         .returns([]);
       configurationGetSettingOrDefaultStub
-        .withArgs(Settings.CurrentWorkingDirectory, workspaceFolderMock.uri.fsPath, workspaceFolderMock)
+        .withArgs(
+          Settings.CurrentWorkingDirectory,
+          workspaceFolderMock.uri.fsPath,
+          workspaceFolderMock,
+        )
         .returns(workspaceFolderMock.uri.fsPath);
 
       // Act & Assert
-      await expect(sut.init()).to.eventually.be.rejectedWith(CouldNotSpawnProcessError);
-      expect(loggerMock.error.calledWith(sinon.match('Server process error:'))).to.be.true;
+      await expect(sut.init()).to.eventually.be.rejectedWith(
+        CouldNotSpawnProcessError,
+      );
+      expect(loggerMock.error.calledWith(sinon.match('Server process error:')))
+        .to.be.true;
     });
 
     it('should successfully spawn a simple command and handle exit', async () => {
       // Arrange
       const serverPath = process.platform === 'win32' ? 'cmd' : 'echo';
-      const serverArgs = process.platform === 'win32' ? ['/c', 'echo', 'test'] : ['test'];
+      const serverArgs =
+        process.platform === 'win32' ? ['/c', 'echo', 'test'] : ['test'];
 
-      configurationGetSettingStub.withArgs(Settings.ServerPath, workspaceFolderMock).returns(serverPath);
+      configurationGetSettingStub
+        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .returns(serverPath);
       configurationGetSettingOrDefaultStub
         .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
         .returns(serverArgs);
       configurationGetSettingOrDefaultStub
-        .withArgs(Settings.CurrentWorkingDirectory, workspaceFolderMock.uri.fsPath, workspaceFolderMock)
+        .withArgs(
+          Settings.CurrentWorkingDirectory,
+          workspaceFolderMock.uri.fsPath,
+          workspaceFolderMock,
+        )
         .returns(workspaceFolderMock.uri.fsPath);
 
       // Set up promise to wait for process completion
@@ -108,23 +136,41 @@ describe(`${Process.name} (Integration)`, () => {
 
       // Assert
       expect(exitCode).to.equal(0);
-      expect(loggerMock.info.calledWith(sinon.match(`Server configuration: path=${serverPath}`))).to.be.true;
-      expect(loggerMock.info.calledWith(sinon.match('Server process started with PID'))).to.be.true;
-      expect(loggerMock.info.calledWith('Server process exited normally with code 0')).to.be.true;
+      expect(
+        loggerMock.info.calledWith(
+          sinon.match(`Server configuration: path=${serverPath}`),
+        ),
+      ).to.be.true;
+      expect(
+        loggerMock.info.calledWith(
+          sinon.match('Server process started with PID'),
+        ),
+      ).to.be.true;
+      expect(
+        loggerMock.info.calledWith(
+          'Server process exited normally with code 0',
+        ),
+      ).to.be.true;
     });
-
 
     it('should handle process that exits with non-zero code', async () => {
       // Arrange
       const serverPath = process.platform === 'win32' ? 'cmd' : 'sh';
-      const serverArgs = process.platform === 'win32' ? ['/c', 'exit', '1'] : ['-c', 'exit 1'];
+      const serverArgs =
+        process.platform === 'win32' ? ['/c', 'exit', '1'] : ['-c', 'exit 1'];
 
-      configurationGetSettingStub.withArgs(Settings.ServerPath, workspaceFolderMock).returns(serverPath);
+      configurationGetSettingStub
+        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .returns(serverPath);
       configurationGetSettingOrDefaultStub
         .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
         .returns(serverArgs);
       configurationGetSettingOrDefaultStub
-        .withArgs(Settings.CurrentWorkingDirectory, workspaceFolderMock.uri.fsPath, workspaceFolderMock)
+        .withArgs(
+          Settings.CurrentWorkingDirectory,
+          workspaceFolderMock.uri.fsPath,
+          workspaceFolderMock,
+        )
         .returns(workspaceFolderMock.uri.fsPath);
 
       // Set up promise to wait for process error
@@ -144,14 +190,17 @@ describe(`${Process.name} (Integration)`, () => {
 
       // Assert
       expect(exitCode).to.equal(1);
-      expect(loggerMock.error.calledWith('Server process exited with code 1')).to.be.true;
+      expect(loggerMock.error.calledWith('Server process exited with code 1'))
+        .to.be.true;
     });
   });
 
   describe('write', () => {
     it('should throw error when process is not initialized', () => {
       // Act & Assert
-      expect(() => sut.write('test')).to.throw('Process stdin is not available');
+      expect(() => sut.write('test')).to.throw(
+        'Process stdin is not available',
+      );
     });
 
     it('should write data to process stdin when initialized', async () => {
@@ -159,12 +208,18 @@ describe(`${Process.name} (Integration)`, () => {
       const serverPath = process.platform === 'win32' ? 'more' : 'cat';
       const serverArgs: string[] = [];
 
-      configurationGetSettingStub.withArgs(Settings.ServerPath, workspaceFolderMock).returns(serverPath);
+      configurationGetSettingStub
+        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .returns(serverPath);
       configurationGetSettingOrDefaultStub
         .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
         .returns(serverArgs);
       configurationGetSettingOrDefaultStub
-        .withArgs(Settings.CurrentWorkingDirectory, workspaceFolderMock.uri.fsPath, workspaceFolderMock)
+        .withArgs(
+          Settings.CurrentWorkingDirectory,
+          workspaceFolderMock.uri.fsPath,
+          workspaceFolderMock,
+        )
         .returns(workspaceFolderMock.uri.fsPath);
 
       const stdoutData: Buffer[] = [];
@@ -182,20 +237,31 @@ describe(`${Process.name} (Integration)`, () => {
     it('should kill long running process when disposed', async () => {
       // Arrange
       const serverPath = process.platform === 'win32' ? 'ping' : 'sleep';
-      const serverArgs = process.platform === 'win32' ? ['-t', 'localhost'] : ['10'];
+      const serverArgs =
+        process.platform === 'win32' ? ['-t', 'localhost'] : ['10'];
 
-      configurationGetSettingStub.withArgs(Settings.ServerPath, workspaceFolderMock).returns(serverPath);
+      configurationGetSettingStub
+        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .returns(serverPath);
       configurationGetSettingOrDefaultStub
         .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
         .returns(serverArgs);
       configurationGetSettingOrDefaultStub
-        .withArgs(Settings.CurrentWorkingDirectory, workspaceFolderMock.uri.fsPath, workspaceFolderMock)
+        .withArgs(
+          Settings.CurrentWorkingDirectory,
+          workspaceFolderMock.uri.fsPath,
+          workspaceFolderMock,
+        )
         .returns(workspaceFolderMock.uri.fsPath);
 
       await sut.init();
 
       // Verify process started
-      expect(loggerMock.info.calledWith(sinon.match('Server process started with PID'))).to.be.true;
+      expect(
+        loggerMock.info.calledWith(
+          sinon.match('Server process started with PID'),
+        ),
+      ).to.be.true;
 
       // Act
       sut.dispose();
@@ -210,11 +276,18 @@ describe(`${Process.name} (Integration)`, () => {
       // Arrange
       const testMessage = 'stdout test';
       const serverPath = process.platform === 'win32' ? 'cmd' : 'echo';
-      const serverArgs = process.platform === 'win32' ? ['/c', 'echo', testMessage] : [testMessage];
+      const serverArgs =
+        process.platform === 'win32'
+          ? ['/c', 'echo', testMessage]
+          : [testMessage];
 
-      configurationGetSettingStub.withArgs(Settings.ServerPath, workspaceFolderMock).returns(serverPath);
+      configurationGetSettingStub
+        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .returns(serverPath);
       configurationGetSettingOrDefaultStub.returns([]);
-      configurationGetSettingOrDefaultStub.returns(workspaceFolderMock.uri.fsPath);
+      configurationGetSettingOrDefaultStub.returns(
+        workspaceFolderMock.uri.fsPath,
+      );
       configurationGetSettingOrDefaultStub
         .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
         .returns(serverArgs);
@@ -228,7 +301,7 @@ describe(`${Process.name} (Integration)`, () => {
       await sut.init();
 
       // Wait a bit for the output
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Assert
       expect(stdoutEvents.length).to.be.greaterThan(0);
@@ -239,13 +312,18 @@ describe(`${Process.name} (Integration)`, () => {
     it('should emit stderr events for error output', async () => {
       // Arrange
       const serverPath = process.platform === 'win32' ? 'cmd' : 'sh';
-      const serverArgs = process.platform === 'win32'
-        ? ['/c', 'echo error message 1>&2']
-        : ['-c', 'echo "error message" >&2'];
+      const serverArgs =
+        process.platform === 'win32'
+          ? ['/c', 'echo error message 1>&2']
+          : ['-c', 'echo "error message" >&2'];
 
-      configurationGetSettingStub.withArgs(Settings.ServerPath, workspaceFolderMock).returns(serverPath);
+      configurationGetSettingStub
+        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .returns(serverPath);
       configurationGetSettingOrDefaultStub.returns([]);
-      configurationGetSettingOrDefaultStub.returns(workspaceFolderMock.uri.fsPath);
+      configurationGetSettingOrDefaultStub.returns(
+        workspaceFolderMock.uri.fsPath,
+      );
       configurationGetSettingOrDefaultStub
         .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
         .returns(serverArgs);
@@ -259,7 +337,7 @@ describe(`${Process.name} (Integration)`, () => {
       await sut.init();
 
       // Wait a bit for the output
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Assert
       expect(stderrEvents.length).to.be.greaterThan(0);

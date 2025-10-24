@@ -15,10 +15,7 @@ export class StdioTransport extends BaseTransport {
     commonTokens.process,
   ] as const;
 
-  constructor(
-    logger: ContextualLogger,
-    process: Process
-  ) {
+  constructor(logger: ContextualLogger, process: Process) {
     super(logger);
     this.process = process;
   }
@@ -29,11 +26,14 @@ export class StdioTransport extends BaseTransport {
     });
 
     this.process.on('stderr', (data: Buffer) => {
-      this.logger.info(data.toString(), "Server");
+      this.logger.info(data.toString(), 'Server');
     });
 
     this.connected = true;
-    this.logger.info('Connected to mutation server via stdio', StdioTransport.name);
+    this.logger.info(
+      'Connected to mutation server via stdio',
+      StdioTransport.name,
+    );
   }
 
   send(message: string): void {
@@ -42,7 +42,9 @@ export class StdioTransport extends BaseTransport {
     }
 
     const content = Buffer.from(message);
-    this.process.write(`Content-Length: ${content.byteLength}\r\n\r\n${content}`);
+    this.process.write(
+      `Content-Length: ${content.byteLength}\r\n\r\n${content}`,
+    );
   }
 
   async dispose(): Promise<void> {

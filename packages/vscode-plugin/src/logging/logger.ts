@@ -4,7 +4,9 @@ export class Logger {
   private outputChannel: vscode.OutputChannel;
 
   constructor(channelName: string) {
-    this.outputChannel = vscode.window.createOutputChannel(channelName, { log: true });
+    this.outputChannel = vscode.window.createOutputChannel(channelName, {
+      log: true,
+    });
   }
 
   /**

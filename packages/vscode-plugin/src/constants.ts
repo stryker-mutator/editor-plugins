@@ -1,7 +1,7 @@
 export class Constants {
   public static readonly AppName = 'strykerMutator';
   public static readonly ServerStartupTimeoutMs = 10000;
-  public static readonly SupportedMspVersion = '0.4.0';
+  public static readonly SupportedMspVersion = '1';
   public static readonly DefaultFileSystemWatcherPattern =
     '**/*.{js,ts,jsx,tsx}';
   public static readonly FileSystemWatcherDebounceMs = 100;

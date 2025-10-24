@@ -32,10 +32,12 @@ describe(StdioTransport.name, () => {
       expect(processMock.on.calledWith('stdout')).to.be.true;
       expect(processMock.on.calledWith('stderr')).to.be.true;
       expect(sut.isConnected()).to.be.true;
-      expect(loggerMock.info.calledWith(
-        'Connected to mutation server via stdio',
-        StdioTransport.name
-      )).to.be.true;
+      expect(
+        loggerMock.info.calledWith(
+          'Connected to mutation server via stdio',
+          StdioTransport.name,
+        ),
+      ).to.be.true;
     });
 
     it('should handle stderr data by logging it', async () => {
@@ -49,7 +51,8 @@ describe(StdioTransport.name, () => {
       stderrCallback(testData);
 
       // Assert
-      expect(loggerMock.info.calledWith('error message\n', 'Server')).to.be.true;
+      expect(loggerMock.info.calledWith('error message\n', 'Server')).to.be
+        .true;
     });
   });
 
@@ -66,9 +69,11 @@ describe(StdioTransport.name, () => {
       sut.send(message);
 
       // Assert
-      expect(processMock.write.calledWith(
-        `Content-Length: ${expectedContent.byteLength}\r\n\r\n${expectedContent}`
-      )).to.be.true;
+      expect(
+        processMock.write.calledWith(
+          `Content-Length: ${expectedContent.byteLength}\r\n\r\n${expectedContent}`,
+        ),
+      ).to.be.true;
     });
 
     it('should throw error when not connected', () => {
@@ -77,7 +82,9 @@ describe(StdioTransport.name, () => {
       const message = '{"jsonrpc":"2.0","method":"test","params":{}}';
 
       // Act & Assert
-      expect(() => sut.send(message)).to.throw('Stdio transport is not connected');
+      expect(() => sut.send(message)).to.throw(
+        'Stdio transport is not connected',
+      );
     });
   });
 
@@ -136,11 +143,13 @@ describe(StdioTransport.name, () => {
       const testNotification: JSONRPCRequest = {
         jsonrpc: '2.0',
         method: 'test/notification',
-        params: { data: 'test' }
+        params: { data: 'test' },
       };
 
       const jsonData = JSON.stringify(testNotification);
-      const testData = Buffer.from(`Content-Length: ${jsonData.length}\r\n\r\n${jsonData}`);
+      const testData = Buffer.from(
+        `Content-Length: ${jsonData.length}\r\n\r\n${jsonData}`,
+      );
 
       let receivedNotification: JSONRPCRequest | undefined;
       notificationCallback = (notification) => {
@@ -159,11 +168,13 @@ describe(StdioTransport.name, () => {
       const testResponse: JSONRPCResponse = {
         jsonrpc: '2.0',
         id: 123,
-        result: { data: 'test' }
+        result: { data: 'test' },
       };
 
       const jsonData = JSON.stringify(testResponse);
-      const testData = Buffer.from(`Content-Length: ${jsonData.length}\r\n\r\n${jsonData}`);
+      const testData = Buffer.from(
+        `Content-Length: ${jsonData.length}\r\n\r\n${jsonData}`,
+      );
 
       let receivedMessage: JSONRPCResponse | undefined;
       messageCallback = (message) => {
@@ -180,7 +191,9 @@ describe(StdioTransport.name, () => {
 
     it('should handle malformed JSON by logging error', async () => {
       const malformedJson = '{invalid}';
-      const malformedData = Buffer.from(`Content-Length: ${malformedJson.length}\r\n\r\n${malformedJson}`);
+      const malformedData = Buffer.from(
+        `Content-Length: ${malformedJson.length}\r\n\r\n${malformedJson}`,
+      );
 
       // Simulate stdout data
       const stdoutCallback = processMock.on.getCall(0).args[1];
@@ -194,7 +207,7 @@ describe(StdioTransport.name, () => {
       const testResponse: JSONRPCResponse = {
         jsonrpc: '2.0',
         id: 456,
-        result: { data: 'partial' }
+        result: { data: 'partial' },
       };
 
       const jsonData = JSON.stringify(testResponse);
@@ -221,7 +234,7 @@ describe(StdioTransport.name, () => {
       const testResponse: JSONRPCResponse = {
         jsonrpc: '2.0',
         id: 789,
-        result: { data: 'clean' }
+        result: { data: 'clean' },
       };
 
       const jsonData = JSON.stringify(testResponse);
