@@ -52,28 +52,38 @@ export class Process extends EventEmitter {
       `Server configuration: path=${serverPath}, args=${serverArgs}, cwd=${cwd}`,
     );
 
-    this.#process = spawn(serverPath, serverArgs, { cwd });
+    return new Promise<void>((resolve, reject) => {
+      this.#process = spawn(serverPath, serverArgs, { cwd });
 
-    this.#process.stdout.on('data', (data) => {
-      this.emit('stdout', data);
-    });
-    this.#process.stderr.on('data', (data) => {
-      this.emit('stderr', data);
-    });
+      this.#process.on('error', (error) => {
+        this.logger.error(`Server process error: ${error.message}`);
+        reject(new CouldNotSpawnProcessError());
+      });
 
-    if (this.#process.pid === undefined) {
-      this.logger.error('Server process could not be spawned.');
-      throw new CouldNotSpawnProcessError();
-    }
+      this.#process.stdout.on('data', (data) => {
+        this.emit('stdout', data);
+      });
+      this.#process.stderr.on('data', (data) => {
+        this.emit('stderr', data);
+      });
 
-    this.logger.info(`Server process started with PID ${this.#process.pid}`);
+      this.#process.on('exit', (code) => {
+        if (code === 0) {
+          this.logger.info('Server process exited normally with code 0');
+        } else {
+          this.logger.error(`Server process exited with code ${code}`);
+        }
+      });
 
-    this.#process.on('exit', (code) => {
-      if (code === 0) {
-        this.logger.info('Server process exited normally with code 0');
-      } else {
-        this.logger.error(`Server process exited with code ${code}`);
+      // Check if process spawned successfully
+      if (this.#process.pid === undefined) {
+        this.logger.error('Server process could not be spawned.');
+        reject(new CouldNotSpawnProcessError());
+        return;
       }
+
+      this.logger.info(`Server process started with PID ${this.#process.pid}`);
+      resolve();
     });
   }
   write(data: string | Buffer) {
