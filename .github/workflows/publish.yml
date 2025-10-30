@@ -12,14 +12,14 @@ jobs:
       contents: read
       id-token: write # to enable use of OIDC for npm provenance
     steps:
-      - uses: actions/checkout@v4
-      - name: Set NPM Env
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
       - name: Install dependencies
         run: npm ci
       - name: Build
         run: npm run build
       - name: Release
-        run: npx lerna publish from-git --yes --pre-dist-tag next --no-verify-access
-        env:
-          NPM_CONFIG_PROVENANCE: true
+        run: npx lerna publish from-git --yes --pre-dist-tag next
