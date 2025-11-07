@@ -1,6 +1,12 @@
 # Stryker Mutation Testing for VS Code
 
+[![Slack](https://img.shields.io/badge/slack-stryker_mutator-green.svg?style=flat)](https://stryker-mutator.slack.com/messages/general/)
+
 The Stryker Mutation Testing extension for Visual Studio Code brings mutation testing to life with a fast, visual, and fully integrated experience. Say goodbye to sifting through raw terminal output or hunting through HTML reports. This extension puts everything right where you need it: in your code, in your workflow, and in real time.
+
+## Requirements
+
+- [StrykerJS v9.4.0 or newer](https://stryker-mutator.io/docs/stryker-js/getting-started/) installed and configured in your project.
 
 ## Why use the extension instead of the CLI?
 
@@ -35,19 +41,13 @@ Learn more about mutation testing and StrykerJS in the [official documentation](
 
   ![code-annotations.gif](https://raw.githubusercontent.com/stryker-mutator/editor-plugins/refs/heads/main/packages/vscode-plugin/images/inline-annotations.gif)
 
-## Requirements
-
-- You must have [StrykerJS v9.1.0 or higher](https://stryker-mutator.io/docs/stryker-js/getting-started/) installed and configured in your project.
-- The extension will automatically detect your Stryker configuration in your project and guide you through setup (check your notifications)
-
-  ![setup-notification.png](https://raw.githubusercontent.com/stryker-mutator/editor-plugins/refs/heads/main/packages/vscode-plugin/images/setup-notification.png)
-
 ## Extension Settings
 
 This extension contributes the following settings:
 
 - **`strykerMutator.enable`** (boolean):
   - Enable or disable Stryker mutation testing integration for this workspace.
+  - Default: `true`
 
 - **`strykerMutator.watchPattern`** (string):
   - Glob pattern for files to watch for changes and trigger mutation discovery. Uses [VS Code glob pattern syntax](https://code.visualstudio.com/docs/editor/glob-patterns#_glob-pattern-syntax).
@@ -59,10 +59,11 @@ This extension contributes the following settings:
 
 - **`strykerMutator.server.args`** (array):
   - Arguments to pass to the Stryker server process when starting.
-  - Default: `["runServer"]`
+  - Default: `["serve", "stdio"]`
 
 - **`strykerMutator.server.workingDirectory`** (string):
   - Working directory for the Stryker server process. Defaults to the workspace folder if not set.
+  - Default: `"."`
 
 - **`strykerMutator.server.configFile`** (string):
   - Optional path to your project's configuration file which will be passed to the server. When not provided, the mutation testing framework will use the default configuration file.
