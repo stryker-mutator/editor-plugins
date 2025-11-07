@@ -62,10 +62,9 @@ export class TestRunner {
     const mutationTestParams = testItemUtils.toMutationTestParams(queue);
     let progressPromises: Promise<void>[] = [];
     try {
-      const mutationTestResult$ = this.mutationServer.mutationTest(
-        mutationTestParams,
-      );
-      
+      const mutationTestResult$ =
+        this.mutationServer.mutationTest(mutationTestParams);
+
       // Subscribe to handle each emission from the observable
       await new Promise<void>((resolve, reject) => {
         mutationTestResult$.subscribe({

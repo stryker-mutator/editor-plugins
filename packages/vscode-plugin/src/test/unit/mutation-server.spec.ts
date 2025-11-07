@@ -344,7 +344,7 @@ describe(MutationServer.name, () => {
 
       // Act
       const observable$ = sut.mutationTest(mutationTestParams);
-      
+
       await new Promise<void>((resolve) => {
         observable$.subscribe({
           next: (result) => {
