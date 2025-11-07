@@ -1,5 +1,24 @@
 # Change Log
 
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 0.2.0 (2025-11-07)
+
+### Bug Fixes
+
+- update prepublish script to use build instead of package ([#21](https://github.com/stryker-mutator/editor-plugins/issues/21)) ([26b8474](https://github.com/stryker-mutator/editor-plugins/commit/26b847454782e45335edbd28dfabbd786c1260cf))
+- **workspace:** support local workspace directory ([#54](https://github.com/stryker-mutator/editor-plugins/issues/54)) ([3cc5418](https://github.com/stryker-mutator/editor-plugins/commit/3cc5418172f86aeaace0e732529814b023699739))
+
+### Features
+
+- add initial VS Code plugin ([#20](https://github.com/stryker-mutator/editor-plugins/issues/20)) ([b8edef6](https://github.com/stryker-mutator/editor-plugins/commit/b8edef60abe4c0a7928dd474b24f705b12a93092))
+- add reload workspace command ([#56](https://github.com/stryker-mutator/editor-plugins/issues/56)) ([e5f0668](https://github.com/stryker-mutator/editor-plugins/commit/e5f06680dfd2dc6556278b6b2ce7344a88cc96df))
+- **plugin:** use plugin in StrykerJS projects without requiring manual setup ([#62](https://github.com/stryker-mutator/editor-plugins/issues/62)) ([1e587ef](https://github.com/stryker-mutator/editor-plugins/commit/1e587efd89c0ca698d62f8cd4f9cdbb7d28707ee))
+- **plugin:** use stdio instead of tcp socket for transport ([#66](https://github.com/stryker-mutator/editor-plugins/issues/66)) ([47b3456](https://github.com/stryker-mutator/editor-plugins/commit/47b3456315755e24485b005f79526fce28a43741))
+
+# Change Log
+
 All notable changes to the "Stryker Mutation Testing" extension will be documented in this file.
 
 ## 0.1.0

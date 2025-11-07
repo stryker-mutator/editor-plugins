@@ -2,7 +2,7 @@
   "name": "stryker-mutator",
   "displayName": "Stryker Mutation Testing",
   "description": "Test your tests with mutation testing.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "stryker-mutator",
   "private": true,
   "author": "Jasper van der Veen",
@@ -133,7 +133,7 @@
   },
   "dependencies": {
     "json-rpc-2.0": "^1.7.1",
-    "mutation-server-protocol": "^0.3.0",
+    "mutation-server-protocol": "0.4.0",
     "rxjs": "^7.8.2",
     "typed-inject": "^5.0.0"
   }

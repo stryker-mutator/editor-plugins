@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/stryker-mutator/editor-plugins/compare/mutation-server-protocol@0.3.0...mutation-server-protocol@0.4.0) (2025-11-07)
+
+### Features
+
+- add initial VS Code plugin ([#20](https://github.com/stryker-mutator/editor-plugins/issues/20)) ([b8edef6](https://github.com/stryker-mutator/editor-plugins/commit/b8edef60abe4c0a7928dd474b24f705b12a93092))
+- support dual transport modes (stdio/socket) with static port configuration ([#65](https://github.com/stryker-mutator/editor-plugins/issues/65)) ([1b82ac7](https://github.com/stryker-mutator/editor-plugins/commit/1b82ac707b6c4756c5535b4a7d139d09b15858cc))
+
 # [0.3.0](https://github.com/stryker-mutator/editor-plugins/compare/mutation-server-protocol@0.2.0...mutation-server-protocol@0.3.0) (2025-05-09)
 
 ### Bug Fixes
