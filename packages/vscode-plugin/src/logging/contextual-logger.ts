@@ -46,4 +46,8 @@ export class ContextualLogger {
   clear(): void {
     this.#logger.clear();
   }
+
+  dispose(): void {
+    this.#logger.dispose();
+  }
 }

@@ -1,6 +1,6 @@
 # GitHub Copilot Instructions for Editor Plugins
 
-This repository contains a VS Code extension and related packages for mutation testing integration, specifically focused on StrykerJS support.
+This repository contains a VS Code extension and related packages for mutation testing integration via the Mutation Server Protocol.
 
 ## Project Overview
 
@@ -23,7 +23,7 @@ Higher kill rates indicate stronger, more resilient tests. Mutation testing prov
 
 This is a monorepo with the following packages:
 
-- `packages/vscode-plugin/` - Main VS Code extension for StrykerJS mutation testing
+- `packages/vscode-plugin/` - Main VS Code extension for mutation testing
 - `packages/mutation-server-protocol/` - TypeScript definitions for the Mutation Server Protocol
 
 ### Extension Features
@@ -55,11 +55,19 @@ The VS Code extension provides:
 
 **Key Components:**
 
+- `Workspace` - Top-level manager for multiple workspace folders
 - `WorkspaceFolder` - Main orchestrator for workspace-level mutation testing
-- `Process` - Manages StrykerJS server process lifecycle
+- `MutationServer` - Spawns server process & orchestrates communication with it via JSON-RPC
+- `Process` - Manages mutation testing framework server process lifecycle
+- `Transport` - Abstract transport layer for server communication (right now only stdio)
+- `StdioTransport` - Process-based transport for local mutation testing framework instances
 - `TestExplorer` - Integrates with VS Code Test Explorer API
 - `Configuration` - Handles VS Code settings management
 - `Logger` - Contextual logging with multiple labels support
+- `TestRunner` - Executes mutation tests and handles test results
+- `FileSystemWatcher` - Monitors file changes for automatic re-discovery
+- `FileChangeHandler` - Processes file change events and triggers updates
+- `ContextualLogger` - Enhanced logger with contextual labels
 
 **Coding Standards:**
 
@@ -69,28 +77,10 @@ The VS Code extension provides:
 - Handle errors gracefully with proper logging
 - Use meaningful variable and function names
 
-### Configuration Management
-
-All settings use the `strykerMutator` prefix and are designed for workspace-level configuration:
-
-- `strykerMutator.enable` (boolean) - Enable/disable mutation testing integration
-- `strykerMutator.watchPattern` (string) - Glob pattern for files to watch for changes and trigger mutation discovery
-  - Default: `**/*.{js,ts,jsx,tsx}`
-- `strykerMutator.server.path` (string) - Path to Stryker server executable
-  - Default: `node_modules/.bin/stryker`
-- `strykerMutator.server.args` (array) - Arguments to pass to Stryker server process
-  - Default: `["runServer"]`
-- `strykerMutator.server.workingDirectory` (string) - Working directory for Stryker server process
-- `strykerMutator.server.configFile` (string) - Path to Stryker configuration file
-  - Default: `stryker.config.json`
-
-The extension automatically detects Stryker configuration and guides users through setup if needed.
-
 ### Error Handling
 
 - Custom error classes for specific scenarios (e.g., `UnsupportedServerVersionError`)
 - Proper logging at appropriate levels (info, warn, error)
-- Graceful degradation when StrykerJS is not available
 
 ### Testing
 
@@ -128,12 +118,12 @@ For the VS Code extension (`packages/vscode-plugin/`), tests are organized in th
 - `eslint` - Linting
 - `@types/vscode` - VS Code API types
 
-## StrykerJS Integration
+## Mutation Testing Framework Integration
 
-This extension integrates with StrykerJS via the Mutation Server Protocol:
+This extension integrates with the mutation testing framework via the Mutation Server Protocol:
 
-- Spawns StrykerJS process with `runServer` command
-- Communicates via JSON-RPC over sockets
+- Spawns mutation testing framework (e.g. StrykerJs) process with `serve stdio` command
+- Communicates via JSON-RPC over stdio
 - Handles configuration, discovery, and mutation testing operations
 - Presents results in VS Code Test Explorer and inline annotations
 

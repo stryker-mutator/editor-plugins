@@ -9,6 +9,7 @@ import {
 } from './index.ts';
 import type { BaseContext } from './di/index.ts';
 import { createInjector, type Injector } from 'typed-inject';
+import { StdioTransport } from './transport/stdio-transport.ts';
 
 export class Workspace {
   private readonly injectorFactory;
@@ -85,10 +86,12 @@ export class Workspace {
       commonTokens.workspaceFolder,
       folder,
     );
+
     const workspaceFolder = workspaceFolderInjector
       .provideValue(commonTokens.loggerContext, folder.name)
       .provideClass(commonTokens.contextualLogger, ContextualLogger)
       .provideClass(commonTokens.process, Process)
+      .provideClass(commonTokens.transport, StdioTransport)
       .provideClass(commonTokens.mutationServer, MutationServer)
       .injectClass(WorkspaceFolder);
 
@@ -149,5 +152,6 @@ export class Workspace {
     await Promise.all(
       this.#workspaceFolders.map(async (folder) => await folder.dispose()),
     );
+    this.#logger.dispose();
   }
 }

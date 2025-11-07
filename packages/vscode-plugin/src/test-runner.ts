@@ -8,6 +8,7 @@ import {
   testItemUtils,
   testControllerUtils,
 } from './utils/index.ts';
+import { lastValueFrom, mergeMap } from 'rxjs';
 export class TestRunner {
   private readonly mutationServer;
   private readonly workspaceFolder;
@@ -60,19 +61,17 @@ export class TestRunner {
       testRun.end();
     });
     const mutationTestParams = testItemUtils.toMutationTestParams(queue);
-    let progressPromises: Promise<void>[] = [];
     try {
-      await this.mutationServer.mutationTest(
-        mutationTestParams,
-        async (progress) => {
-          const progressPromise = this.processMutationTestResult(
-            progress,
-            testRun,
-            queue,
-          );
-          progressPromises.push(progressPromise);
-          await progressPromise;
-        },
+      const mutationTestResult$ =
+        this.mutationServer.mutationTest(mutationTestParams);
+
+      // Subscribe to handle each emission from the observable
+      await lastValueFrom(
+        mutationTestResult$.pipe(
+          mergeMap(async (result) => {
+            await this.processMutationTestResult(result, testRun, queue);
+          }),
+        ),
       );
     } catch (error: Error | unknown) {
       const errorMessage =
@@ -89,7 +88,6 @@ export class TestRunner {
         });
       });
     } finally {
-      await Promise.all(progressPromises);
       testRun.end();
       this.logger.info('Mutation test run finished');
     }

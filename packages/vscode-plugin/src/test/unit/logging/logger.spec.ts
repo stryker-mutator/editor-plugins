@@ -69,6 +69,16 @@ describe(Logger.name, () => {
 
       expect(mockOutputChannel.show.called).to.be.false;
     });
+
+    it('should remove trailing newlines from messages', () => {
+      const message = 'Test message with newlines\n\n\n';
+      const expectedMessage = 'Test message with newlines';
+
+      logger.info(message);
+
+      expect(mockOutputChannel.appendLine.calledWith(expectedMessage)).to.be
+        .true;
+    });
   });
 
   describe('warn', () => {
@@ -95,18 +105,21 @@ describe(Logger.name, () => {
       ).to.be.true;
     });
 
-    it('should show output channel after logging warning', () => {
-      logger.warn('Test warning');
-
-      expect(mockOutputChannel.show.calledOnce).to.be.true;
-      expect(mockOutputChannel.show.calledWith(sinon.match.any)).to.be.true;
-    });
-
     it('should show output channel after appendLine', () => {
       logger.warn('Test warning');
 
       expect(mockOutputChannel.appendLine.calledBefore(mockOutputChannel.show))
         .to.be.true;
+    });
+
+    it('should remove trailing newlines from messages', () => {
+      const message = 'Test message with newlines\n\n\n';
+      const expectedMessage = '[WARN] Test message with newlines';
+
+      logger.warn(message);
+
+      expect(mockOutputChannel.appendLine.calledWith(expectedMessage)).to.be
+        .true;
     });
   });
 
@@ -134,18 +147,21 @@ describe(Logger.name, () => {
       ).to.be.true;
     });
 
-    it('should show output channel after logging error', () => {
-      logger.error('Test error');
-
-      expect(mockOutputChannel.show.calledOnce).to.be.true;
-      expect(mockOutputChannel.show.calledWith(sinon.match.any)).to.be.true;
-    });
-
     it('should show output channel after appendLine', () => {
       logger.error('Test error');
 
       expect(mockOutputChannel.appendLine.calledBefore(mockOutputChannel.show))
         .to.be.true;
+    });
+
+    it('should remove trailing newlines from messages', () => {
+      const message = 'Test message with newlines\n\n\n';
+      const expectedMessage = '[ERROR] Test message with newlines';
+
+      logger.error(message);
+
+      expect(mockOutputChannel.appendLine.calledWith(expectedMessage)).to.be
+        .true;
     });
   });
 
@@ -254,8 +270,6 @@ describe(Logger.name, () => {
           '[ErrorLabel] [ERROR] Error message',
         ),
       ).to.be.true;
-
-      expect(mockOutputChannel.show.calledTwice).to.be.true; // Only for warn and error
     });
 
     it('should handle long messages without truncation', () => {

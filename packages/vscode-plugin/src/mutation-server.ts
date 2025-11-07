@@ -1,14 +1,6 @@
 import { commonTokens } from './di/index.ts';
-import type { ServerLocation } from './domain/index.ts';
-import * as net from 'net';
-import { ContextualLogger } from './logging/index.ts';
-import {
-  JSONRPCClient,
-  JSONRPCErrorException,
-  type JSONRPCRequest,
-} from 'json-rpc-2.0';
-import { JsonRpcEventDeserializer } from './utils/index.ts';
-import { promisify } from 'util';
+import { JSONRPCClient } from 'json-rpc-2.0';
+import { StdioTransport } from './transport/index.ts';
 import {
   ConfigureParams,
   ConfigureResult,
@@ -17,11 +9,10 @@ import {
   MutationTestParams,
   MutationTestResult,
 } from 'mutation-server-protocol';
-import { filter, map, Subject } from 'rxjs';
-import { Settings, Configuration } from './config/index.ts';
+import { filter, map, Observable, merge, from, takeUntil } from 'rxjs';
 import vscode from 'vscode';
+import { Configuration, Settings } from './config/index.ts';
 import { Constants, Process } from './index.ts';
-
 const rpcMethods = Object.freeze({
   configure: 'configure',
   discover: 'discover',
@@ -29,57 +20,51 @@ const rpcMethods = Object.freeze({
   reportMutationTestProgressNotification: 'reportMutationTestProgress',
 });
 export class MutationServer {
-  private readonly logger;
   private readonly workspaceFolder;
   private readonly process;
-  private socket?: net.Socket;
-  private jsonRPCClient?: JSONRPCClient;
-  private readonly notifications = new Subject<JSONRPCRequest>();
+  private transport: StdioTransport;
+  private jsonRPCClient: JSONRPCClient;
+
   public static readonly inject = [
-    commonTokens.contextualLogger,
     commonTokens.workspaceFolder,
     commonTokens.process,
+    commonTokens.transport,
   ] as const;
+
   constructor(
-    logger: ContextualLogger,
     workspaceFolder: vscode.WorkspaceFolder,
     process: Process,
+    transport: StdioTransport,
   ) {
-    this.logger = logger;
     this.workspaceFolder = workspaceFolder;
     this.process = process;
+    this.transport = transport;
+
+    // Setup JSON-RPC client with transport
+    this.jsonRPCClient = new JSONRPCClient((jsonRPCRequest) => {
+      const message = JSON.stringify(jsonRPCRequest);
+      this.transport.send(message);
+    });
   }
+
   public async init() {
-    const serverLocation = await this.process.init();
-    await this.connect(serverLocation);
-    const serverConfig = await this.configure();
-    if (serverConfig.version !== Constants.SupportedMspVersion) {
+    await this.process.init();
+    await this.transport.init();
+
+    // Handle incoming messages (responses and requests with id)
+    this.transport.messages.subscribe((event) => {
+      this.jsonRPCClient.receive(event);
+    });
+
+    const configResult = await this.configure();
+
+    if (configResult.version !== Constants.SupportedMspVersion) {
       throw new Error(
-        `Mismatched server version. Expected: ${Constants.SupportedMspVersion}, got: ${serverConfig.version}`,
+        `Mismatched server version. Expected: ${Constants.SupportedMspVersion}, got: ${configResult.version}`,
       );
     }
   }
-  private async connect(serverLocation: ServerLocation) {
-    this.socket = net.connect(serverLocation.port, serverLocation.host, () => {
-      this.logger.info('Connected to socket of mutation server');
-    });
-    this.jsonRPCClient = new JSONRPCClient((jsonRPCRequest) => {
-      const content = Buffer.from(JSON.stringify(jsonRPCRequest));
-      this.socket!.write(`Content-Length: ${content.byteLength}\r\n\r\n`);
-      this.socket!.write(content);
-    });
-    const deserializer = new JsonRpcEventDeserializer();
-    this.socket.on('data', (data) => {
-      const events = deserializer.deserialize(data);
-      for (const event of events) {
-        if (event.id === undefined) {
-          this.notifications.next(event);
-        } else {
-          this.jsonRPCClient!.receive(event);
-        }
-      }
-    });
-  }
+
   private async configure(): Promise<ConfigureResult> {
     const configFilePath = Configuration.getSetting<string>(
       Settings.ConfigFilePath,
@@ -87,7 +72,7 @@ export class MutationServer {
     );
 
     const configureParams: ConfigureParams = { configFilePath: configFilePath };
-    return await this.jsonRPCClient!.request(
+    return await this.jsonRPCClient.request(
       rpcMethods.configure,
       configureParams,
     );
@@ -95,39 +80,37 @@ export class MutationServer {
   public async discover(
     discoverParams: DiscoverParams,
   ): Promise<DiscoverResult> {
-    return await this.jsonRPCClient!.request(
+    return await this.jsonRPCClient.request(
       rpcMethods.discover,
       discoverParams,
     );
   }
-  public async mutationTest(
+
+  public mutationTest(
     mutationTestParams: MutationTestParams,
-    onPartialResult: (partialResult: MutationTestResult) => void,
-  ): Promise<MutationTestResult> {
-    const subscription = this.notifications
-      .pipe(
-        filter(
-          (notification) =>
-            notification.method ===
-            rpcMethods.reportMutationTestProgressNotification,
-        ),
-        map((notification) => notification.params),
-      )
-      .subscribe(onPartialResult);
-    try {
-      const result = await this.jsonRPCClient!.request(
+  ): Observable<MutationTestResult> {
+    const finalResult$ = from(
+      this.jsonRPCClient.request(
         rpcMethods.mutationTest,
         mutationTestParams,
-      );
-      return result;
-    } catch (e: JSONRPCErrorException | any) {
-      return Promise.reject(e.message);
-    } finally {
-      subscription.unsubscribe();
-    }
+      ) as Promise<MutationTestResult>,
+    );
+
+    const progressNotification$ = this.transport.notifications.pipe(
+      filter(
+        (notification) =>
+          notification.method ===
+          rpcMethods.reportMutationTestProgressNotification,
+      ),
+      map((notification) => notification.params as MutationTestResult),
+      takeUntil(finalResult$),
+    );
+
+    return merge(progressNotification$, finalResult$);
   }
+
   public async dispose() {
-    await promisify(this.socket!.end.bind(this.socket))();
+    await this.transport.dispose();
     this.process.dispose();
   }
 }
