@@ -196,13 +196,6 @@ describe(`${Process.name} (Integration)`, () => {
   });
 
   describe('write', () => {
-    it('should throw error when process is not initialized', () => {
-      // Act & Assert
-      expect(() => sut.write('test')).to.throw(
-        'Process stdin is not available',
-      );
-    });
-
     it('should write data to process stdin when initialized', async () => {
       // Arrange
       const serverPath = process.platform === 'win32' ? 'more' : 'cat';

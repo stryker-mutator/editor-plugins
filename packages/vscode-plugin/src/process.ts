@@ -87,10 +87,7 @@ export class Process extends EventEmitter {
     });
   }
   write(data: string | Buffer) {
-    if (!this.#process?.stdin) {
-      throw new Error('Process stdin is not available');
-    }
-    this.#process.stdin.write(data);
+    this.#process!.stdin.write(data);
   }
   dispose() {
     this.#process?.removeAllListeners();
