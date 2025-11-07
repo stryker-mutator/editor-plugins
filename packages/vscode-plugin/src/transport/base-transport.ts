@@ -2,12 +2,11 @@ import { Subject } from 'rxjs';
 import { JSONRPCRequest, JSONRPCResponse } from 'json-rpc-2.0';
 import { JsonRpcEventDeserializer } from '../utils/index.ts';
 import { ContextualLogger } from '../logging/index.ts';
-import { ITransport } from './transport.ts';
 
 /**
  * Base transport class with common functionality
  */
-export abstract class BaseTransport implements ITransport {
+export abstract class BaseTransport {
   protected readonly deserializer = new JsonRpcEventDeserializer();
   protected connected = false;
 

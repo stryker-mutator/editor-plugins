@@ -1,7 +1,6 @@
 import { commonTokens } from './di/index.ts';
-import { ContextualLogger } from './logging/index.ts';
 import { JSONRPCClient, JSONRPCErrorException } from 'json-rpc-2.0';
-import { ITransport } from './transport/index.ts';
+import { StdioTransport } from './transport/index.ts';
 import {
   ConfigureParams,
   ConfigureResult,
@@ -23,7 +22,7 @@ const rpcMethods = Object.freeze({
 export class MutationServer {
   private readonly workspaceFolder;
   private readonly process;
-  private transport: ITransport;
+  private transport: StdioTransport;
   private jsonRPCClient: JSONRPCClient;
 
   public static readonly inject = [
@@ -35,7 +34,7 @@ export class MutationServer {
   constructor(
     workspaceFolder: vscode.WorkspaceFolder,
     process: Process,
-    transport: ITransport,
+    transport: StdioTransport,
   ) {
     this.workspaceFolder = workspaceFolder;
     this.process = process;
