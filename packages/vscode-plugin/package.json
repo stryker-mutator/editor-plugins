@@ -2,7 +2,7 @@
   "name": "stryker-mutator",
   "displayName": "Stryker Mutation Testing",
   "description": "Test your tests with mutation testing.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "stryker-mutator",
   "private": true,
   "author": "Jasper van der Veen",

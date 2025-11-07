@@ -2,16 +2,16 @@
   "folders": [
     {
       "name": "parent",
-      "path": ".",
+      "path": "."
     },
     {
       "name": "mutation-server-protocol",
-      "path": "packages/mutation-server-protocol",
+      "path": "packages/mutation-server-protocol"
     },
     {
       "name": "vscode-plugin",
-      "path": "packages/vscode-plugin",
-    },
+      "path": "packages/vscode-plugin"
+    }
   ],
   "settings": {
     "search.exclude": {
