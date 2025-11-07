@@ -96,7 +96,7 @@ export class MutationServer {
       ) as Promise<MutationTestResult>,
     );
 
-    const progressNotifications$ = this.transport.notifications.pipe(
+    const progressNotification$ = this.transport.notifications.pipe(
       filter(
         (notification) =>
           notification.method ===
@@ -106,7 +106,7 @@ export class MutationServer {
       takeUntil(finalResult$),
     );
 
-    return merge(progressNotifications$, finalResult$);
+    return merge(progressNotification$, finalResult$);
   }
 
   public async dispose() {
