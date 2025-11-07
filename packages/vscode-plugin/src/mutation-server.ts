@@ -1,5 +1,5 @@
 import { commonTokens } from './di/index.ts';
-import { JSONRPCClient, JSONRPCErrorException } from 'json-rpc-2.0';
+import { JSONRPCClient } from 'json-rpc-2.0';
 import { StdioTransport } from './transport/index.ts';
 import {
   ConfigureParams,
@@ -9,7 +9,7 @@ import {
   MutationTestParams,
   MutationTestResult,
 } from 'mutation-server-protocol';
-import { filter, map } from 'rxjs';
+import { filter, map, Observable, merge, from, takeUntil } from 'rxjs';
 import vscode from 'vscode';
 import { Configuration, Settings } from './config/index.ts';
 import { Constants, Process } from './index.ts';
@@ -86,31 +86,27 @@ export class MutationServer {
     );
   }
 
-  public async mutationTest(
+  public mutationTest(
     mutationTestParams: MutationTestParams,
-    onPartialResult: (partialResult: MutationTestResult) => void,
-  ): Promise<MutationTestResult> {
-    const subscription = this.transport.notifications
-      .pipe(
-        filter(
-          (notification) =>
-            notification.method ===
-            rpcMethods.reportMutationTestProgressNotification,
-        ),
-        map((notification) => notification.params),
-      )
-      .subscribe(onPartialResult);
-    try {
-      const result = await this.jsonRPCClient.request(
+  ): Observable<MutationTestResult> {
+    const finalResult$ = from(
+      this.jsonRPCClient.request(
         rpcMethods.mutationTest,
         mutationTestParams,
-      );
-      return result;
-    } catch (e: JSONRPCErrorException | any) {
-      return Promise.reject(e.message);
-    } finally {
-      subscription.unsubscribe();
-    }
+      ) as Promise<MutationTestResult>,
+    );
+
+    const progressNotifications$ = this.transport.notifications.pipe(
+      filter(
+        (notification) =>
+          notification.method ===
+          rpcMethods.reportMutationTestProgressNotification,
+      ),
+      map((notification) => notification.params as MutationTestResult),
+      takeUntil(finalResult$),
+    );
+
+    return merge(progressNotifications$, finalResult$);
   }
 
   public async dispose() {

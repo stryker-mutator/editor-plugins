@@ -62,18 +62,26 @@ export class TestRunner {
     const mutationTestParams = testItemUtils.toMutationTestParams(queue);
     let progressPromises: Promise<void>[] = [];
     try {
-      await this.mutationServer.mutationTest(
+      const mutationTestResult$ = this.mutationServer.mutationTest(
         mutationTestParams,
-        async (progress) => {
-          const progressPromise = this.processMutationTestResult(
-            progress,
-            testRun,
-            queue,
-          );
-          progressPromises.push(progressPromise);
-          await progressPromise;
-        },
       );
+      
+      // Subscribe to handle each emission from the observable
+      await new Promise<void>((resolve, reject) => {
+        mutationTestResult$.subscribe({
+          next: async (progress: MutationTestResult) => {
+            const progressPromise = this.processMutationTestResult(
+              progress,
+              testRun,
+              queue,
+            );
+            progressPromises.push(progressPromise);
+            await progressPromise;
+          },
+          error: reject,
+          complete: resolve,
+        });
+      });
     } catch (error: Error | unknown) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);

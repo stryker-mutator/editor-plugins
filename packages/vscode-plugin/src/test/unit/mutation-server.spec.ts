@@ -17,6 +17,7 @@ import {
   DiscoverParams,
   DiscoverResult,
   MutationTestParams,
+  MutationTestResult,
 } from 'mutation-server-protocol';
 import { createMutationTestResult, createMutantResult } from '../factory';
 
@@ -311,7 +312,7 @@ describe(MutationServer.name, () => {
         },
       });
 
-      const progressCallback = sandbox.stub();
+      const emittedResults: MutationTestResult[] = [];
       let capturedParams: MutationTestParams | undefined;
 
       transportMock.send = sandbox.stub().callsFake((message: string) => {
@@ -320,33 +321,44 @@ describe(MutationServer.name, () => {
           capturedParams = request.params;
 
           // Simulate progress notification
-          const progressNotification: JSONRPCRequest = {
-            jsonrpc: '2.0',
-            method: 'reportMutationTestProgress',
-            params: partialResult,
-          };
-          transportMock.notifications.next(progressNotification);
+          setTimeout(() => {
+            const progressNotification: JSONRPCRequest = {
+              jsonrpc: '2.0',
+              method: 'reportMutationTestProgress',
+              params: partialResult,
+            };
+            transportMock.notifications.next(progressNotification);
+          }, 0);
 
           // Simulate final response
-          const response: JSONRPCResponse = {
-            jsonrpc: '2.0',
-            id: request.id,
-            result: finalResult,
-          };
-          transportMock.messages.next(response);
+          setTimeout(() => {
+            const response: JSONRPCResponse = {
+              jsonrpc: '2.0',
+              id: request.id,
+              result: finalResult,
+            };
+            transportMock.messages.next(response);
+          }, 0);
         }
       });
 
       // Act
-      const result = await sut.mutationTest(
-        mutationTestParams,
-        progressCallback,
-      );
+      const observable$ = sut.mutationTest(mutationTestParams);
+      
+      await new Promise<void>((resolve) => {
+        observable$.subscribe({
+          next: (result) => {
+            emittedResults.push(result);
+          },
+          complete: resolve,
+        });
+      });
 
       // Assert
       expect(capturedParams).to.deep.equal(mutationTestParams);
-      expect(progressCallback.calledOnceWith(partialResult)).to.be.true;
-      expect(result).to.deep.equal(finalResult);
+      expect(emittedResults).to.have.lengthOf(2);
+      expect(emittedResults[0]).to.deep.equal(partialResult);
+      expect(emittedResults[1]).to.deep.equal(finalResult);
     });
 
     it('should handle JSON-RPC errors properly', async () => {
@@ -359,24 +371,31 @@ describe(MutationServer.name, () => {
       transportMock.send.callsFake((message: string) => {
         const request = JSON.parse(message);
         if (request.method === 'mutationTest') {
-          const errorResponse: JSONRPCErrorResponse = {
-            jsonrpc: '2.0',
-            id: request.id,
-            error: {
-              code: -1,
-              message: errorMessage,
-            },
-          };
-          transportMock.messages.next(errorResponse);
+          setTimeout(() => {
+            const errorResponse: JSONRPCErrorResponse = {
+              jsonrpc: '2.0',
+              id: request.id,
+              error: {
+                code: -1,
+                message: errorMessage,
+              },
+            };
+            transportMock.messages.next(errorResponse);
+          }, 0);
         }
       });
 
-      const progressCallback = sandbox.stub();
+      // Act
+      const observable$ = sut.mutationTest(mutationTestParams);
 
-      // Act & Assert
+      // Assert
       await expect(
-        sut.mutationTest(mutationTestParams, progressCallback),
-      ).to.eventually.be.rejectedWith(errorMessage);
+        new Promise((_, reject) => {
+          observable$.subscribe({
+            error: reject,
+          });
+        }),
+      ).to.be.rejectedWith(errorMessage);
     });
   });
   describe('dispose', () => {
