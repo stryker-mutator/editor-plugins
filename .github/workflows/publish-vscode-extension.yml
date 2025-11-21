@@ -34,3 +34,5 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         run: npm run deploy
         working-directory: packages/vscode-plugin
+        env:
+          OVSX_TOKEN: ${{ secrets.OVSX_TOKEN }}
