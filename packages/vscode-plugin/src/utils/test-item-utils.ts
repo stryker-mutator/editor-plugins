@@ -43,10 +43,7 @@ export const testItemUtils = {
     return testItems.some(hasMutantId);
   },
 
-  toMutationTestParams(
-    testItems: vscode.TestItem[],
-    workspaceFolder: vscode.WorkspaceFolder,
-  ): MutationTestParams {
+  toMutationTestParams(testItems: vscode.TestItem[]): MutationTestParams {
     const files: FileRange[] = testItems.map((testItem) => {
       if (!testItem.uri) {
         throw new Error(
@@ -54,9 +51,9 @@ export const testItemUtils = {
         );
       }
       const uri = testItem.uri;
+
       const isDirectory = fs.lstatSync(uri.fsPath).isDirectory();
-      let relativePath = path
-        .relative(workspaceFolder.uri.fsPath, uri.fsPath)
+      let relativePath = vscode.workspace.asRelativePath(uri, false)
         .replaceAll('\\', '/');
       if (isDirectory) {
         relativePath = `${relativePath}/`;
