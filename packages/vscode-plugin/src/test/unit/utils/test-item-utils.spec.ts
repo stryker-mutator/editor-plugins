@@ -343,9 +343,7 @@ describe('testItemUtils', () => {
 
       const result = testItemUtils.toMutationTestParams([testItem]);
 
-      expect(result.files![0].path).to.equal(
-        'c:/Users/test/project/file.ts',
-      );
+      expect(result.files![0].path).to.equal('c:/Users/test/project/file.ts');
     });
   });
 });
