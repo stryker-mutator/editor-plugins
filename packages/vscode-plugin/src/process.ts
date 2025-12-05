@@ -53,7 +53,8 @@ export class Process extends EventEmitter {
     );
 
     return new Promise<void>((resolve, reject) => {
-      this.#process = spawn(serverPath, serverArgs, { cwd });
+      const isWindows = process.platform === 'win32';
+      this.#process = spawn(serverPath, serverArgs, { cwd, shell: isWindows });
 
       this.#process.on('error', (error) => {
         this.logger.error(`Server process error: ${error.message}`);

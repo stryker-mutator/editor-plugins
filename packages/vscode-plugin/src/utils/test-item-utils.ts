@@ -51,14 +51,21 @@ export const testItemUtils = {
         );
       }
       const uri = testItem.uri;
-      let path = uri.fsPath;
-      if (fs.lstatSync(uri.fsPath).isDirectory()) {
-        path = `${uri.fsPath}/`;
+
+      const isDirectory = fs.lstatSync(uri.fsPath).isDirectory();
+      let relativePath = vscode.workspace
+        .asRelativePath(uri, false)
+        .replaceAll('\\', '/');
+      if (isDirectory) {
+        relativePath = `${relativePath}/`;
       }
       if (!testItem.range) {
-        return { path };
+        return { path: relativePath };
       }
-      return { path, range: locationUtils.rangeToLocation(testItem.range) };
+      return {
+        path: relativePath,
+        range: locationUtils.rangeToLocation(testItem.range),
+      };
     });
     return { files };
   },
