@@ -330,7 +330,7 @@ describe('testItemUtils', () => {
       expect(lstatSyncStub.called).to.be.false;
     });
 
-    it('should handle Windows-style paths', () => {
+    it('should convert Windows-style paths', () => {
       const windowsUri = vscode.Uri.file('C:\\Users\\test\\project\\file.ts');
 
       const testItem = testController.createTestItem(
@@ -344,7 +344,7 @@ describe('testItemUtils', () => {
       const result = testItemUtils.toMutationTestParams([testItem]);
 
       expect(result.files![0].path).to.equal(
-        'c:\\Users\\test\\project\\file.ts',
+        'c:/Users/test/project/file.ts',
       );
     });
   });
