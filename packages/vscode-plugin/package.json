@@ -105,8 +105,8 @@
     "pretest": "npm run compile-tests && npm run compile",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
-    "test": "xvfb-run -a vscode-test",
-    "test:windows": "vscode-test",
+    "test": "vscode-test",
+    "test:linux": "xvfb-run -a vscode-test",
     "deploy": "vsce publish --azure-credential",
     "deploy:prerelease": "vsce publish --azure-credential --pre-release"
   },
