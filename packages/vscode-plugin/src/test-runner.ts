@@ -60,7 +60,10 @@ export class TestRunner {
       testRun.appendOutput('Test run cancellation requested, ending test run.');
       testRun.end();
     });
-    const mutationTestParams = testItemUtils.toMutationTestParams(queue);
+    const mutationTestParams = testItemUtils.toMutationTestParams(
+      queue,
+      this.workspaceFolder,
+    );
     try {
       const mutationTestResult$ =
         this.mutationServer.mutationTest(mutationTestParams);
