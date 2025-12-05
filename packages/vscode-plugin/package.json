@@ -106,7 +106,7 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "test": "xvfb-run -a vscode-test",
-    "test:local": "vscode-test",
+    "test:windows": "vscode-test",
     "deploy": "vsce publish --azure-credential",
     "deploy:prerelease": "vsce publish --azure-credential --pre-release"
   },
