@@ -74,31 +74,6 @@ describe(`${Process.name} (Integration)`, () => {
       ).to.be.true;
     });
 
-    it('should throw CouldNotSpawnProcessError when server path does not exist', async () => {
-      // Arrange
-      const nonExistentPath = '/path/that/does/not/exist';
-      configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
-        .returns(nonExistentPath);
-      configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
-        .returns([]);
-      configurationGetSettingOrDefaultStub
-        .withArgs(
-          Settings.CurrentWorkingDirectory,
-          workspaceFolderMock.uri.fsPath,
-          workspaceFolderMock,
-        )
-        .returns(workspaceFolderMock.uri.fsPath);
-
-      // Act & Assert
-      await expect(sut.init()).to.eventually.be.rejectedWith(
-        CouldNotSpawnProcessError,
-      );
-      expect(loggerMock.error.calledWith(sinon.match('Server process error:')))
-        .to.be.true;
-    });
-
     it('should successfully spawn a simple command and handle exit', async () => {
       // Arrange
       const serverPath = process.platform === 'win32' ? 'cmd' : 'echo';
@@ -136,21 +111,14 @@ describe(`${Process.name} (Integration)`, () => {
 
       // Assert
       expect(exitCode).to.equal(0);
-      expect(
-        loggerMock.info.calledWith(
-          sinon.match(`Server configuration: path=${serverPath}`),
-        ),
-      ).to.be.true;
-      expect(
-        loggerMock.info.calledWith(
-          sinon.match('Server process started with PID'),
-        ),
-      ).to.be.true;
-      expect(
-        loggerMock.info.calledWith(
-          'Server process exited normally with code 0',
-        ),
-      ).to.be.true;
+      sinon.assert.calledWith(
+        loggerMock.info,
+        sinon.match(`Server configuration: path=${serverPath}`),
+      );
+      sinon.assert.calledWith(
+        loggerMock.info,
+        'Server process exited normally with code 0',
+      );
     });
 
     it('should handle process that exits with non-zero code', async () => {
@@ -248,13 +216,6 @@ describe(`${Process.name} (Integration)`, () => {
         .returns(workspaceFolderMock.uri.fsPath);
 
       await sut.init();
-
-      // Verify process started
-      expect(
-        loggerMock.info.calledWith(
-          sinon.match('Server process started with PID'),
-        ),
-      ).to.be.true;
 
       // Act
       sut.dispose();

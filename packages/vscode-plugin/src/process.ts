@@ -52,39 +52,28 @@ export class Process extends EventEmitter {
       `Server configuration: path=${serverPath}, args=${serverArgs}, cwd=${cwd}`,
     );
 
-    return new Promise<void>((resolve, reject) => {
-      const isWindows = process.platform === 'win32';
-      this.#process = spawn(serverPath, serverArgs, { cwd, shell: isWindows });
+    const isWindows = process.platform === 'win32';
+    this.#process = spawn(serverPath, serverArgs, { cwd, shell: isWindows });
 
-      this.#process.on('error', (error) => {
-        this.logger.error(`Server process error: ${error.message}`);
-        reject(new CouldNotSpawnProcessError());
-      });
+    this.logger.info(`Mutation server child process id: ${this.#process.pid}`);
 
-      this.#process.stdout.on('data', (data) => {
-        this.emit('stdout', data);
-      });
-      this.#process.stderr.on('data', (data) => {
-        this.emit('stderr', data);
-      });
+    this.#process.on('error', (error) => {
+      this.logger.error(`Server process error: ${error.message}`);
+    });
 
-      this.#process.on('exit', (code) => {
-        if (code === 0) {
-          this.logger.info('Server process exited normally with code 0');
-        } else {
-          this.logger.error(`Server process exited with code ${code}`);
-        }
-      });
+    this.#process.stdout.on('data', (data) => {
+      this.emit('stdout', data);
+    });
+    this.#process.stderr.on('data', (data) => {
+      this.emit('stderr', data);
+    });
 
-      // Check if process spawned successfully
-      if (this.#process.pid === undefined) {
-        this.logger.error('Server process could not be spawned.');
-        reject(new CouldNotSpawnProcessError());
-        return;
+    this.#process.on('exit', (code) => {
+      if (code === 0) {
+        this.logger.info('Server process exited normally with code 0');
+      } else {
+        this.logger.error(`Server process exited with code ${code}`);
       }
-
-      this.logger.info(`Server process started with PID ${this.#process.pid}`);
-      resolve();
     });
   }
   write(data: string | Buffer) {
