@@ -179,7 +179,7 @@ describe('testItemUtils', () => {
         ],
       };
 
-      expect(result).to.deep.equal(expected);
+      sinon.assert.match(result, expected);
     });
 
     it('should convert test items without range to FileRange without range', () => {
@@ -206,7 +206,7 @@ describe('testItemUtils', () => {
         ],
       };
 
-      expect(result).to.deep.equal(expected);
+      sinon.assert.match(result, expected);
     });
 
     it('should handle directory test items by appending slash', () => {
@@ -232,7 +232,7 @@ describe('testItemUtils', () => {
         ],
       };
 
-      expect(result).to.deep.equal(expected);
+      sinon.assert.match(result, expected);
     });
 
     it('should handle multiple test items', () => {
@@ -262,7 +262,7 @@ describe('testItemUtils', () => {
         ],
       };
 
-      expect(result).to.deep.equal(expected);
+      sinon.assert.match(result, expected);
     });
 
     it('should throw error for test item without URI', () => {
@@ -318,7 +318,7 @@ describe('testItemUtils', () => {
         ],
       };
 
-      expect(result).to.deep.equal(expected);
+      sinon.assert.match(result, expected);
     });
 
     it('should handle empty test items array', () => {
@@ -328,8 +328,8 @@ describe('testItemUtils', () => {
         files: [],
       };
 
-      expect(result).to.deep.equal(expected);
-      expect(lstatSyncStub.called).to.be.false;
+      sinon.assert.match(result, expected);
+      sinon.assert.notCalled(lstatSyncStub);
     });
   });
 });

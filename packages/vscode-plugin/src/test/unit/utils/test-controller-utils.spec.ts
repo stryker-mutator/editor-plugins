@@ -38,8 +38,8 @@ describe('testControllerUtils', () => {
 
       testControllerUtils.traverse(rootItem, actionSpy);
 
-      expect(actionSpy.calledOnce).to.be.true;
-      expect(actionSpy.calledWith(rootItem)).to.be.true;
+      sinon.assert.calledOnce(actionSpy);
+      sinon.assert.calledWith(actionSpy, rootItem);
     });
 
     it('should handle nested children recursively', () => {
