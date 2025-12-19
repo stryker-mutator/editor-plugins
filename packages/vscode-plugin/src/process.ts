@@ -61,7 +61,10 @@ export class Process extends EventEmitter {
       `Server configuration: path=${resolvedServerPath}, args=${serverArgs}, cwd=${cwd}`,
     );
 
-    this.#process = spawn(resolvedServerPath, serverArgs, { cwd, shell: isWindows });
+    this.#process = spawn(resolvedServerPath, serverArgs, {
+      cwd,
+      shell: isWindows,
+    });
 
     this.#process.on('error', (error) => {
       this.logger.error(`Server process error: ${error.message}`);
@@ -77,14 +80,18 @@ export class Process extends EventEmitter {
     });
 
     this.#process.on('close', (code, signal) => {
-      this.logger.info(`Server process closed with code ${code} and signal ${signal}`);
+      this.logger.info(
+        `Server process closed with code ${code} and signal ${signal}`,
+      );
     });
 
     this.#process.on('exit', (code, signal) => {
       if (code === 0) {
         this.logger.info('Server process exited normally with code 0');
       } else {
-        this.logger.error(`Server process exited with code ${code} and signal ${signal}`);
+        this.logger.error(
+          `Server process exited with code ${code} and signal ${signal}`,
+        );
       }
     });
   }
