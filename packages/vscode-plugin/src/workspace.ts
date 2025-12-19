@@ -95,9 +95,9 @@ export class Workspace {
       .provideClass(commonTokens.mutationServer, MutationServer)
       .injectClass(WorkspaceFolder);
 
-    await workspaceFolder.init();
-
     this.#workspaceFolders.push(workspaceFolder);
+
+    await workspaceFolder.init();
   }
 
   private workspaceFolderExists(folder: vscode.WorkspaceFolder) {
