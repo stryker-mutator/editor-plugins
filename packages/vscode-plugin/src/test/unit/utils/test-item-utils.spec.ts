@@ -4,6 +4,7 @@ import vscode from 'vscode';
 import fs from 'fs';
 import { MutantResult, MutationTestParams } from 'mutation-server-protocol';
 import { testItemUtils } from '../../../utils/test-item-utils.ts';
+import path from 'path';
 
 describe('testItemUtils', () => {
   let testController: vscode.TestController;
@@ -177,8 +178,9 @@ describe('testItemUtils', () => {
       };
 
       expect(result).to.deep.equal(expected);
-      expect(lstatSyncStub.calledOnceWith('/test/project/src/file.ts')).to.be
-        .true;
+      expect(
+        lstatSyncStub.calledOnceWith(path.resolve('/test/project/src/file.ts')),
+      ).to.be.true;
     });
 
     it('should convert test items without range to FileRange without range', () => {

@@ -52,7 +52,7 @@ export const testItemUtils = {
       }
       const uri = testItem.uri;
 
-      const isDirectory = fs.lstatSync(uri.path).isDirectory();
+      const isDirectory = fs.lstatSync(uri.fsPath).isDirectory();
       let relativePath = vscode.workspace
         .asRelativePath(uri, false)
         .replaceAll('\\', '/');
