@@ -1031,8 +1031,10 @@ describe('testControllerUtils', () => {
     it('should work with vscode.workspace.asRelativePath correctly', () => {
       // Mock vscode.workspace.asRelativePath to return a known relative path
       const asRelativePathStub = sinon.stub(vscode.workspace, 'asRelativePath');
-      asRelativePathStub.returns(`src${path.sep}components${path.sep}Button.tsx`);
-      
+      asRelativePathStub.returns(
+        `src${path.sep}components${path.sep}Button.tsx`,
+      );
+
       // Create the structure manually
       const srcItem = testController.createTestItem('src', 'Source');
       const componentsItem = testController.createTestItem(
