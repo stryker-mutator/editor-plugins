@@ -6,6 +6,7 @@ import { Configuration, Settings } from './config/index.ts';
 import { type ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import path from 'path';
+
 export class Process extends EventEmitter {
   private readonly workspaceFolder;
   private readonly logger;
@@ -48,31 +49,42 @@ export class Process extends EventEmitter {
       serverWorkingDirectory,
     );
 
-    this.logger.info(
-      `Server configuration: path=${serverPath}, args=${serverArgs}, cwd=${cwd}`,
+    // get relative path from cwd to serverPath
+    const resolvedServerPath = path.resolve(
+      this.workspaceFolder.uri.fsPath,
+      serverPath,
     );
 
     const isWindows = process.platform === 'win32';
-    this.#process = spawn(serverPath, serverArgs, { cwd, shell: isWindows });
 
-    this.logger.info(`Mutation server child process id: ${this.#process.pid}`);
+    this.logger.info(
+      `Server configuration: path=${resolvedServerPath}, args=${serverArgs}, cwd=${cwd}`,
+    );
+
+    this.#process = spawn(resolvedServerPath, serverArgs, { cwd, shell: isWindows });
 
     this.#process.on('error', (error) => {
       this.logger.error(`Server process error: ${error.message}`);
     });
 
     this.#process.stdout.on('data', (data) => {
+      console.log('stdout', data.toString());
       this.emit('stdout', data);
     });
     this.#process.stderr.on('data', (data) => {
+      console.log('stderr', data.toString());
       this.emit('stderr', data);
     });
 
-    this.#process.on('exit', (code) => {
+    this.#process.on('close', (code, signal) => {
+      this.logger.info(`Server process closed with code ${code} and signal ${signal}`);
+    });
+
+    this.#process.on('exit', (code, signal) => {
       if (code === 0) {
         this.logger.info('Server process exited normally with code 0');
       } else {
-        this.logger.error(`Server process exited with code ${code}`);
+        this.logger.error(`Server process exited with code ${code} and signal ${signal}`);
       }
     });
   }
