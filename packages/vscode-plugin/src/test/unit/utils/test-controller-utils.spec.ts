@@ -4,6 +4,7 @@ import vscode from 'vscode';
 import { DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
 import { testControllerUtils } from '../../../utils/test-controller-utils.ts';
 import { createDiscoveredMutant } from '../../factory.ts';
+import path from 'path';
 
 describe('testControllerUtils', () => {
   let workspaceFolderMock: vscode.WorkspaceFolder;
@@ -249,11 +250,11 @@ describe('testControllerUtils', () => {
       const componentsItem = srcItem?.children.get('components');
       const buttonItem = componentsItem?.children.get('Button.tsx');
 
-      expect(srcItem?.uri?.fsPath).to.equal('/workspace/root/src');
-      expect(componentsItem?.uri?.fsPath).to.equal(
+      expect(srcItem?.uri?.path).to.equal('/workspace/root/src');
+      expect(componentsItem?.uri?.path).to.equal(
         '/workspace/root/src/components',
       );
-      expect(buttonItem?.uri?.fsPath).to.equal(
+      expect(buttonItem?.uri?.path).to.equal(
         '/workspace/root/src/components/Button.tsx',
       );
     });
@@ -274,11 +275,11 @@ describe('testControllerUtils', () => {
       const componentsItem = srcItem?.children.get('components');
       const buttonItem = componentsItem?.children.get('Button.tsx');
 
-      expect(srcItem?.uri?.fsPath).to.equal('/workspace/root/app/src');
-      expect(componentsItem?.uri?.fsPath).to.equal(
+      expect(srcItem?.uri?.path).to.equal('/workspace/root/app/src');
+      expect(componentsItem?.uri?.path).to.equal(
         '/workspace/root/app/src/components',
       );
-      expect(buttonItem?.uri?.fsPath).to.equal(
+      expect(buttonItem?.uri?.path).to.equal(
         '/workspace/root/app/src/components/Button.tsx',
       );
     });
@@ -297,8 +298,8 @@ describe('testControllerUtils', () => {
       const srcItem = appItem?.children.get('src');
       const componentsItem = srcItem?.children.get('components');
       const buttonItem = componentsItem?.children.get('Button.tsx');
-      expect(srcItem?.uri?.fsPath).to.equal('/workspace/root/app/src');
-      expect(buttonItem?.uri?.fsPath).to.equal(
+      expect(srcItem?.uri?.path).to.equal('/workspace/root/app/src');
+      expect(buttonItem?.uri?.path).to.equal(
         '/workspace/root/app/src/components/Button.tsx',
       );
     });
@@ -478,7 +479,7 @@ describe('testControllerUtils', () => {
       expect(result).to.be.instanceOf(Object);
       expect(result.id).to.equal('ReturnStatement(15:8-15:20) (return false)');
       expect(result.label).to.equal('ReturnStatement (Ln 15, Col 8)');
-      expect(result.uri?.fsPath).to.equal('/workspace/root/func.js');
+      expect(result.uri?.path).to.equal('/workspace/root/func.js');
     });
   });
 
@@ -1030,8 +1031,8 @@ describe('testControllerUtils', () => {
     it('should work with vscode.workspace.asRelativePath correctly', () => {
       // Mock vscode.workspace.asRelativePath to return a known relative path
       const asRelativePathStub = sinon.stub(vscode.workspace, 'asRelativePath');
-      asRelativePathStub.returns('src/components/Button.tsx');
-
+      asRelativePathStub.returns(`src${path.sep}components${path.sep}Button.tsx`);
+      
       // Create the structure manually
       const srcItem = testController.createTestItem('src', 'Source');
       const componentsItem = testController.createTestItem(
@@ -1047,7 +1048,7 @@ describe('testControllerUtils', () => {
       srcItem.children.add(componentsItem);
       componentsItem.children.add(buttonItem);
 
-      // Remove using any URI (the stub will return our controlled path)
+      // Remove using any URI (the stub will return our controlled path, so the actual URI doesn't matter)
       const uri = vscode.Uri.file('/any/path/to/file.tsx');
       testControllerUtils.removeTestItemsForUri(testController, uri);
 
