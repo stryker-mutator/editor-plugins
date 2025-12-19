@@ -150,7 +150,9 @@ describe('testItemUtils', () => {
 
   describe('toMutationTestParams', () => {
     it('should convert test items with URI and range to FileRange objects', () => {
-      const uri = vscode.Uri.file(path.join('test', 'project', 'src', 'file.ts'));
+      const uri = vscode.Uri.file(
+        path.join('test', 'project', 'src', 'file.ts'),
+      );
       const range = new vscode.Range(4, 9, 4, 19); // 0-based VS Code range
 
       const testItem = testController.createTestItem(
