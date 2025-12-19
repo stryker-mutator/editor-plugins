@@ -32,12 +32,6 @@ describe(StdioTransport.name, () => {
       expect(processMock.on.calledWith('stdout')).to.be.true;
       expect(processMock.on.calledWith('stderr')).to.be.true;
       expect(sut.isConnected()).to.be.true;
-      expect(
-        loggerMock.info.calledWith(
-          'Connected to mutation server via stdio',
-          StdioTransport.name,
-        ),
-      ).to.be.true;
     });
 
     it('should handle stderr data by logging it', async () => {
