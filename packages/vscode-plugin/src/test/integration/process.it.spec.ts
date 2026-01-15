@@ -22,10 +22,7 @@ describe(`${Process.name} (Integration)`, () => {
   let tempDir: string;
   const isWindows = process.platform === 'win32';
 
-  async function createTestExecutable(
-    name: string,
-    scriptContent: string,
-  ){
+  async function createTestExecutable(name: string, scriptContent: string) {
     const execPath = path.join(tempDir, name);
     await fs.writeFile(execPath, scriptContent);
     if (!isWindows) {
