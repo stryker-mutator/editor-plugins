@@ -49,11 +49,7 @@ export class Process extends EventEmitter {
       serverWorkingDirectory,
     );
 
-    // get relative path from cwd to serverPath
-    const resolvedServerPath = path.resolve(
-      this.workspaceFolder.uri.fsPath,
-      serverPath,
-    );
+    const resolvedServerPath = path.resolve(cwd, serverPath);
 
     const isWindows = process.platform === 'win32';
 
