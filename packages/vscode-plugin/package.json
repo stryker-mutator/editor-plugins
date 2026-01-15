@@ -108,6 +108,7 @@
     "test": "vscode-test",
     "test:linux": "xvfb-run -a vscode-test",
     "deploy": "vsce publish --azure-credential",
+    "postdeploy": "ovsx publish --pat $OVSX_TOKEN",
     "deploy:prerelease": "vsce publish --azure-credential --pre-release"
   },
   "devDependencies": {
@@ -128,6 +129,7 @@
     "esbuild": "^0.27.0",
     "eslint": "^9.37.0",
     "npm-run-all": "^4.1.5",
+    "ovsx": "^0.10.6",
     "sinon": "^21.0.0",
     "sinon-chai": "^4.0.1",
     "typescript": "^5.9.3",
