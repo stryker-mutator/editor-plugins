@@ -4,10 +4,7 @@ import vscode from 'vscode';
 import { Process } from '../../process.ts';
 import { ContextualLogger } from '../../logging/index.ts';
 import { Configuration, Settings } from '../../config/index.ts';
-import {
-  MissingServerPathError,
-  CouldNotSpawnProcessError,
-} from '../../errors.ts';
+import { MissingServerPathError } from '../../errors.ts';
 import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
@@ -145,7 +142,13 @@ describe(`${Process.name} (Integration)`, () => {
       expect(exitCode).to.equal(0);
       sinon.assert.calledWith(
         loggerMock.info,
-        sinon.match('Server configuration: path='),
+        sinon.match((message: string) => {
+          const expectedPath = path.resolve(
+            workspaceFolderMock.uri.fsPath,
+            serverPath,
+          );
+          return message.includes(`Server configuration: path=${expectedPath}`);
+        }),
       );
       sinon.assert.calledWith(
         loggerMock.info,
