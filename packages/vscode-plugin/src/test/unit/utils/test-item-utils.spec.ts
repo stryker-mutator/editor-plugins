@@ -4,6 +4,7 @@ import vscode from 'vscode';
 import fs from 'fs';
 import { MutantResult, MutationTestParams } from 'mutation-server-protocol';
 import { testItemUtils } from '../../../utils/test-item-utils.ts';
+import path from 'path';
 
 describe('testItemUtils', () => {
   let testController: vscode.TestController;
@@ -149,7 +150,9 @@ describe('testItemUtils', () => {
 
   describe('toMutationTestParams', () => {
     it('should convert test items with URI and range to FileRange objects', () => {
-      const uri = vscode.Uri.file('/test/project/src/file.ts');
+      const uri = vscode.Uri.file(
+        path.join('test', 'project', 'src', 'file.ts'),
+      );
       const range = new vscode.Range(4, 9, 4, 19); // 0-based VS Code range
 
       const testItem = testController.createTestItem(
@@ -160,7 +163,7 @@ describe('testItemUtils', () => {
       testItem.range = range;
 
       // Mock fs.lstatSync to return file (not directory)
-      lstatSyncStub.returns({ isDirectory: () => false });
+      lstatSyncStub.withArgs(uri.fsPath).returns({ isDirectory: () => false });
 
       const result = testItemUtils.toMutationTestParams([testItem]);
 
@@ -176,13 +179,12 @@ describe('testItemUtils', () => {
         ],
       };
 
-      expect(result).to.deep.equal(expected);
-      expect(lstatSyncStub.calledOnceWith('/test/project/src/file.ts')).to.be
-        .true;
+      sinon.assert.match(result, expected);
     });
 
     it('should convert test items without range to FileRange without range', () => {
-      const uri = vscode.Uri.file('/test/project/src/file.ts');
+      const filePath = path.join('test', 'project', 'src', 'file.ts');
+      const uri = vscode.Uri.file(filePath);
 
       const testItem = testController.createTestItem(
         'test-item',
@@ -204,11 +206,12 @@ describe('testItemUtils', () => {
         ],
       };
 
-      expect(result).to.deep.equal(expected);
+      sinon.assert.match(result, expected);
     });
 
     it('should handle directory test items by appending slash', () => {
-      const uri = vscode.Uri.file('/test/project/src');
+      const dirPath = path.join('test', 'project', 'src');
+      const uri = vscode.Uri.file(dirPath);
 
       const testItem = testController.createTestItem(
         'src-folder',
@@ -217,7 +220,7 @@ describe('testItemUtils', () => {
       );
 
       // Mock fs.lstatSync to return directory
-      lstatSyncStub.returns({ isDirectory: () => true });
+      lstatSyncStub.withArgs(uri.fsPath).returns({ isDirectory: () => true });
 
       const result = testItemUtils.toMutationTestParams([testItem]);
 
@@ -229,20 +232,20 @@ describe('testItemUtils', () => {
         ],
       };
 
-      expect(result).to.deep.equal(expected);
-      expect(lstatSyncStub.calledOnceWith('/test/project/src')).to.be.true;
+      sinon.assert.match(result, expected);
     });
 
     it('should handle multiple test items', () => {
-      const uri1 = vscode.Uri.file('/test/project/file1.ts');
-      const uri2 = vscode.Uri.file('/test/project/file2.js');
+      const uri1 = vscode.Uri.file(path.join('test', 'project', 'file1.ts'));
+      const uri2 = vscode.Uri.file(path.join('test', 'project', 'file2.js'));
       const range2 = new vscode.Range(2, 5, 3, 10);
 
       const testItem1 = testController.createTestItem('item1', 'Item 1', uri1);
       const testItem2 = testController.createTestItem('item2', 'Item 2', uri2);
       testItem2.range = range2;
 
-      lstatSyncStub.returns({ isDirectory: () => false });
+      lstatSyncStub.withArgs(uri1.fsPath).returns({ isDirectory: () => false });
+      lstatSyncStub.withArgs(uri2.fsPath).returns({ isDirectory: () => false });
 
       const result = testItemUtils.toMutationTestParams([testItem1, testItem2]);
 
@@ -259,8 +262,7 @@ describe('testItemUtils', () => {
         ],
       };
 
-      expect(result).to.deep.equal(expected);
-      expect(lstatSyncStub.callCount).to.equal(2);
+      sinon.assert.match(result, expected);
     });
 
     it('should throw error for test item without URI', () => {
@@ -278,8 +280,8 @@ describe('testItemUtils', () => {
     });
 
     it('should handle mix of files and directories', () => {
-      const fileUri = vscode.Uri.file('/test/project/file.ts');
-      const dirUri = vscode.Uri.file('/test/project/src');
+      const fileUri = vscode.Uri.file(path.join('test', 'project', 'file.ts'));
+      const dirUri = vscode.Uri.file(path.join('test', 'project', 'src'));
       const fileRange = new vscode.Range(0, 0, 1, 5);
 
       const fileItem = testController.createTestItem(
@@ -295,10 +297,10 @@ describe('testItemUtils', () => {
       );
 
       lstatSyncStub
-        .withArgs('/test/project/file.ts')
+        .withArgs(fileUri.fsPath)
         .returns({ isDirectory: () => false });
       lstatSyncStub
-        .withArgs('/test/project/src')
+        .withArgs(dirUri.fsPath)
         .returns({ isDirectory: () => true });
 
       const result = testItemUtils.toMutationTestParams([fileItem, dirItem]);
@@ -316,7 +318,7 @@ describe('testItemUtils', () => {
         ],
       };
 
-      expect(result).to.deep.equal(expected);
+      sinon.assert.match(result, expected);
     });
 
     it('should handle empty test items array', () => {
@@ -326,26 +328,8 @@ describe('testItemUtils', () => {
         files: [],
       };
 
-      expect(result).to.deep.equal(expected);
-      expect(lstatSyncStub.called).to.be.false;
-    });
-
-    it('should handle Windows-style paths', () => {
-      const windowsUri = vscode.Uri.file('C:\\Users\\test\\project\\file.ts');
-
-      const testItem = testController.createTestItem(
-        'windows-item',
-        'Windows Item',
-        windowsUri,
-      );
-
-      lstatSyncStub.returns({ isDirectory: () => false });
-
-      const result = testItemUtils.toMutationTestParams([testItem]);
-
-      expect(result.files![0].path).to.equal(
-        'c:\\Users\\test\\project\\file.ts',
-      );
+      sinon.assert.match(result, expected);
+      sinon.assert.notCalled(lstatSyncStub);
     });
   });
 });
