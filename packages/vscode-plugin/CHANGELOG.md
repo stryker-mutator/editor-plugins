@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/stryker-mutator/editor-plugins/compare/stryker-mutator@0.3.0...stryker-mutator@0.4.0) (2026-01-16)
+
+### Features
+
+- publish to Open-VSX registry ([#81](https://github.com/stryker-mutator/editor-plugins/issues/81)) ([c7595f5](https://github.com/stryker-mutator/editor-plugins/commit/c7595f53f390cd8336cd7ff5ad3d761bb775014b))
+- Windows support & detect config file changes after setup failure ([#97](https://github.com/stryker-mutator/editor-plugins/issues/97)) ([858bdcb](https://github.com/stryker-mutator/editor-plugins/commit/858bdcb9df7b3175f70fb0675748ac8a5bee64dc))
+
 # 0.3.0 (2025-11-07)
 
 ### Bug Fixes
