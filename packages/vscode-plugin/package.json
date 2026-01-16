@@ -98,14 +98,15 @@
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --watch --noEmit",
     "build": "npm run check-types && npm run lint && node esbuild.js --production",
+    "build:tsc": "tsc",
     "clean": "rm -rf out",
     "compile-tests": "npm run clean && tsc --outDir out",
     "watch-tests": "npm run clean && tsc -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
-    "test": "xvfb-run -a vscode-test",
-    "test:local": "vscode-test",
+    "test": "vscode-test",
+    "test:linux": "xvfb-run -a vscode-test",
     "deploy": "vsce publish --azure-credential",
     "postdeploy": "ovsx publish --pat $OVSX_TOKEN",
     "deploy:prerelease": "vsce publish --azure-credential --pre-release"
@@ -131,7 +132,8 @@
     "ovsx": "^0.10.6",
     "sinon": "^21.0.0",
     "sinon-chai": "^4.0.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vscode-test": "^1.6.1"
   },
   "dependencies": {
     "json-rpc-2.0": "^1.7.1",

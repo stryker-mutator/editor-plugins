@@ -2,6 +2,7 @@ import vscode from 'vscode';
 import { DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
 import { testItemUtils } from './test-item-utils.ts';
 import { locationUtils } from './location-utils.ts';
+import path from 'path';
 
 export const testControllerUtils = {
   traverse(
@@ -27,16 +28,20 @@ export const testControllerUtils = {
         serverWorkingDirectory,
         mutantRelativeFilePath,
       );
-    const pathSegments = mutantRelativeFilePathFromWorkspaceRoot.split('/');
+    const pathSegments = mutantRelativeFilePathFromWorkspaceRoot.split(
+      path.sep,
+    );
     let currentCollection = testController.items;
     let currentUri = '';
 
     for (const pathSegment of pathSegments) {
-      currentUri += `/${pathSegment}`;
+      currentUri += `${path.sep}${pathSegment}`;
       const node = currentCollection.get(pathSegment);
 
       if (!node) {
-        const uri = vscode.Uri.file(`${workspaceFolder.uri.path}${currentUri}`);
+        const uri = vscode.Uri.file(
+          `${workspaceFolder.uri.fsPath}${currentUri}`,
+        );
         const newDirectory = testController.createTestItem(
           pathSegment,
           pathSegment,
@@ -49,7 +54,9 @@ export const testControllerUtils = {
       }
     }
 
-    const fileUri = vscode.Uri.file(`${workspaceFolder.uri.path}${currentUri}`);
+    const fileUri = vscode.Uri.file(
+      `${workspaceFolder.uri.fsPath}${currentUri}`,
+    );
     const mutantId =
       `${mutant.mutatorName}(${mutant.location.start.line}:` +
       `${mutant.location.start.column}-${mutant.location.end.line}:` +
@@ -79,7 +86,7 @@ export const testControllerUtils = {
         serverWorkingDirectory,
         mutantRelativeFilePath,
       );
-    const directories = mutantRelativeFilePathFromWorkspaceRoot.split('/');
+    const directories = mutantRelativeFilePathFromWorkspaceRoot.split(path.sep);
     const fileName = directories[directories.length - 1];
     let currentCollection = testController.items;
 
@@ -100,7 +107,9 @@ export const testControllerUtils = {
     uri: vscode.Uri,
   ): void {
     const relativePath = vscode.workspace.asRelativePath(uri, false);
-    const directories = relativePath.split('/').filter((x) => x.length > 0);
+    const directories = relativePath
+      .split(path.sep)
+      .filter((x) => x.length > 0);
     const fileName = directories[directories.length - 1];
     const parentDirectory = directories[directories.length - 2];
     if (!parentDirectory) {
