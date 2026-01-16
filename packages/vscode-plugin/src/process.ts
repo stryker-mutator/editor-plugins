@@ -67,11 +67,9 @@ export class Process extends EventEmitter {
     });
 
     this.#process.stdout.on('data', (data) => {
-      console.log('stdout', data.toString());
       this.emit('stdout', data);
     });
     this.#process.stderr.on('data', (data) => {
-      console.log('stderr', data.toString());
       this.emit('stderr', data);
     });
 
