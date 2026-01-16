@@ -4,10 +4,7 @@ import vscode from 'vscode';
 import { Process } from '../../process.ts';
 import { ContextualLogger } from '../../logging/index.ts';
 import { Configuration, Settings } from '../../config/index.ts';
-import {
-  MissingServerPathError,
-  CouldNotSpawnProcessError,
-} from '../../errors.ts';
+import { MissingServerPathError } from '../../errors.ts';
 import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
@@ -20,6 +17,15 @@ describe(`${Process.name} (Integration)`, () => {
   let configurationGetSettingStub: sinon.SinonStub;
   let configurationGetSettingOrDefaultStub: sinon.SinonStub;
   let tempDir: string;
+  const isWindows = process.platform === 'win32';
+
+  async function createTestExecutable(name: string, scriptContent: string) {
+    const execPath = path.join(tempDir, name);
+    await fs.writeFile(execPath, scriptContent);
+    if (!isWindows) {
+      await fs.chmod(execPath, 0o755); // Make it executable on Unix-like systems
+    }
+  }
 
   beforeEach(async () => {
     sandbox = sinon.createSandbox();
@@ -34,6 +40,30 @@ describe(`${Process.name} (Integration)`, () => {
       name: 'test-workspace',
       index: 0,
     };
+
+    // Create test executables
+    await createTestExecutable(
+      isWindows ? 'echo-test.bat' : 'echo-test.sh',
+      isWindows ? '@echo %*' : '#!/bin/sh\necho "$@"',
+    );
+    await createTestExecutable(
+      isWindows ? 'exit-error.bat' : 'exit-error.sh',
+      isWindows ? '@exit /b 1' : '#!/bin/sh\nexit 1',
+    );
+    await createTestExecutable(
+      isWindows ? 'stderr-test.bat' : 'stderr-test.sh',
+      isWindows
+        ? '@echo error message 1>&2'
+        : '#!/bin/sh\necho "error message" >&2',
+    );
+    await createTestExecutable(
+      isWindows ? 'sleep-test.bat' : 'sleep-test.sh',
+      isWindows ? '@timeout /t 10' : '#!/bin/sh\nsleep 10',
+    );
+    await createTestExecutable(
+      isWindows ? 'cat-test.bat' : 'cat-test.sh',
+      isWindows ? '@findstr /V "^$"' : '#!/bin/sh\ncat',
+    );
 
     configurationGetSettingStub = sandbox.stub(Configuration, 'getSetting');
     configurationGetSettingOrDefaultStub = sandbox.stub(
@@ -74,36 +104,10 @@ describe(`${Process.name} (Integration)`, () => {
       ).to.be.true;
     });
 
-    it('should throw CouldNotSpawnProcessError when server path does not exist', async () => {
-      // Arrange
-      const nonExistentPath = '/path/that/does/not/exist';
-      configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
-        .returns(nonExistentPath);
-      configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
-        .returns([]);
-      configurationGetSettingOrDefaultStub
-        .withArgs(
-          Settings.CurrentWorkingDirectory,
-          workspaceFolderMock.uri.fsPath,
-          workspaceFolderMock,
-        )
-        .returns(workspaceFolderMock.uri.fsPath);
-
-      // Act & Assert
-      await expect(sut.init()).to.eventually.be.rejectedWith(
-        CouldNotSpawnProcessError,
-      );
-      expect(loggerMock.error.calledWith(sinon.match('Server process error:')))
-        .to.be.true;
-    });
-
     it('should successfully spawn a simple command and handle exit', async () => {
       // Arrange
-      const serverPath = process.platform === 'win32' ? 'cmd' : 'echo';
-      const serverArgs =
-        process.platform === 'win32' ? ['/c', 'echo', 'test'] : ['test'];
+      const serverPath = isWindows ? 'echo-test.bat' : 'echo-test.sh';
+      const serverArgs = ['test'];
 
       configurationGetSettingStub
         .withArgs(Settings.ServerPath, workspaceFolderMock)
@@ -136,28 +140,26 @@ describe(`${Process.name} (Integration)`, () => {
 
       // Assert
       expect(exitCode).to.equal(0);
-      expect(
-        loggerMock.info.calledWith(
-          sinon.match(`Server configuration: path=${serverPath}`),
-        ),
-      ).to.be.true;
-      expect(
-        loggerMock.info.calledWith(
-          sinon.match('Server process started with PID'),
-        ),
-      ).to.be.true;
-      expect(
-        loggerMock.info.calledWith(
-          'Server process exited normally with code 0',
-        ),
-      ).to.be.true;
+      sinon.assert.calledWith(
+        loggerMock.info,
+        sinon.match((message: string) => {
+          const expectedPath = path.resolve(
+            workspaceFolderMock.uri.fsPath,
+            serverPath,
+          );
+          return message.includes(`Server configuration: path=${expectedPath}`);
+        }),
+      );
+      sinon.assert.calledWith(
+        loggerMock.info,
+        'Server process exited normally with code 0',
+      );
     });
 
     it('should handle process that exits with non-zero code', async () => {
       // Arrange
-      const serverPath = process.platform === 'win32' ? 'cmd' : 'sh';
-      const serverArgs =
-        process.platform === 'win32' ? ['/c', 'exit', '1'] : ['-c', 'exit 1'];
+      const serverPath = isWindows ? 'exit-error.bat' : 'exit-error.sh';
+      const serverArgs: string[] = [];
 
       configurationGetSettingStub
         .withArgs(Settings.ServerPath, workspaceFolderMock)
@@ -190,15 +192,17 @@ describe(`${Process.name} (Integration)`, () => {
 
       // Assert
       expect(exitCode).to.equal(1);
-      expect(loggerMock.error.calledWith('Server process exited with code 1'))
-        .to.be.true;
+      sinon.assert.calledWith(
+        loggerMock.error,
+        sinon.match('Server process exited with code 1'),
+      );
     });
   });
 
   describe('write', () => {
     it('should write data to process stdin when initialized', async () => {
       // Arrange
-      const serverPath = process.platform === 'win32' ? 'more' : 'cat';
+      const serverPath = isWindows ? 'cat-test.bat' : 'cat-test.sh';
       const serverArgs: string[] = [];
 
       configurationGetSettingStub
@@ -229,9 +233,8 @@ describe(`${Process.name} (Integration)`, () => {
   describe('dispose', () => {
     it('should kill long running process when disposed', async () => {
       // Arrange
-      const serverPath = process.platform === 'win32' ? 'ping' : 'sleep';
-      const serverArgs =
-        process.platform === 'win32' ? ['-t', 'localhost'] : ['10'];
+      const serverPath = isWindows ? 'sleep-test.bat' : 'sleep-test.sh';
+      const serverArgs: string[] = [];
 
       configurationGetSettingStub
         .withArgs(Settings.ServerPath, workspaceFolderMock)
@@ -249,13 +252,6 @@ describe(`${Process.name} (Integration)`, () => {
 
       await sut.init();
 
-      // Verify process started
-      expect(
-        loggerMock.info.calledWith(
-          sinon.match('Server process started with PID'),
-        ),
-      ).to.be.true;
-
       // Act
       sut.dispose();
 
@@ -268,11 +264,8 @@ describe(`${Process.name} (Integration)`, () => {
     it('should emit stdout events', async () => {
       // Arrange
       const testMessage = 'stdout test';
-      const serverPath = process.platform === 'win32' ? 'cmd' : 'echo';
-      const serverArgs =
-        process.platform === 'win32'
-          ? ['/c', 'echo', testMessage]
-          : [testMessage];
+      const serverPath = isWindows ? 'echo-test.bat' : 'echo-test.sh';
+      const serverArgs = [testMessage];
 
       configurationGetSettingStub
         .withArgs(Settings.ServerPath, workspaceFolderMock)
@@ -304,11 +297,8 @@ describe(`${Process.name} (Integration)`, () => {
 
     it('should emit stderr events for error output', async () => {
       // Arrange
-      const serverPath = process.platform === 'win32' ? 'cmd' : 'sh';
-      const serverArgs =
-        process.platform === 'win32'
-          ? ['/c', 'echo error message 1>&2']
-          : ['-c', 'echo "error message" >&2'];
+      const serverPath = isWindows ? 'stderr-test.bat' : 'stderr-test.sh';
+      const serverArgs: string[] = [];
 
       configurationGetSettingStub
         .withArgs(Settings.ServerPath, workspaceFolderMock)

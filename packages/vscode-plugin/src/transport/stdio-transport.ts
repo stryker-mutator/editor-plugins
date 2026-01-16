@@ -30,10 +30,6 @@ export class StdioTransport extends BaseTransport {
     });
 
     this.connected = true;
-    this.logger.info(
-      'Connected to mutation server via stdio',
-      StdioTransport.name,
-    );
   }
 
   send(message: string): void {
