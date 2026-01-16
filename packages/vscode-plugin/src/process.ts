@@ -6,6 +6,7 @@ import { Configuration, Settings } from './config/index.ts';
 import { type ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import path from 'path';
+
 export class Process extends EventEmitter {
   private readonly workspaceFolder;
   private readonly logger;
@@ -48,42 +49,44 @@ export class Process extends EventEmitter {
       serverWorkingDirectory,
     );
 
+    const resolvedServerPath = path.resolve(cwd, serverPath);
+
+    const isWindows = process.platform === 'win32';
+
     this.logger.info(
-      `Server configuration: path=${serverPath}, args=${serverArgs}, cwd=${cwd}`,
+      `Server configuration: path=${resolvedServerPath}, args=${serverArgs}, cwd=${cwd}`,
     );
 
-    return new Promise<void>((resolve, reject) => {
-      this.#process = spawn(serverPath, serverArgs, { cwd });
+    this.#process = spawn(resolvedServerPath, serverArgs, {
+      cwd,
+      shell: isWindows,
+    });
 
-      this.#process.on('error', (error) => {
-        this.logger.error(`Server process error: ${error.message}`);
-        reject(new CouldNotSpawnProcessError());
-      });
+    this.#process.on('error', (error) => {
+      this.logger.error(`Server process error: ${error.message}`);
+    });
 
-      this.#process.stdout.on('data', (data) => {
-        this.emit('stdout', data);
-      });
-      this.#process.stderr.on('data', (data) => {
-        this.emit('stderr', data);
-      });
+    this.#process.stdout.on('data', (data) => {
+      this.emit('stdout', data);
+    });
+    this.#process.stderr.on('data', (data) => {
+      this.emit('stderr', data);
+    });
 
-      this.#process.on('exit', (code) => {
-        if (code === 0) {
-          this.logger.info('Server process exited normally with code 0');
-        } else {
-          this.logger.error(`Server process exited with code ${code}`);
-        }
-      });
+    this.#process.on('close', (code, signal) => {
+      this.logger.info(
+        `Server process closed with code ${code} and signal ${signal}`,
+      );
+    });
 
-      // Check if process spawned successfully
-      if (this.#process.pid === undefined) {
-        this.logger.error('Server process could not be spawned.');
-        reject(new CouldNotSpawnProcessError());
-        return;
+    this.#process.on('exit', (code, signal) => {
+      if (code === 0) {
+        this.logger.info('Server process exited normally with code 0');
+      } else {
+        this.logger.error(
+          `Server process exited with code ${code} and signal ${signal}`,
+        );
       }
-
-      this.logger.info(`Server process started with PID ${this.#process.pid}`);
-      resolve();
     });
   }
   write(data: string | Buffer) {
