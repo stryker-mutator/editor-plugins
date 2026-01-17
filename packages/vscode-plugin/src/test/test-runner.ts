@@ -10,17 +10,17 @@ export async function run(): Promise<void> {
     rootHooks: {
       beforeAll() {
         import('./setup.js');
-      }
-    }
+      },
+    },
   });
 
   const testFiles = await glob('**/**.spec.js', { cwd: testsRoot });
-  testFiles.forEach(file => mocha.addFile(path.resolve(testsRoot, file)));
+  testFiles.forEach((file) => mocha.addFile(path.resolve(testsRoot, file)));
 
   const failures = await new Promise<number>((resolve) => {
     mocha.run((failures) => resolve(failures));
   });
-  
+
   if (failures > 0) {
     throw new Error(`${failures} tests failed.`);
   }
