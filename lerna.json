@@ -6,7 +6,7 @@
       "allowBranch": ["main"],
       "conventionalCommits": true,
       "createRelease": "github",
-      "forcePublish": true,
+      "forcePublish": false,
       "exact": true,
       "preid": "beta"
     }

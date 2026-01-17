@@ -3,7 +3,6 @@
     "module": "nodenext",
     "target": "ES2022",
     "lib": ["ES2022"],
-    // "noEmit": true,
     "sourceMap": true,
     "rootDir": "src",
     "strict": true,
