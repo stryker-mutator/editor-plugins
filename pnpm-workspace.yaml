@@ -1,0 +1,3 @@
+packages:
+  - 'packages/*'
+minimumReleaseAge: 4320 # 3 days, see: https://pnpm.io/settings#minimumreleaseage
