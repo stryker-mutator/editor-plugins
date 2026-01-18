@@ -16,3 +16,4 @@ vsc-extension-quickstart.md
 ../../**
 images/**
 !images/icon.png
+tsconfig.tsbuildinfo
