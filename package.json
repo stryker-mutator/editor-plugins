@@ -5,13 +5,13 @@
     "packages/*"
   ],
   "scripts": {
-    "all": "npm run clean && npm run build && npm run lint && npm run test",
+    "all": "pnpm run clean && pnpm run build && pnpm run lint && pnpm run test",
     "clean": "rimraf -g packages/*/dist/ packages/*/*.tsbuildinfo",
     "build": "lerna run build",
     "test": "lerna run test",
-    "lint": "lerna run lint && npm run format",
+    "lint": "lerna run lint && pnpm run format",
     "format": "prettier . --check",
-    "format:fix": "npm run format -- --write",
+    "format:fix": "pnpm run format --write",
     "release": "GH_TOKEN=$(gh auth token) lerna version"
   },
   "devDependencies": {
@@ -24,5 +24,6 @@
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
     "typescript": "~5.9.3"
-  }
+  },
+  "packageManager": "pnpm@10.28.0"
 }

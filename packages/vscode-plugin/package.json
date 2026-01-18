@@ -92,6 +92,7 @@
     }
   },
   "scripts": {
+    "all": "pnpm run clean && pnpm run build && pnpm run lint && pnpm run test",
     "build": "node esbuild.js --production && tsc -b",
     "watch:tsc": "tsc -b -w",
     "watch:esbuild": "node esbuild.js --watch",
@@ -99,8 +100,8 @@
     "lint": "eslint src",
     "test": "vscode-test",
     "test:linux": "xvfb-run -a vscode-test",
-    "pack": "vsce package",
-    "deploy": "vsce publish --azure-credential",
+    "pack": "vsce package --no-dependencies",
+    "deploy": "vsce publish --azure-credential --no-dependencies",
     "postdeploy": "ovsx publish --pat $OVSX_TOKEN"
   },
   "devDependencies": {
