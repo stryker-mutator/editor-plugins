@@ -101,8 +101,7 @@
     "test:linux": "xvfb-run -a vscode-test",
     "pack": "vsce package",
     "deploy": "vsce publish --azure-credential",
-    "postdeploy": "ovsx publish --pat $OVSX_TOKEN",
-    "deploy:prerelease": "vsce publish --azure-credential --pre-release"
+    "postdeploy": "ovsx publish --pat $OVSX_TOKEN"
   },
   "devDependencies": {
     "@types/chai": "^5.2.2",
