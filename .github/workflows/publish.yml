@@ -1,4 +1,4 @@
-name: Publish
+name: Publish Mutation Server Protocol
 
 on:
   push:

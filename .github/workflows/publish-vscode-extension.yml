@@ -3,7 +3,7 @@ name: Publish VS Code Extension
 on:
   push:
     tags:
-      - 'stryker-mutator@*' 
+      - 'stryker-mutator@*'
 
 jobs:
   publish:
