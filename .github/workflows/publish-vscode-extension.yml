@@ -1,7 +1,9 @@
 name: Publish VS Code Extension
 
 on:
-  workflow_dispatch:
+  push:
+    tags:
+      - 'stryker-mutator@*'
 
 jobs:
   publish:
