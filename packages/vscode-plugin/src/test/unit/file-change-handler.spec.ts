@@ -159,7 +159,7 @@ describe(FileChangeHandler.name, () => {
       // Assert
       expect(contextualLoggerMock.warn).calledWith(
         'Could not stat file /path/to/failing-file.ts: Error: File not found',
-        'FileChangeHandler',
+        { labels: [FileChangeHandler.name] },
       );
 
       // Only the working file should be included in the discovery params
@@ -221,7 +221,7 @@ describe(FileChangeHandler.name, () => {
       // Assert
       expect(contextualLoggerMock.error).calledWith(
         `Failed to process file changes: Error: Mutation server discovery failed for ${[{ path: '/path/to/file.ts' }]}`,
-        'FileChangeHandler',
+        { labels: [FileChangeHandler.name] },
       );
       expect(testExplorerMock.processDiscoverResult).not.called;
     });

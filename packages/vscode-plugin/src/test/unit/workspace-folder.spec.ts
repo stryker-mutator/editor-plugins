@@ -235,4 +235,106 @@ describe(WorkspaceFolder.name, () => {
       expect(testExplorerMock.dispose.called).to.be.false;
     });
   });
+
+  describe('runMutationTestsForFile', () => {
+    it('should delegate file-scoped mutation tests when initialized', async () => {
+      // Arrange
+      getSettingOrDefaultStub
+        .withArgs(Settings.enable, true, workspaceFolderMock)
+        .returns(true);
+      getSettingOrDefaultStub
+        .withArgs(Settings.CurrentWorkingDirectory, '.', workspaceFolderMock)
+        .returns('/foo/bar/server');
+
+      injectorMock.injectClass
+        .withArgs(TestExplorer)
+        .returns(testExplorerMock)
+        .withArgs(FileSystemWatcher)
+        .returns(fileSystemWatcherMock);
+
+      mutationServerMock.discover.resolves({ files: {} });
+
+      await sut.init();
+
+      const fileUri = vscode.Uri.file('/foo/bar/file.ts');
+
+      // Act
+      await sut.runMutationTestsForFile(fileUri);
+
+      // Assert
+      expect(
+        testExplorerMock.runMutationTestsForFile.calledOnceWithExactly(fileUri),
+      ).to.be.true;
+    });
+
+    it('should skip with warning alert when setting "enable" is false', async () => {
+      // Arrange
+      const fileUri = vscode.Uri.file('/foo/bar/file.ts');
+      getSettingOrDefaultStub
+        .withArgs(Settings.enable, true, workspaceFolderMock)
+        .returns(false);
+
+      // Act
+      await sut.runMutationTestsForFile(fileUri);
+
+      // Assert
+      expect(testExplorerMock.runMutationTestsForFile.called).to.be.false;
+      expect(contextualLoggerMock.info.called).to.be.false;
+      expect(
+        contextualLoggerMock.error.calledOnceWithExactly(
+          `Setting 'strykerMutator.enable' is false. Skipping mutation test run for: ${fileUri.fsPath}`,
+          { notify: true },
+        ),
+      ).to.be.true;
+    });
+
+    it('should skip when workspace folder is not initialized', async () => {
+      // Arrange
+      const fileUri = vscode.Uri.file('/foo/bar/file.ts');
+      getSettingOrDefaultStub
+        .withArgs(Settings.enable, true, workspaceFolderMock)
+        .returns(true);
+
+      // Act
+      await sut.runMutationTestsForFile(fileUri);
+
+      // Assert
+      expect(testExplorerMock.runMutationTestsForFile.called).to.be.false;
+      expect(
+        contextualLoggerMock.error.calledOnceWithExactly(
+          `Workspace folder is not initialized for: ${workspaceFolderMock.uri.fsPath}. Skipping mutation test run for: ${fileUri.fsPath}`,
+          { notify: true },
+        ),
+      ).to.be.true;
+    });
+
+    it('should skip when running after dispose', async () => {
+      // Arrange
+      getSettingOrDefaultStub
+        .withArgs(Settings.enable, true, workspaceFolderMock)
+        .returns(true);
+      getSettingOrDefaultStub
+        .withArgs(Settings.CurrentWorkingDirectory, '.', workspaceFolderMock)
+        .returns('/foo/bar/server');
+
+      injectorMock.injectClass
+        .withArgs(TestExplorer)
+        .returns(testExplorerMock)
+        .withArgs(FileSystemWatcher)
+        .returns(fileSystemWatcherMock);
+
+      mutationServerMock.discover.resolves({ files: {} });
+
+      await sut.init();
+      await sut.dispose();
+
+      const fileUri = vscode.Uri.file('/foo/bar/file.ts');
+
+      // Act
+      await sut.runMutationTestsForFile(fileUri);
+
+      // Assert
+      expect(testExplorerMock.runMutationTestsForFile.called).to.be.false;
+    });
+  });
 });

@@ -46,7 +46,7 @@ export abstract class BaseTransport {
     } catch (error) {
       this.logger.error(
         `Error processing incoming data: ${error}`,
-        this.constructor.name,
+        { labels: [this.constructor.name] },
       );
     }
   }

@@ -45,8 +45,29 @@
         "category": "Stryker Mutator",
         "command": "strykerMutator.reload",
         "title": "Reload Workspace"
+      },
+      {
+        "category": "Stryker Mutator",
+        "command": "strykerMutator.runMutationForFile",
+        "title": "Run Mutation Tests for File"
       }
     ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "strykerMutator.runMutationForFile",
+          "group": "strykerMutator",
+          "when": "resourceExtname =~ /\\.(js|jsx|ts|tsx|mjs|cjs|mts|cts)$/"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "strykerMutator.runMutationForFile",
+          "group": "strykerMutator",
+          "when": "resourceExtname =~ /\\.(js|jsx|ts|tsx|mjs|cjs|mts|cts)$/"
+        }
+      ]
+    },
     "configuration": {
       "title": "Stryker Mutator",
       "properties": {

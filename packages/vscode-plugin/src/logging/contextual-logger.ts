@@ -1,5 +1,6 @@
 import { commonTokens } from '../di/index.ts';
 import { Logger } from './index.ts';
+import type { LogOptions } from './logger.ts';
 
 export class ContextualLogger {
   #logger: Logger;
@@ -18,26 +19,35 @@ export class ContextualLogger {
    * Log an informational message with the context label.
    * @param message The message to log.
    */
-  info(message: string, ...labels: string[]): void {
-    this.#logger.info(message, this.#label, ...labels);
+  info(message: string, options: LogOptions = {}): void {
+    this.#logger.info(message, {
+      ...options,
+      labels: [this.#label, ...(options.labels ?? [])],
+    });
   }
 
   /**
    * Log a warning message with the context label.
    * @param message The message to log.
-   * @param labels Additional labels to include.
+   * @param options Additional log options.
    */
-  warn(message: string, ...labels: string[]): void {
-    this.#logger.warn(message, this.#label, ...labels);
+  warn(message: string, options: LogOptions = {}): void {
+    this.#logger.warn(message, {
+      ...options,
+      labels: [this.#label, ...(options.labels ?? [])],
+    });
   }
 
   /**
    * Log an error message with the context label.
    * @param message The message to log.
-   * @param labels Additional labels to include.
+   * @param options Additional log options.
    */
-  error(message: string, ...labels: string[]): void {
-    this.#logger.error(message, this.#label, ...labels);
+  error(message: string, options: LogOptions = {}): void {
+    this.#logger.error(message, {
+      ...options,
+      labels: [this.#label, ...(options.labels ?? [])],
+    });
   }
 
   /**

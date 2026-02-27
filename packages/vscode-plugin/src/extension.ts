@@ -10,9 +10,23 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('strykerMutator.reload', async () => {
       await workspace?.reload();
     }),
+    vscode.commands.registerCommand(
+      'strykerMutator.runMutationForFile',
+      async (uri?: vscode.Uri) => {
+        // If no URI is provided, use the active text editor's document URI 
+        // This is used when the command is invoked from the command palette)
+        const targetUri = uri ?? vscode.window.activeTextEditor?.document.uri;
+        if (!targetUri) {
+          return;
+        }
+        await workspace?.runMutationTestsForFile(targetUri);
+      },
+    ),
   );
 
-  await workspace.init();
+  void workspace.init().catch((error) => {
+    console.error('Failed to initialize workspace', error);
+  });
 }
 
 export async function deactivate() {

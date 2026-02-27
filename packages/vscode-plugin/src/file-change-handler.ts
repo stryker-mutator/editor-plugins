@@ -38,7 +38,7 @@ export class FileChangeHandler {
           } catch (statError) {
             this.#logger.warn(
               `Could not stat file ${uri.fsPath}: ${statError}`,
-              'FileChangeHandler',
+              { labels: [FileChangeHandler.name] },
             );
             return undefined;
           }
@@ -49,7 +49,7 @@ export class FileChangeHandler {
     if (fileRanges.length === 0) {
       this.#logger.info(
         'No valid file changes to process.',
-        'FileChangeHandler',
+        { labels: [FileChangeHandler.name] },
       );
       return;
     }
@@ -65,7 +65,7 @@ export class FileChangeHandler {
     } catch (error) {
       this.#logger.error(
         `Failed to process file changes: ${error} for ${fileRanges}`,
-        'FileChangeHandler',
+        { labels: [FileChangeHandler.name] },
       );
     }
   }
