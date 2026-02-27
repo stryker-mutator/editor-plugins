@@ -30,9 +30,8 @@ describe(ContextualLogger.name, () => {
       contextualLogger.info(message);
 
       expect(mockLogger.info.calledOnce).to.be.true;
-      expect(
-        mockLogger.info.calledWith(message, { labels: [testContext] }),
-      ).to.be.true;
+      expect(mockLogger.info.calledWith(message, { labels: [testContext] })).to
+        .be.true;
     });
 
     it('should call logger.info with context label, message and additional labels', () => {
@@ -54,15 +53,16 @@ describe(ContextualLogger.name, () => {
 
       contextualLogger.info(message);
 
-      expect(
-        mockLogger.info.calledWith(message, { labels: [testContext] }),
-      ).to.be.true;
+      expect(mockLogger.info.calledWith(message, { labels: [testContext] })).to
+        .be.true;
     });
 
     it('should handle multiple additional labels', () => {
       const message = 'Test info message';
 
-      contextualLogger.info(message, { labels: ['Extra1', 'Extra2', 'Extra3'] });
+      contextualLogger.info(message, {
+        labels: ['Extra1', 'Extra2', 'Extra3'],
+      });
 
       expect(
         mockLogger.info.calledWith(message, {
@@ -95,9 +95,8 @@ describe(ContextualLogger.name, () => {
       contextualLogger.warn(message);
 
       expect(mockLogger.warn.calledOnce).to.be.true;
-      expect(
-        mockLogger.warn.calledWith(message, { labels: [testContext] }),
-      ).to.be.true;
+      expect(mockLogger.warn.calledWith(message, { labels: [testContext] })).to
+        .be.true;
     });
 
     it('should call logger.warn with context label, message and additional labels', () => {
@@ -147,9 +146,8 @@ describe(ContextualLogger.name, () => {
       contextualLogger.error(message);
 
       expect(mockLogger.error.calledOnce).to.be.true;
-      expect(
-        mockLogger.error.calledWith(message, { labels: [testContext] }),
-      ).to.be.true;
+      expect(mockLogger.error.calledWith(message, { labels: [testContext] })).to
+        .be.true;
     });
 
     it('should call logger.error with context label, message and additional labels', () => {
@@ -171,8 +169,7 @@ describe(ContextualLogger.name, () => {
 
       contextualLogger.error(message, { labels: ['Second', 'Third'] });
 
-      const [actualMessage, args] =
-        mockLogger.error.firstCall.args;
+      const [actualMessage, args] = mockLogger.error.firstCall.args;
       expect(actualMessage).to.equal(message);
       expect(args).to.deep.equal({
         labels: [testContext, 'Second', 'Third'],

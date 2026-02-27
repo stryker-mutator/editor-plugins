@@ -20,7 +20,8 @@ describe(Workspace.name, () => {
   describe('init', () => {
     it('initializes all workspace folders', async () => {
       const loggerMock = sinon.createStubInstance(ContextualLogger);
-      const workspaceFolderRuntimeMock = sinon.createStubInstance(WorkspaceFolder);
+      const workspaceFolderRuntimeMock =
+        sinon.createStubInstance(WorkspaceFolder);
 
       const workspaceFolder = {
         uri: vscode.Uri.file('/workspace'),
@@ -28,7 +29,11 @@ describe(Workspace.name, () => {
         index: 0,
       } as vscode.WorkspaceFolder;
 
-      (workspaceFolderRuntimeMock as { workspaceFolder: vscode.WorkspaceFolder }).workspaceFolder = workspaceFolder;
+      (
+        workspaceFolderRuntimeMock as {
+          workspaceFolder: vscode.WorkspaceFolder;
+        }
+      ).workspaceFolder = workspaceFolder;
       workspaceFolderRuntimeMock.init.resolves();
 
       const injectorMock = factory.injector();
@@ -38,7 +43,9 @@ describe(Workspace.name, () => {
         .withArgs(WorkspaceFolder)
         .returns(workspaceFolderRuntimeMock as unknown as WorkspaceFolder);
 
-      sandbox.stub(vscode.workspace, 'workspaceFolders').value([workspaceFolder]);
+      sandbox
+        .stub(vscode.workspace, 'workspaceFolders')
+        .value([workspaceFolder]);
 
       const context = {
         subscriptions: [],
@@ -67,14 +74,16 @@ describe(Workspace.name, () => {
       const sut = new Workspace(context, () => injectorMock as never);
       await sut.init();
 
-      expect(loggerMock.info.calledWith('No workspace (folder) is opened')).to.be.true;
+      expect(loggerMock.info.calledWith('No workspace (folder) is opened')).to
+        .be.true;
     });
   });
 
   describe('runMutationTestsForFile', () => {
     it('routes file-scoped mutation run to owning workspace folder', async () => {
       const loggerMock = sinon.createStubInstance(ContextualLogger);
-      const workspaceFolderRuntimeMock = sinon.createStubInstance(WorkspaceFolder);
+      const workspaceFolderRuntimeMock =
+        sinon.createStubInstance(WorkspaceFolder);
 
       const workspaceFolder = {
         uri: vscode.Uri.file('/workspace'),
@@ -82,7 +91,11 @@ describe(Workspace.name, () => {
         index: 0,
       } as vscode.WorkspaceFolder;
 
-      (workspaceFolderRuntimeMock as { workspaceFolder: vscode.WorkspaceFolder }).workspaceFolder = workspaceFolder;
+      (
+        workspaceFolderRuntimeMock as {
+          workspaceFolder: vscode.WorkspaceFolder;
+        }
+      ).workspaceFolder = workspaceFolder;
 
       workspaceFolderRuntimeMock.init.resolves();
 
@@ -93,7 +106,9 @@ describe(Workspace.name, () => {
         .withArgs(WorkspaceFolder)
         .returns(workspaceFolderRuntimeMock as unknown as WorkspaceFolder);
 
-      sandbox.stub(vscode.workspace, 'workspaceFolders').value([workspaceFolder]);
+      sandbox
+        .stub(vscode.workspace, 'workspaceFolders')
+        .value([workspaceFolder]);
 
       const context = {
         subscriptions: [],
@@ -103,12 +118,16 @@ describe(Workspace.name, () => {
       await sut.init();
 
       const fileUri = vscode.Uri.file('/workspace/src/file.ts');
-      sandbox.stub(vscode.workspace, 'getWorkspaceFolder').returns(workspaceFolder);
+      sandbox
+        .stub(vscode.workspace, 'getWorkspaceFolder')
+        .returns(workspaceFolder);
 
       await sut.runMutationTestsForFile(fileUri);
 
       expect(
-        workspaceFolderRuntimeMock.runMutationTestsForFile.calledOnceWithExactly(fileUri),
+        workspaceFolderRuntimeMock.runMutationTestsForFile.calledOnceWithExactly(
+          fileUri,
+        ),
       ).to.be.true;
     });
 
@@ -161,7 +180,9 @@ describe(Workspace.name, () => {
       const sut = new Workspace(context, () => injectorMock as never);
 
       const fileUri = vscode.Uri.file('/workspace/src/file.ts');
-      sandbox.stub(vscode.workspace, 'getWorkspaceFolder').returns(workspaceFolder);
+      sandbox
+        .stub(vscode.workspace, 'getWorkspaceFolder')
+        .returns(workspaceFolder);
 
       await sut.runMutationTestsForFile(fileUri);
 
@@ -174,8 +195,10 @@ describe(Workspace.name, () => {
 
     it('routes to correct workspace folder when multiple folders exist', async () => {
       const loggerMock = sinon.createStubInstance(ContextualLogger);
-      const workspaceFolderRuntime1Mock = sinon.createStubInstance(WorkspaceFolder);
-      const workspaceFolderRuntime2Mock = sinon.createStubInstance(WorkspaceFolder);
+      const workspaceFolderRuntime1Mock =
+        sinon.createStubInstance(WorkspaceFolder);
+      const workspaceFolderRuntime2Mock =
+        sinon.createStubInstance(WorkspaceFolder);
 
       const workspaceFolder1 = {
         uri: vscode.Uri.file('/workspace1'),
@@ -189,8 +212,16 @@ describe(Workspace.name, () => {
         index: 1,
       } as vscode.WorkspaceFolder;
 
-      (workspaceFolderRuntime1Mock as { workspaceFolder: vscode.WorkspaceFolder }).workspaceFolder = workspaceFolder1;
-      (workspaceFolderRuntime2Mock as { workspaceFolder: vscode.WorkspaceFolder }).workspaceFolder = workspaceFolder2;
+      (
+        workspaceFolderRuntime1Mock as {
+          workspaceFolder: vscode.WorkspaceFolder;
+        }
+      ).workspaceFolder = workspaceFolder1;
+      (
+        workspaceFolderRuntime2Mock as {
+          workspaceFolder: vscode.WorkspaceFolder;
+        }
+      ).workspaceFolder = workspaceFolder2;
 
       workspaceFolderRuntime1Mock.init.resolves();
       workspaceFolderRuntime2Mock.init.resolves();
@@ -207,7 +238,9 @@ describe(Workspace.name, () => {
         .onSecondCall()
         .returns(workspaceFolderRuntime2Mock as unknown as WorkspaceFolder);
 
-      sandbox.stub(vscode.workspace, 'workspaceFolders').value([workspaceFolder1, workspaceFolder2]);
+      sandbox
+        .stub(vscode.workspace, 'workspaceFolders')
+        .value([workspaceFolder1, workspaceFolder2]);
 
       const context = {
         subscriptions: [],
@@ -217,13 +250,18 @@ describe(Workspace.name, () => {
       await sut.init();
 
       const fileUri = vscode.Uri.file('/workspace2/src/file.ts');
-      sandbox.stub(vscode.workspace, 'getWorkspaceFolder').returns(workspaceFolder2);
+      sandbox
+        .stub(vscode.workspace, 'getWorkspaceFolder')
+        .returns(workspaceFolder2);
 
       await sut.runMutationTestsForFile(fileUri);
 
-      expect(workspaceFolderRuntime1Mock.runMutationTestsForFile.called).to.be.false;
+      expect(workspaceFolderRuntime1Mock.runMutationTestsForFile.called).to.be
+        .false;
       expect(
-        workspaceFolderRuntime2Mock.runMutationTestsForFile.calledOnceWithExactly(fileUri),
+        workspaceFolderRuntime2Mock.runMutationTestsForFile.calledOnceWithExactly(
+          fileUri,
+        ),
       ).to.be.true;
     });
   });
@@ -231,7 +269,8 @@ describe(Workspace.name, () => {
   describe('reload', () => {
     it('reloads all workspace folders', async () => {
       const loggerMock = sinon.createStubInstance(ContextualLogger);
-      const workspaceFolderRuntimeMock = sinon.createStubInstance(WorkspaceFolder);
+      const workspaceFolderRuntimeMock =
+        sinon.createStubInstance(WorkspaceFolder);
 
       const workspaceFolder = {
         uri: vscode.Uri.file('/workspace'),
@@ -239,7 +278,11 @@ describe(Workspace.name, () => {
         index: 0,
       } as vscode.WorkspaceFolder;
 
-      (workspaceFolderRuntimeMock as { workspaceFolder: vscode.WorkspaceFolder }).workspaceFolder = workspaceFolder;
+      (
+        workspaceFolderRuntimeMock as {
+          workspaceFolder: vscode.WorkspaceFolder;
+        }
+      ).workspaceFolder = workspaceFolder;
       workspaceFolderRuntimeMock.init.resolves();
       workspaceFolderRuntimeMock.dispose.resolves();
 
@@ -250,7 +293,9 @@ describe(Workspace.name, () => {
         .withArgs(WorkspaceFolder)
         .returns(workspaceFolderRuntimeMock as unknown as WorkspaceFolder);
 
-      sandbox.stub(vscode.workspace, 'workspaceFolders').value([workspaceFolder]);
+      sandbox
+        .stub(vscode.workspace, 'workspaceFolders')
+        .value([workspaceFolder]);
 
       const context = {
         subscriptions: [],
@@ -269,7 +314,8 @@ describe(Workspace.name, () => {
   describe('dispose', () => {
     it('disposes all workspace folders', async () => {
       const loggerMock = sinon.createStubInstance(ContextualLogger);
-      const workspaceFolderRuntimeMock = sinon.createStubInstance(WorkspaceFolder);
+      const workspaceFolderRuntimeMock =
+        sinon.createStubInstance(WorkspaceFolder);
 
       const workspaceFolder = {
         uri: vscode.Uri.file('/workspace'),
@@ -277,7 +323,11 @@ describe(Workspace.name, () => {
         index: 0,
       } as vscode.WorkspaceFolder;
 
-      (workspaceFolderRuntimeMock as { workspaceFolder: vscode.WorkspaceFolder }).workspaceFolder = workspaceFolder;
+      (
+        workspaceFolderRuntimeMock as {
+          workspaceFolder: vscode.WorkspaceFolder;
+        }
+      ).workspaceFolder = workspaceFolder;
       workspaceFolderRuntimeMock.init.resolves();
       workspaceFolderRuntimeMock.dispose.resolves();
 
@@ -288,7 +338,9 @@ describe(Workspace.name, () => {
         .withArgs(WorkspaceFolder)
         .returns(workspaceFolderRuntimeMock as unknown as WorkspaceFolder);
 
-      sandbox.stub(vscode.workspace, 'workspaceFolders').value([workspaceFolder]);
+      sandbox
+        .stub(vscode.workspace, 'workspaceFolders')
+        .value([workspaceFolder]);
 
       const context = {
         subscriptions: [],

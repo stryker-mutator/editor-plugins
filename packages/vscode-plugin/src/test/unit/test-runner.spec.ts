@@ -43,9 +43,9 @@ describe(TestRunner.name, () => {
           }
         },
       },
-      createTestRun: sandbox.stub().returns(
-        testRun as unknown as vscode.TestRun,
-      ),
+      createTestRun: sandbox
+        .stub()
+        .returns(testRun as unknown as vscode.TestRun),
     } as unknown as vscode.TestController;
   }
 
@@ -120,7 +120,9 @@ describe(TestRunner.name, () => {
 
     const sut = createSut(mutationServerMock, testController, loggerMock);
 
-    await sut.runMutationTestsForFile(vscode.Uri.file('/workspace/src/file.ts'));
+    await sut.runMutationTestsForFile(
+      vscode.Uri.file('/workspace/src/file.ts'),
+    );
 
     expect(
       mutationServerMock.mutationTest.calledOnceWithExactly({
@@ -162,7 +164,9 @@ describe(TestRunner.name, () => {
     ]);
 
     sandbox.stub(vscode.workspace, 'asRelativePath').returns('src/file.ts');
-    sandbox.stub(testControllerUtils, 'upsertMutantTestItem').returns(mutantItem);
+    sandbox
+      .stub(testControllerUtils, 'upsertMutantTestItem')
+      .returns(mutantItem);
 
     mutationServerMock.mutationTest.returns(
       of(
@@ -203,7 +207,10 @@ describe(TestRunner.name, () => {
     const isMutantInTestTreeStub = sandbox
       .stub(testItemUtils, 'isMutantInTestTree')
       .returns(false);
-    const upsertStub = sandbox.stub(testControllerUtils, 'upsertMutantTestItem');
+    const upsertStub = sandbox.stub(
+      testControllerUtils,
+      'upsertMutantTestItem',
+    );
 
     mutationServerMock.mutationTest.returns(
       of(
@@ -224,11 +231,7 @@ describe(TestRunner.name, () => {
       profile: undefined,
       preserveFocus: false,
     } as unknown as vscode.TestRunRequest;
-    await sut.runMutationTests(
-      request,
-      testController,
-      createToken(),
-    );
+    await sut.runMutationTests(request, testController, createToken());
 
     expect(traverseStub.called).to.be.true;
     expect(toMutationTestParamsStub.calledOnceWithExactly([queuedItem])).to.be
@@ -264,11 +267,7 @@ describe(TestRunner.name, () => {
       profile: undefined,
       preserveFocus: false,
     } as unknown as vscode.TestRunRequest;
-    await sut.runMutationTests(
-      request,
-      testController,
-      createToken(),
-    );
+    await sut.runMutationTests(request, testController, createToken());
 
     expect(testRun.errored.calledOnce).to.be.true;
     expect(testRun.end.called).to.be.true;
@@ -336,7 +335,9 @@ describe(TestRunner.name, () => {
     );
 
     const sut = createSut(mutationServerMock, testController, loggerMock);
-    await sut.runMutationTestsForFile(vscode.Uri.file('/workspace/src/file.ts'));
+    await sut.runMutationTestsForFile(
+      vscode.Uri.file('/workspace/src/file.ts'),
+    );
 
     expect(testRun.skipped.calledOnce).to.be.true;
     expect(testRun.passed.called).to.be.false;

@@ -47,7 +47,7 @@ describe(StdioTransport.name, () => {
       // Assert
       expect(
         loggerMock.info.calledWith('error message\n', {
-          labels: ["Server"],
+          labels: ['Server'],
         }),
       ).to.be.true;
     });

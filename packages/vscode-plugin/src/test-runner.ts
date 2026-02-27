@@ -1,5 +1,9 @@
 import vscode from 'vscode';
-import { MutationTestResult, MutantResult, MutationTestParams } from 'mutation-server-protocol';
+import {
+  MutationTestResult,
+  MutantResult,
+  MutationTestParams,
+} from 'mutation-server-protocol';
 import { ContextualLogger } from './logging/index.ts';
 import { MutationServer } from './index.ts';
 import { commonTokens } from './di/index.ts';
@@ -58,11 +62,7 @@ export class TestRunner {
     });
     const mutationTestParams = testItemUtils.toMutationTestParams(queue);
     try {
-      await this.executeMutationTest(
-        testRun,
-        mutationTestParams,
-        queue,
-      );
+      await this.executeMutationTest(testRun, mutationTestParams, queue);
     } catch (error: Error | unknown) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -95,7 +95,7 @@ export class TestRunner {
 
     const fileTestItems = this.getExistingFileTestItems(fileUri);
     this.markAsStarted(testRun, fileTestItems);
-    
+
     const relativePath = vscode.workspace
       .asRelativePath(fileUri, false)
       .replaceAll('\\', '/');
@@ -104,9 +104,7 @@ export class TestRunner {
     };
 
     try {
-      await this.executeMutationTest(
-        testRun,
-        mutationTestParams);
+      await this.executeMutationTest(testRun, mutationTestParams);
     } catch (error: Error | unknown) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -151,11 +149,7 @@ export class TestRunner {
     await lastValueFrom(
       mutationTestResult$.pipe(
         mergeMap(async (result) => {
-          await this.processMutationTestResult(
-            result,
-            testRun,
-            queue,
-          );
+          await this.processMutationTestResult(result, testRun, queue);
         }),
       ),
     );

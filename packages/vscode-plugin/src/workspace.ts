@@ -101,9 +101,7 @@ export class Workspace {
   }
 
   private workspaceFolderExists(folder: vscode.WorkspaceFolder) {
-    return this.#workspaceFolders.some(
-      (wf) => wf.workspaceFolder === folder,
-    );
+    return this.#workspaceFolders.some((wf) => wf.workspaceFolder === folder);
   }
 
   private async onWorkspaceFoldersChanged(
@@ -122,9 +120,7 @@ export class Workspace {
     event: vscode.ConfigurationChangeEvent,
   ) {
     for (const wf of this.#workspaceFolders) {
-      if (
-        event.affectsConfiguration(Constants.AppName, wf.workspaceFolder)
-      ) {
+      if (event.affectsConfiguration(Constants.AppName, wf.workspaceFolder)) {
         this.#logger.info(
           `Configuration changed for ${wf.workspaceFolder.uri.fsPath}. Reloading workspace folder`,
         );

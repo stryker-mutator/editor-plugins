@@ -47,10 +47,9 @@ export class FileChangeHandler {
     ).filter((fr): fr is FileRange => fr !== undefined);
 
     if (fileRanges.length === 0) {
-      this.#logger.info(
-        'No valid file changes to process.',
-        { labels: [FileChangeHandler.name] },
-      );
+      this.#logger.info('No valid file changes to process.', {
+        labels: [FileChangeHandler.name],
+      });
       return;
     }
 
