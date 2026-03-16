@@ -1,7 +1,10 @@
 version: 2
 updates:
-  - package-ecosystem: 'npm'
-    directories:
-      - '*'
+  - package-ecosystem: github-actions
+    directory: '/'
     schedule:
-      interval: 'daily'
+      interval: daily
+    commit-message:
+      prefix: 'build'
+      prefix-development: 'build'
+      include: 'scope'
