@@ -114,13 +114,13 @@
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.6.2",
-    "chai": "^6.2.0",
-    "chai-as-promised": "^8.0.2",
+    "chai": "6.2.2",
+    "chai-as-promised": "8.0.2",
     "esbuild": "^0.27.0",
     "glob": "^10.5.0",
     "ovsx": "^0.10.6",
-    "sinon": "^21.0.0",
-    "sinon-chai": "^4.0.1",
+    "sinon": "21.0.2",
+    "sinon-chai": "4.0.1",
     "typescript": "^5.9.3"
   },
   "dependencies": {
