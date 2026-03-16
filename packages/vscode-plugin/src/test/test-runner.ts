@@ -1,6 +1,6 @@
-import * as path from 'path';
 import { glob } from 'glob';
 import Mocha from 'mocha';
+import * as path from 'path';
 
 export async function run(): Promise<void> {
   const testsRoot = __dirname;
@@ -8,8 +8,8 @@ export async function run(): Promise<void> {
   const mocha = new Mocha({
     ui: 'bdd',
     rootHooks: {
-      beforeAll() {
-        import('./setup.js');
+      async beforeAll() {
+        await import('./setup.js');
       },
     },
   });

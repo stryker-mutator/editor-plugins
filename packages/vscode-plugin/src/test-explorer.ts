@@ -1,9 +1,11 @@
-import { commonTokens } from './di/index.ts';
+import type { DiscoverResult } from 'mutation-server-protocol';
 import vscode from 'vscode';
+
+import { commonTokens } from './di/index.ts';
 import { Constants } from './index.ts';
-import { TestRunner } from './test-runner.ts';
+import type { TestRunner } from './test-runner.ts';
 import { testControllerUtils } from './utils/test-controller-utils.ts';
-import { DiscoverResult } from 'mutation-server-protocol';
+
 export function provideTestController(
   workspaceFolder: vscode.WorkspaceFolder,
 ): vscode.TestController {

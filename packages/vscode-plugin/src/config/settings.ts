@@ -1,4 +1,5 @@
 import { Constants } from '../constants.ts';
+
 export const Settings = {
   enable: 'enable',
   ServerPath: 'path',

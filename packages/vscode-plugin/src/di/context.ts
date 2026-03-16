@@ -1,6 +1,7 @@
-import { Logger } from '../logging/index.ts';
-import { commonTokens } from './tokens.ts';
-import vscode from 'vscode';
+import type vscode from 'vscode';
+
+import type { Logger } from '../logging/index.ts';
+import type { commonTokens } from './tokens.ts';
 
 /**
  * The basic dependency injection context within Stryker

@@ -3,13 +3,13 @@
  */
 import {
   array,
+  boolean,
+  enum as enum_,
   number,
   object,
-  string,
-  enum as enum_,
-  type z,
-  boolean,
   record,
+  string,
+  type z,
 } from 'zod';
 
 export const ConfigureParams = object({

@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
 import vscode from 'vscode';
+
 import { Logger } from '../../../logging/logger.ts';
 
 describe(Logger.name, () => {
-  let mockOutputChannel: any;
-  let createOutputChannelStub: sinon.SinonStub;
+  let mockOutputChannel: sinon.SinonStubbedInstance<vscode.LogOutputChannel>;
   let logger: Logger;
   const channelName = 'Test Channel';
 
@@ -18,11 +18,9 @@ describe(Logger.name, () => {
       dispose: sinon.stub(),
       name: channelName,
       replace: sinon.stub(),
-    };
+    } as unknown as sinon.SinonStubbedInstance<vscode.LogOutputChannel>;
 
-    createOutputChannelStub = sinon
-      .stub(vscode.window, 'createOutputChannel')
-      .returns(mockOutputChannel);
+    sinon.stub(vscode.window, 'createOutputChannel').returns(mockOutputChannel);
 
     logger = new Logger(channelName);
   });
@@ -67,6 +65,7 @@ describe(Logger.name, () => {
     it('should not show output channel for info messages', () => {
       logger.info('Test message');
 
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       expect(mockOutputChannel.show.called).to.be.false;
     });
 
@@ -108,6 +107,7 @@ describe(Logger.name, () => {
     it('should show output channel after appendLine', () => {
       logger.warn('Test warning');
 
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       expect(mockOutputChannel.appendLine.calledBefore(mockOutputChannel.show))
         .to.be.true;
     });
@@ -150,6 +150,7 @@ describe(Logger.name, () => {
     it('should show output channel after appendLine', () => {
       logger.error('Test error');
 
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       expect(mockOutputChannel.appendLine.calledBefore(mockOutputChannel.show))
         .to.be.true;
     });

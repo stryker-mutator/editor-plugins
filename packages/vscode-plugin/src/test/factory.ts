@@ -1,11 +1,11 @@
-import {
+import type {
   DiscoveredMutant,
-  MutationTestResult,
   MutantResult,
+  MutationTestResult,
 } from 'mutation-server-protocol';
 import sinon from 'sinon';
-import { Injector } from 'typed-inject';
-import vscode from 'vscode';
+import type { Injector } from 'typed-inject';
+import type vscode from 'vscode';
 
 export function createMutantResult(
   overrides?: Partial<MutantResult>,
@@ -73,7 +73,7 @@ export function workspaceFolder(): sinon.SinonStubbedInstance<vscode.WorkspaceFo
 }
 
 export function testController(): sinon.SinonStubbedInstance<vscode.TestController> {
-  return sinon.createStubInstance(TestControllerMock);
+  return sinon.createStubInstance<vscode.TestController>(TestControllerMock);
 }
 
 export class WorkspaceFolderMock implements vscode.WorkspaceFolder {
@@ -107,16 +107,10 @@ export class TestControllerMock implements vscode.TestController {
   refreshHandler:
     | ((token: vscode.CancellationToken) => Thenable<void> | void)
     | undefined = sinon.stub<any>();
-  createTestRun(
-    request: vscode.TestRunRequest,
-    name?: string,
-    persist?: boolean,
-  ): vscode.TestRun {
+  createTestRun(): vscode.TestRun {
     return sinon.stub() as unknown as vscode.TestRun;
   }
-  invalidateTestResults(
-    items?: vscode.TestItem | readonly vscode.TestItem[],
-  ): void {
+  invalidateTestResults(): void {
     return;
   }
   dispose = sinon.stub<any>();

@@ -1,45 +1,39 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { expect } from 'chai';
-import sinon from 'sinon';
-import { Subject } from 'rxjs';
-import vscode from 'vscode';
-import { MutationServer } from '../../mutation-server.ts';
-import { Process } from '../../process.ts';
-import { ContextualLogger } from '../../logging/index.ts';
-import {
+import type {
   JSONRPCErrorResponse,
   JSONRPCRequest,
   JSONRPCResponse,
 } from 'json-rpc-2.0';
-import { Configuration } from '../../config/index.ts';
-import { Constants } from '../../constants.ts';
-import {
+import type {
   ConfigureResult,
   DiscoverParams,
   DiscoverResult,
   MutationTestParams,
   MutationTestResult,
 } from 'mutation-server-protocol';
-import { createMutationTestResult, createMutantResult } from '../factory';
+import { Subject } from 'rxjs';
+import sinon from 'sinon';
+import type vscode from 'vscode';
+
+import { Configuration } from '../../config/index.ts';
+import { Constants } from '../../constants.ts';
+import { MutationServer } from '../../mutation-server.ts';
+import { Process } from '../../process.ts';
+import type { StdioTransport } from '../../transport';
+import { createMutantResult, createMutationTestResult } from '../factory';
 
 describe(MutationServer.name, () => {
   let sandbox: sinon.SinonSandbox;
   let sut: MutationServer;
-  let loggerMock: sinon.SinonStubbedInstance<ContextualLogger>;
   let workspaceFolderMock: vscode.WorkspaceFolder;
   let processMock: sinon.SinonStubbedInstance<Process>;
-  let transportMock: {
-    init: sinon.SinonStub;
-    send: sinon.SinonStub;
-    dispose: sinon.SinonStub;
-    messages: Subject<JSONRPCResponse>;
-    notifications: Subject<JSONRPCRequest>;
-  };
+  let transportMock: sinon.SinonStubbedInstance<StdioTransport>;
   let configurationStub: sinon.SinonStub;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
 
-    loggerMock = sandbox.createStubInstance(ContextualLogger);
     processMock = sandbox.createStubInstance(Process);
 
     workspaceFolderMock = {
@@ -55,15 +49,11 @@ describe(MutationServer.name, () => {
       dispose: sandbox.stub(),
       messages: new Subject<JSONRPCResponse>(),
       notifications: new Subject<JSONRPCRequest>(),
-    };
+    } as unknown as sinon.SinonStubbedInstance<StdioTransport>;
 
     configurationStub = sandbox.stub(Configuration, 'getSetting');
 
-    sut = new MutationServer(
-      workspaceFolderMock,
-      processMock,
-      transportMock as any,
-    );
+    sut = new MutationServer(workspaceFolderMock, processMock, transportMock);
   });
 
   afterEach(() => {
@@ -79,7 +69,7 @@ describe(MutationServer.name, () => {
 
       configurationStub.returns(undefined); // No config file path
 
-      transportMock.send = sandbox.stub().callsFake((message: string) => {
+      transportMock.send.callsFake((message: string) => {
         // Simulate successful configure response
         const request = JSON.parse(message);
         if (request.method === 'configure') {
@@ -108,7 +98,7 @@ describe(MutationServer.name, () => {
 
       configurationStub.returns(undefined); // No config file path
 
-      transportMock.send = sandbox.stub().callsFake((message: string) => {
+      transportMock.send.callsFake((message: string) => {
         // Simulate successful configure response
         const request = JSON.parse(message);
         if (request.method === 'configure') {
@@ -126,13 +116,15 @@ describe(MutationServer.name, () => {
 
       // Assert
       expect(
-        transportMock.send.calledWithMatch((message: string) => {
-          const request = JSON.parse(message);
-          return (
-            request.method === 'configure' &&
-            request.params.configFilePath === undefined
-          );
-        }),
+        transportMock.send.calledWithMatch(
+          sinon.match((message: string) => {
+            const request = JSON.parse(message);
+            return (
+              request.method === 'configure' &&
+              request.params.configFilePath === undefined
+            );
+          }),
+        ),
       ).to.be.true;
     });
 
@@ -145,7 +137,7 @@ describe(MutationServer.name, () => {
 
       configurationStub.returns(configFilePath); // Config file path set
 
-      transportMock.send = sandbox.stub().callsFake((message: string) => {
+      transportMock.send.callsFake((message: string) => {
         // Simulate successful configure response
         const request = JSON.parse(message);
         if (request.method === 'configure') {
@@ -163,13 +155,15 @@ describe(MutationServer.name, () => {
 
       // Assert
       expect(
-        transportMock.send.calledWithMatch((message: string) => {
-          const request = JSON.parse(message);
-          return (
-            request.method === 'configure' &&
-            request.params.configFilePath === configFilePath
-          );
-        }),
+        transportMock.send.calledWithMatch(
+          sinon.match((message: string) => {
+            const request = JSON.parse(message);
+            return (
+              request.method === 'configure' &&
+              request.params.configFilePath === configFilePath
+            );
+          }),
+        ),
       ).to.be.true;
     });
 
@@ -204,7 +198,7 @@ describe(MutationServer.name, () => {
     beforeEach(async () => {
       // Set up successful init
       configurationStub.returns(undefined);
-      transportMock.send = sandbox.stub().callsFake((message: string) => {
+      transportMock.send.callsFake((message: string) => {
         const request = JSON.parse(message);
         if (request.method === 'configure') {
           setTimeout(() => {
@@ -270,7 +264,7 @@ describe(MutationServer.name, () => {
     beforeEach(async () => {
       // Set up successful init
       configurationStub.returns(undefined);
-      transportMock.send = sandbox.stub().callsFake((message: string) => {
+      transportMock.send.callsFake((message: string) => {
         const request = JSON.parse(message);
         if (request.method === 'configure') {
           setTimeout(() => {
@@ -315,7 +309,7 @@ describe(MutationServer.name, () => {
       const emittedResults: MutationTestResult[] = [];
       let capturedParams: MutationTestParams | undefined;
 
-      transportMock.send = sandbox.stub().callsFake((message: string) => {
+      transportMock.send.callsFake((message: string) => {
         const request = JSON.parse(message);
         if (request.method === 'mutationTest') {
           capturedParams = request.params;

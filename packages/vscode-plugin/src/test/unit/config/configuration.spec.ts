@@ -1,12 +1,13 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
 import vscode from 'vscode';
+
 import { Configuration } from '../../../config/configuration.ts';
 import { Settings, SettingSections } from '../../../config/index.ts';
 
 describe(Configuration.name, () => {
   let getConfigurationStub: sinon.SinonStub;
-  let mockWorkspaceConfig: any;
+  let mockWorkspaceConfig: sinon.SinonStubbedInstance<vscode.WorkspaceConfiguration>;
 
   beforeEach(() => {
     mockWorkspaceConfig = {
@@ -14,7 +15,7 @@ describe(Configuration.name, () => {
       update: sinon.stub(),
       has: sinon.stub(),
       inspect: sinon.stub(),
-    };
+    } as unknown as sinon.SinonStubbedInstance<vscode.WorkspaceConfiguration>;
     getConfigurationStub = sinon
       .stub(vscode.workspace, 'getConfiguration')
       .returns(mockWorkspaceConfig);

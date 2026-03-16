@@ -1,12 +1,15 @@
-import { type Injector } from 'typed-inject';
-import vscode from 'vscode';
-import { type BaseContext, commonTokens } from './di/index.ts';
+import type { Injector } from 'typed-inject';
+import type vscode from 'vscode';
+
 import { Configuration, Settings } from './config/index.ts';
-import { ContextualLogger } from './logging/index.ts';
-import { MutationServer, TestRunner } from './index.ts';
-import { provideTestController, TestExplorer } from './test-explorer.ts';
-import { FileSystemWatcher } from './file-system-watcher.ts';
+import { type BaseContext, commonTokens } from './di/index.ts';
 import { FileChangeHandler } from './file-change-handler.ts';
+import { FileSystemWatcher } from './file-system-watcher.ts';
+import type { MutationServer } from './index.ts';
+import { TestRunner } from './index.ts';
+import type { ContextualLogger } from './logging/index.ts';
+import { provideTestController, TestExplorer } from './test-explorer.ts';
+
 export interface WorkspaceFolderContext extends BaseContext {
   [commonTokens.loggerContext]: string;
   [commonTokens.contextualLogger]: ContextualLogger;
@@ -59,9 +62,9 @@ export class WorkspaceFolder {
       Settings.CurrentWorkingDirectory,
       '.',
       this.workspaceFolder,
-    ) as string;
+    );
 
-    let workspaceScopedInjector = this.injector
+    const workspaceScopedInjector = this.injector
       .provideValue(commonTokens.mutationServer, this.mutationServer)
       .provideValue(
         commonTokens.serverWorkspaceDirectory,

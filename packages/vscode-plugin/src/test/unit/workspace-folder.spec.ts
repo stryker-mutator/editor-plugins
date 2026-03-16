@@ -1,18 +1,17 @@
-import sinon from 'sinon';
-import vscode from 'vscode';
 import { expect } from 'chai';
-import { Injector } from 'typed-inject';
-import {
-  WorkspaceFolder,
-  WorkspaceFolderContext,
-} from '../../workspace-folder.ts';
-import * as factory from '../factory.ts';
-import { MutationServer } from '../../mutation-server.ts';
-import { ContextualLogger } from '../../logging/contextual-logger.ts';
+import sinon from 'sinon';
+import type { Injector } from 'typed-inject';
+import type vscode from 'vscode';
+
 import { Configuration, Settings } from '../../config/index.ts';
 import { commonTokens } from '../../di/tokens.ts';
-import { provideTestController, TestExplorer } from '../../test-explorer.ts';
 import { FileSystemWatcher } from '../../file-system-watcher.ts';
+import { ContextualLogger } from '../../logging/contextual-logger.ts';
+import { MutationServer } from '../../mutation-server.ts';
+import { provideTestController, TestExplorer } from '../../test-explorer.ts';
+import type { WorkspaceFolderContext } from '../../workspace-folder.ts';
+import { WorkspaceFolder } from '../../workspace-folder.ts';
+import * as factory from '../factory.ts';
 
 describe(WorkspaceFolder.name, () => {
   let sandbox: sinon.SinonSandbox;
