@@ -48,7 +48,7 @@ importers:
         specifier: 11.7.5
         version: 11.7.5
       prettier:
-        specifier: ^3.6.2
+        specifier: 3.8.1
         version: 3.8.1
       rimraf:
         specifier: ^6.0.1
