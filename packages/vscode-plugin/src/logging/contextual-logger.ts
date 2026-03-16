@@ -1,5 +1,5 @@
 import { commonTokens } from '../di/index.ts';
-import { Logger } from './index.ts';
+import type { Logger } from './index.ts';
 
 export class ContextualLogger {
   #logger: Logger;

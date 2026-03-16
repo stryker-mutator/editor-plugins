@@ -1,9 +1,10 @@
 import { expect } from 'chai';
+import type { JSONRPCRequest, JSONRPCResponse } from 'json-rpc-2.0';
 import sinon from 'sinon';
-import { StdioTransport } from '../../../transport/stdio-transport.ts';
-import { Process } from '../../../process.ts';
+
 import { ContextualLogger } from '../../../logging/index.ts';
-import { JSONRPCRequest, JSONRPCResponse } from 'json-rpc-2.0';
+import { Process } from '../../../process.ts';
+import { StdioTransport } from '../../../transport/stdio-transport.ts';
 
 describe(StdioTransport.name, () => {
   let sandbox: sinon.SinonSandbox;
@@ -133,7 +134,7 @@ describe(StdioTransport.name, () => {
       });
     });
 
-    it('should emit notifications for JSON-RPC messages without id', async () => {
+    it('should emit notifications for JSON-RPC messages without id', () => {
       const testNotification: JSONRPCRequest = {
         jsonrpc: '2.0',
         method: 'test/notification',
@@ -158,7 +159,7 @@ describe(StdioTransport.name, () => {
       expect(receivedNotification).to.deep.equal(testNotification);
     });
 
-    it('should emit messages for JSON-RPC responses with id', async () => {
+    it('should emit messages for JSON-RPC responses with id', () => {
       const testResponse: JSONRPCResponse = {
         jsonrpc: '2.0',
         id: 123,
@@ -183,7 +184,7 @@ describe(StdioTransport.name, () => {
       expect(receivedMessage).to.deep.equal(testResponse);
     });
 
-    it('should handle malformed JSON by logging error', async () => {
+    it('should handle malformed JSON by logging error', () => {
       const malformedJson = '{invalid}';
       const malformedData = Buffer.from(
         `Content-Length: ${malformedJson.length}\r\n\r\n${malformedJson}`,
@@ -197,7 +198,7 @@ describe(StdioTransport.name, () => {
       expect(loggerMock.error.called).to.be.true;
     });
 
-    it('should handle partial messages correctly', async () => {
+    it('should handle partial messages correctly', () => {
       const testResponse: JSONRPCResponse = {
         jsonrpc: '2.0',
         id: 456,
@@ -224,7 +225,7 @@ describe(StdioTransport.name, () => {
       expect(receivedMessage).to.deep.equal(testResponse);
     });
 
-    it('should handle junk data between messages', async () => {
+    it('should handle junk data between messages', () => {
       const testResponse: JSONRPCResponse = {
         jsonrpc: '2.0',
         id: 789,

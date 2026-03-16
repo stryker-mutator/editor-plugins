@@ -1,4 +1,6 @@
-const injector: import('typed-inject').InjectorToken = '$injector';
+import type { InjectorToken } from 'typed-inject';
+
+const injector: InjectorToken = '$injector';
 
 /**
  * Common tokens used for dependency injection (see typed-inject readme for more information)

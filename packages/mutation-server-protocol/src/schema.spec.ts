@@ -1,3 +1,5 @@
+import { expect } from 'chai';
+
 import {
   ConfigureParams,
   DiscoveredMutant,
@@ -7,7 +9,6 @@ import {
   MutationTestParams,
   MutationTestResult,
 } from './schema.js';
-import { expect } from 'chai';
 
 describe('Schema', () => {
   describe('ConfigureParams', () => {

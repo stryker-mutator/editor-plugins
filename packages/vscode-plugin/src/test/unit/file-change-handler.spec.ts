@@ -1,12 +1,13 @@
-import sinon from 'sinon';
-import vscode from 'vscode';
 import { expect } from 'chai';
 import fs from 'fs/promises';
+import sinon from 'sinon';
+import type vscode from 'vscode';
+
 import { FileChangeHandler } from '../../file-change-handler.ts';
-import * as factory from '../factory.ts';
+import { ContextualLogger } from '../../logging/contextual-logger.ts';
 import { MutationServer } from '../../mutation-server.ts';
 import { TestExplorer } from '../../test-explorer.ts';
-import { ContextualLogger } from '../../logging/contextual-logger.ts';
+import * as factory from '../factory.ts';
 
 describe(FileChangeHandler.name, () => {
   let sandbox: sinon.SinonSandbox;
@@ -220,7 +221,7 @@ describe(FileChangeHandler.name, () => {
 
       // Assert
       expect(contextualLoggerMock.error).calledWith(
-        `Failed to process file changes: Error: Mutation server discovery failed for ${[{ path: '/path/to/file.ts' }]}`,
+        `Failed to process file changes: Error: Mutation server discovery failed for ${JSON.stringify([{ path: '/path/to/file.ts' }], undefined, 2)}`,
         'FileChangeHandler',
       );
       expect(testExplorerMock.processDiscoverResult).not.called;

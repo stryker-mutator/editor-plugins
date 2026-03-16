@@ -1,4 +1,5 @@
 import type { Injector } from 'typed-inject';
+
 import { commonTokens } from '../di/index.ts';
 import { Logger } from './index.ts';
 

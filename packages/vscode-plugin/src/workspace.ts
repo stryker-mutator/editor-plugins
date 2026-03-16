@@ -1,14 +1,15 @@
-import vscode from 'vscode';
-import { commonTokens } from './di/tokens.ts';
-import { ContextualLogger, provideLogger } from './logging/index.ts';
-import {
-  WorkspaceFolder,
-  Constants,
-  Process,
-  MutationServer,
-} from './index.ts';
-import type { BaseContext } from './di/index.ts';
 import { createInjector, type Injector } from 'typed-inject';
+import vscode from 'vscode';
+
+import type { BaseContext } from './di/index.ts';
+import { commonTokens } from './di/tokens.ts';
+import {
+  Constants,
+  MutationServer,
+  Process,
+  WorkspaceFolder,
+} from './index.ts';
+import { ContextualLogger, provideLogger } from './logging/index.ts';
 import { StdioTransport } from './transport/stdio-transport.ts';
 
 export class Workspace {
@@ -56,7 +57,8 @@ export class Workspace {
 
     await Promise.all(
       workspaceFolders.map((folder) =>
-        this.addWorkspaceFolder(folder).catch((error: any) => {
+        this.addWorkspaceFolder(folder).catch((error) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
           this.#logger.error(error.message ?? error);
         }),
       ),

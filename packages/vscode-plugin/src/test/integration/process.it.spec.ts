@@ -1,13 +1,14 @@
 import { expect } from 'chai';
+import { promises as fs } from 'fs';
+import os from 'os';
+import path from 'path';
 import sinon from 'sinon';
-import vscode from 'vscode';
-import { Process } from '../../process.ts';
-import { ContextualLogger } from '../../logging/index.ts';
+import type vscode from 'vscode';
+
 import { Configuration, Settings } from '../../config/index.ts';
 import { MissingServerPathError } from '../../errors.ts';
-import { promises as fs } from 'fs';
-import path from 'path';
-import os from 'os';
+import { ContextualLogger } from '../../logging/index.ts';
+import { Process } from '../../process.ts';
 
 describe(`${Process.name} (Integration)`, () => {
   let sandbox: sinon.SinonSandbox;
@@ -79,11 +80,7 @@ describe(`${Process.name} (Integration)`, () => {
     sut.dispose();
 
     // Clean up temp directory
-    try {
-      await fs.rm(tempDir, { recursive: true });
-    } catch (error) {
-      // Ignore cleanup errors
-    }
+    await fs.rm(tempDir, { force: true, recursive: true });
   });
 
   describe('init', () => {

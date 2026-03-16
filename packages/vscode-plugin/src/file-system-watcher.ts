@@ -1,10 +1,12 @@
+import { buffer, debounceTime, Subject } from 'rxjs';
 import vscode from 'vscode';
-import { Constants } from './index.ts';
-import { commonTokens } from './di/index.ts';
+
 import { Configuration, Settings } from './config/index.ts';
-import { Subject, buffer, debounceTime } from 'rxjs';
-import { FileChangeHandler } from './file-change-handler.ts';
-import { ContextualLogger } from './logging/contextual-logger.ts';
+import { commonTokens } from './di/index.ts';
+import type { FileChangeHandler } from './file-change-handler.ts';
+import { Constants } from './index.ts';
+import type { ContextualLogger } from './logging/contextual-logger.ts';
+
 export class FileSystemWatcher {
   private readonly workspaceFolder;
   private readonly fileChangeHandler;
@@ -36,6 +38,7 @@ export class FileSystemWatcher {
           ),
         ),
       )
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       .subscribe(async (uris) => {
         await this.fileChangeHandler.handleFilesChanged(uris);
       });
