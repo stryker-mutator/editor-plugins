@@ -12,13 +12,13 @@ importers:
         specifier: 10.0.1
         version: 10.0.1(eslint@10.0.3(jiti@2.6.1))
       '@types/chai':
-        specifier: ^5.2.2
+        specifier: 5.2.3
         version: 5.2.3
       '@types/mocha':
-        specifier: ^10.0.10
+        specifier: 10.0.10
         version: 10.0.10
       '@types/node':
-        specifier: ^24.7.2
+        specifier: 24.12.0
         version: 24.12.0
       chai:
         specifier: ^6.2.0
@@ -82,25 +82,25 @@ importers:
         version: 5.0.0
     devDependencies:
       '@types/chai':
-        specifier: ^5.2.2
+        specifier: 5.2.3
         version: 5.2.3
       '@types/chai-as-promised':
-        specifier: ^8.0.2
+        specifier: 8.0.2
         version: 8.0.2
       '@types/mocha':
-        specifier: ^10.0.10
+        specifier: 10.0.10
         version: 10.0.10
       '@types/node':
-        specifier: 24.x
+        specifier: 24.12.0
         version: 24.12.0
       '@types/sinon':
-        specifier: ^21.0.0
+        specifier: 21.0.0
         version: 21.0.0
       '@types/sinon-chai':
-        specifier: ^4.0.0
+        specifier: 4.0.0
         version: 4.0.0
       '@types/vscode':
-        specifier: ^1.104.0
+        specifier: 1.110.0
         version: 1.110.0
       '@vscode/test-cli':
         specifier: ^0.0.12
