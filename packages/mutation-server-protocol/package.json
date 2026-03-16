@@ -41,6 +41,6 @@
   },
   "homepage": "https://github.com/stryker-mutator/editor-plugins/tree/main/packages/mutation-server-protocol#readme",
   "dependencies": {
-    "zod": "^4.1.12"
+    "zod": "^4.3.5"
   }
 }
