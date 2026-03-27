@@ -41,6 +41,10 @@ Learn more about mutation testing and StrykerJS in the [official documentation](
 
   ![code-annotations.gif](https://raw.githubusercontent.com/stryker-mutator/editor-plugins/refs/heads/main/packages/vscode-plugin/images/inline-annotations.gif)
 
+- **Context Menu Commands:**
+  - Run mutation tests for a specific file directly from the Explorer or Editor context menu.
+  - Right-click any JavaScript/TypeScript file in the Explorer or on the editor tab to access the "Run Mutation Tests for File" command.
+
 ## Extension Settings
 
 This extension contributes the following settings:

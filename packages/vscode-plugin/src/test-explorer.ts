@@ -45,6 +45,10 @@ export class TestExplorer {
     await this.testRunner.runMutationTests(request, this.testController, token);
   }
 
+  async runMutationTestsForFile(fileUri: vscode.Uri) {
+    await this.testRunner.runMutationTestsForFile(fileUri);
+  }
+
   processDiscoverResult(
     discovery: DiscoverResult,
     serverWorkingDirectory: string,

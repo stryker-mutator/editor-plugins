@@ -46,8 +46,11 @@ describe(StdioTransport.name, () => {
       stderrCallback(testData);
 
       // Assert
-      expect(loggerMock.info.calledWith('error message\n', 'Server')).to.be
-        .true;
+      expect(
+        loggerMock.info.calledWith('error message\n', {
+          labels: ['Server'],
+        }),
+      ).to.be.true;
     });
   });
 

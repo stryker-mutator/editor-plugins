@@ -1,5 +1,6 @@
 import type {
   MutantResult,
+  MutationTestParams,
   MutationTestResult,
 } from 'mutation-server-protocol';
 import { lastValueFrom, mergeMap } from 'rxjs';
@@ -56,28 +57,14 @@ export class TestRunner {
     const queue: vscode.TestItem[] = request.include
       ? [...request.include]
       : [...testController.items].map(([, testItem]) => testItem);
-    queue.forEach((testItem) => {
-      testControllerUtils.traverse(testItem, (item) => {
-        testRun.started(item);
-      });
-    });
+    this.markAsStarted(testRun, queue);
     token.onCancellationRequested(() => {
       testRun.appendOutput('Test run cancellation requested, ending test run.');
       testRun.end();
     });
     const mutationTestParams = testItemUtils.toMutationTestParams(queue);
     try {
-      const mutationTestResult$ =
-        this.mutationServer.mutationTest(mutationTestParams);
-
-      // Subscribe to handle each emission from the observable
-      await lastValueFrom(
-        mutationTestResult$.pipe(
-          mergeMap(async (result) => {
-            await this.processMutationTestResult(result, testRun, queue);
-          }),
-        ),
-      );
+      await this.executeMutationTest(testRun, mutationTestParams, queue);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -97,16 +84,91 @@ export class TestRunner {
       this.logger.info('Mutation test run finished');
     }
   }
+
+  async runMutationTestsForFile(fileUri: vscode.Uri) {
+    this.logger.info(
+      `Starting file-scoped mutation test run for ${fileUri.fsPath}`,
+    );
+    const testRun = this.testController.createTestRun(
+      new vscode.TestRunRequest(),
+      'Mutation Test',
+      true,
+    );
+
+    const fileTestItems = this.getExistingFileTestItems(fileUri);
+    this.markAsStarted(testRun, fileTestItems);
+
+    const relativePath = testItemUtils.toWorkspaceRelativePath(fileUri);
+    const mutationTestParams: MutationTestParams = {
+      files: [{ path: relativePath }],
+    };
+
+    try {
+      await this.executeMutationTest(testRun, mutationTestParams);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Mutation server threw an exception during file-scoped mutation testing:\n${errorMessage}`,
+      );
+      testRun.appendOutput(`Mutation Server: ${errorMessage}\r\n`);
+    } finally {
+      testRun.end();
+      this.logger.info('File-scoped mutation test run finished');
+    }
+  }
+
+  private getExistingFileTestItems(fileUri: vscode.Uri): vscode.TestItem[] {
+    const fileTestItems: vscode.TestItem[] = [];
+    for (const [, rootItem] of this.testController.items) {
+      testControllerUtils.traverse(rootItem, (item) => {
+        if (item.uri?.fsPath === fileUri.fsPath && item.children.size > 0) {
+          fileTestItems.push(item);
+        }
+      });
+    }
+    return fileTestItems;
+  }
+
+  private markAsStarted(testRun: vscode.TestRun, testItems: vscode.TestItem[]) {
+    testItems.forEach((testItem) => {
+      testControllerUtils.traverse(testItem, (item) => {
+        testRun.started(item);
+      });
+    });
+  }
+
+  private async executeMutationTest(
+    testRun: vscode.TestRun,
+    mutationTestParams: MutationTestParams,
+    queue?: vscode.TestItem[],
+  ) {
+    const mutationTestResult$ =
+      this.mutationServer.mutationTest(mutationTestParams);
+
+    await lastValueFrom(
+      mutationTestResult$.pipe(
+        mergeMap(async (result) => {
+          await this.processMutationTestResult(result, testRun, queue);
+        }),
+      ),
+    );
+  }
+
   private async processMutationTestResult(
     mutationTestResult: MutationTestResult,
     testRun: vscode.TestRun,
-    queue: vscode.TestItem[],
+    queue?: vscode.TestItem[],
   ) {
+    // Process each mutant emitted by the mutation server and report it to the VS Code test run.
+    // When a queue is provided (normal run), only mutants that already exist in that queued
+    // test tree are handled. When queue is omitted (file-scoped run), all emitted mutants are
+    // handled, which allows direct file runs without relying on pre-discovered tree state.
     for (const [filePath, mutants] of Object.entries(
       mutationTestResult.files,
     )) {
       for (const mutant of mutants.mutants) {
-        if (!testItemUtils.isMutantInTestTree(mutant, queue)) {
+        if (queue && !testItemUtils.isMutantInTestTree(mutant, queue)) {
           continue;
         }
         const testItem = testControllerUtils.upsertMutantTestItem(

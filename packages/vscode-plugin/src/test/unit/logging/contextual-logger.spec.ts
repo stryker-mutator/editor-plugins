@@ -31,18 +31,21 @@ describe(ContextualLogger.name, () => {
       contextualLogger.info(message);
 
       expect(mockLogger.info.calledOnce).to.be.true;
-      expect(mockLogger.info.calledWith(message, testContext)).to.be.true;
+      expect(mockLogger.info.calledWith(message, { labels: [testContext] })).to
+        .be.true;
     });
 
     it('should call logger.info with context label, message and additional labels', () => {
       const message = 'Test info message';
       const additionalLabels = ['Label1', 'Label2'];
 
-      contextualLogger.info(message, ...additionalLabels);
+      contextualLogger.info(message, { labels: additionalLabels });
 
       expect(mockLogger.info.calledOnce).to.be.true;
       expect(
-        mockLogger.info.calledWith(message, testContext, 'Label1', 'Label2'),
+        mockLogger.info.calledWith(message, {
+          labels: [testContext, 'Label1', 'Label2'],
+        }),
       ).to.be.true;
     });
 
@@ -51,22 +54,37 @@ describe(ContextualLogger.name, () => {
 
       contextualLogger.info(message);
 
-      expect(mockLogger.info.calledWith(message, testContext)).to.be.true;
+      expect(mockLogger.info.calledWith(message, { labels: [testContext] })).to
+        .be.true;
     });
 
     it('should handle multiple additional labels', () => {
       const message = 'Test info message';
 
-      contextualLogger.info(message, 'Extra1', 'Extra2', 'Extra3');
+      contextualLogger.info(message, {
+        labels: ['Extra1', 'Extra2', 'Extra3'],
+      });
 
       expect(
-        mockLogger.info.calledWith(
-          message,
-          testContext,
-          'Extra1',
-          'Extra2',
-          'Extra3',
-        ),
+        mockLogger.info.calledWith(message, {
+          labels: [testContext, 'Extra1', 'Extra2', 'Extra3'],
+        }),
+      ).to.be.true;
+    });
+
+    it('should forward notify option after labels', () => {
+      const message = 'Test info message';
+
+      contextualLogger.info(message, {
+        labels: ['Extra1'],
+        notify: true,
+      });
+
+      expect(
+        mockLogger.info.calledWith(message, {
+          labels: [testContext, 'Extra1'],
+          notify: true,
+        }),
       ).to.be.true;
     });
   });
@@ -78,33 +96,47 @@ describe(ContextualLogger.name, () => {
       contextualLogger.warn(message);
 
       expect(mockLogger.warn.calledOnce).to.be.true;
-      expect(mockLogger.warn.calledWith(message, testContext)).to.be.true;
+      expect(mockLogger.warn.calledWith(message, { labels: [testContext] })).to
+        .be.true;
     });
 
     it('should call logger.warn with context label, message and additional labels', () => {
       const message = 'Test warning message';
       const additionalLabels = ['WarnLabel1', 'WarnLabel2'];
 
-      contextualLogger.warn(message, ...additionalLabels);
+      contextualLogger.warn(message, { labels: additionalLabels });
 
       expect(mockLogger.warn.calledOnce).to.be.true;
       expect(
-        mockLogger.warn.calledWith(
-          message,
-          testContext,
-          'WarnLabel1',
-          'WarnLabel2',
-        ),
+        mockLogger.warn.calledWith(message, {
+          labels: [testContext, 'WarnLabel1', 'WarnLabel2'],
+        }),
       ).to.be.true;
     });
 
     it('should handle single additional label', () => {
       const message = 'Test warning message';
 
-      contextualLogger.warn(message, 'SingleLabel');
+      contextualLogger.warn(message, { labels: ['SingleLabel'] });
 
-      expect(mockLogger.warn.calledWith(message, testContext, 'SingleLabel')).to
-        .be.true;
+      expect(
+        mockLogger.warn.calledWith(message, {
+          labels: [testContext, 'SingleLabel'],
+        }),
+      ).to.be.true;
+    });
+
+    it('should forward notify option', () => {
+      const message = 'Test warning message';
+
+      contextualLogger.warn(message, { notify: true });
+
+      expect(
+        mockLogger.warn.calledWith(message, {
+          labels: [testContext],
+          notify: true,
+        }),
+      ).to.be.true;
     });
   });
 
@@ -115,37 +147,50 @@ describe(ContextualLogger.name, () => {
       contextualLogger.error(message);
 
       expect(mockLogger.error.calledOnce).to.be.true;
-      expect(mockLogger.error.calledWith(message, testContext)).to.be.true;
+      expect(mockLogger.error.calledWith(message, { labels: [testContext] })).to
+        .be.true;
     });
 
     it('should call logger.error with context label, message and additional labels', () => {
       const message = 'Test error message';
       const additionalLabels = ['ErrorLabel1', 'ErrorLabel2'];
 
-      contextualLogger.error(message, ...additionalLabels);
+      contextualLogger.error(message, { labels: additionalLabels });
 
       expect(mockLogger.error.calledOnce).to.be.true;
       expect(
-        mockLogger.error.calledWith(
-          message,
-          testContext,
-          'ErrorLabel1',
-          'ErrorLabel2',
-        ),
+        mockLogger.error.calledWith(message, {
+          labels: [testContext, 'ErrorLabel1', 'ErrorLabel2'],
+        }),
       ).to.be.true;
     });
 
     it('should preserve label order with context first', () => {
       const message = 'Test error message';
 
-      contextualLogger.error(message, 'Second', 'Third');
+      contextualLogger.error(message, { labels: ['Second', 'Third'] });
 
-      const [actualMessage, firstLabel, secondLabel, thirdLabel] =
-        mockLogger.error.firstCall.args;
+      const [actualMessage, args] = mockLogger.error.firstCall.args;
       expect(actualMessage).to.equal(message);
-      expect(firstLabel).to.equal(testContext);
-      expect(secondLabel).to.equal('Second');
-      expect(thirdLabel).to.equal('Third');
+      expect(args).to.deep.equal({
+        labels: [testContext, 'Second', 'Third'],
+      });
+    });
+
+    it('should forward notify option after labels', () => {
+      const message = 'Test error message';
+
+      contextualLogger.error(message, {
+        labels: ['Second'],
+        notify: true,
+      });
+
+      expect(
+        mockLogger.error.calledWith(message, {
+          labels: [testContext, 'Second'],
+          notify: true,
+        }),
+      ).to.be.true;
     });
   });
 

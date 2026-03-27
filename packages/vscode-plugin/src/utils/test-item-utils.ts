@@ -10,6 +10,10 @@ import vscode from 'vscode';
 import { locationUtils } from './location-utils.ts';
 
 export const testItemUtils = {
+  toWorkspaceRelativePath(uri: vscode.Uri): string {
+    return vscode.workspace.asRelativePath(uri, false).replaceAll('\\', '/');
+  },
+
   resolveFromWorkspaceRoot(
     workspaceFolder: vscode.WorkspaceFolder,
     serverWorkingDirectory: string,
@@ -54,9 +58,7 @@ export const testItemUtils = {
       const uri = testItem.uri;
 
       const isDirectory = fs.lstatSync(uri.fsPath).isDirectory();
-      let relativePath = vscode.workspace
-        .asRelativePath(uri, false)
-        .replaceAll('\\', '/');
+      let relativePath = testItemUtils.toWorkspaceRelativePath(uri);
       if (isDirectory) {
         relativePath = `${relativePath}/`;
       }

@@ -26,7 +26,7 @@ export class StdioTransport extends BaseTransport {
     });
 
     this.process.on('stderr', (data: Buffer) => {
-      this.logger.info(data.toString(), 'Server');
+      this.logger.info(data.toString(), { labels: ['Server'] });
     });
 
     this.connected = true;

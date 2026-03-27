@@ -45,7 +45,7 @@ export class Workspace {
 
     await Promise.all(
       this.#workspaceFolders.map((wf) =>
-        this.removeWorkspaceFolder(wf.getWorkspaceFolder()),
+        this.removeWorkspaceFolder(wf.workspaceFolder),
       ),
     );
 
@@ -66,7 +66,7 @@ export class Workspace {
   }
   private async removeWorkspaceFolder(folder: vscode.WorkspaceFolder) {
     const index = this.#workspaceFolders.findIndex(
-      (wf) => wf.getWorkspaceFolder() === folder,
+      (wf) => wf.workspaceFolder === folder,
     );
 
     if (index !== -1) {
@@ -103,9 +103,7 @@ export class Workspace {
   }
 
   private workspaceFolderExists(folder: vscode.WorkspaceFolder) {
-    return this.#workspaceFolders.some(
-      (wf) => wf.getWorkspaceFolder() === folder,
-    );
+    return this.#workspaceFolders.some((wf) => wf.workspaceFolder === folder);
   }
 
   private async onWorkspaceFoldersChanged(
@@ -124,13 +122,11 @@ export class Workspace {
     event: vscode.ConfigurationChangeEvent,
   ) {
     for (const wf of this.#workspaceFolders) {
-      if (
-        event.affectsConfiguration(Constants.AppName, wf.getWorkspaceFolder())
-      ) {
+      if (event.affectsConfiguration(Constants.AppName, wf.workspaceFolder)) {
         this.#logger.info(
-          `Configuration changed for ${wf.getWorkspaceFolder().uri.fsPath}. Reloading workspace folder`,
+          `Configuration changed for ${wf.workspaceFolder.uri.fsPath}. Reloading workspace folder`,
         );
-        await this.reloadWorkspaceFolder(wf.getWorkspaceFolder());
+        await this.reloadWorkspaceFolder(wf.workspaceFolder);
       }
     }
   }
@@ -139,9 +135,32 @@ export class Workspace {
     this.#logger.info('Reloading workspace');
     await Promise.all(
       this.#workspaceFolders.map(async (folder) => {
-        await this.reloadWorkspaceFolder(folder.getWorkspaceFolder());
+        await this.reloadWorkspaceFolder(folder.workspaceFolder);
       }),
     );
+  }
+
+  public async runMutationTestsForFile(fileUri: vscode.Uri) {
+    const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
+    if (!workspaceFolder) {
+      this.#logger.warn(
+        `No workspace folder found for file: ${fileUri.fsPath}. Skipping file-scoped mutation test run.`,
+      );
+      return;
+    }
+
+    const targetWorkspaceFolder = this.#workspaceFolders.find(
+      (wf) => wf.workspaceFolder === workspaceFolder,
+    );
+
+    if (!targetWorkspaceFolder) {
+      this.#logger.warn(
+        `Workspace folder is not initialized for file: ${fileUri.fsPath}. Skipping file-scoped mutation test run.`,
+      );
+      return;
+    }
+
+    await targetWorkspaceFolder.runMutationTestsForFile(fileUri);
   }
 
   private async reloadWorkspaceFolder(workspaceFolder: vscode.WorkspaceFolder) {

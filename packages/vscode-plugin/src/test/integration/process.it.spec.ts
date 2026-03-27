@@ -80,7 +80,11 @@ describe(`${Process.name} (Integration)`, () => {
     sut.dispose();
 
     // Clean up temp directory
-    await fs.rm(tempDir, { force: true, recursive: true });
+    try {
+      await fs.rm(tempDir, { force: true, recursive: true });
+    } catch {
+      // Ignore errors during cleanup
+    }
   });
 
   describe('init', () => {

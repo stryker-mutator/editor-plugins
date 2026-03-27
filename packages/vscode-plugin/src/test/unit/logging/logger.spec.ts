@@ -5,6 +5,9 @@ import vscode from 'vscode';
 import { Logger } from '../../../logging/logger.ts';
 
 describe(Logger.name, () => {
+  let showInformationMessageStub: sinon.SinonStub;
+  let showWarningMessageStub: sinon.SinonStub;
+  let showErrorMessageStub: sinon.SinonStub;
   let mockOutputChannel: sinon.SinonStubbedInstance<vscode.LogOutputChannel>;
   let logger: Logger;
   const channelName = 'Test Channel';
@@ -21,6 +24,16 @@ describe(Logger.name, () => {
     } as unknown as sinon.SinonStubbedInstance<vscode.LogOutputChannel>;
 
     sinon.stub(vscode.window, 'createOutputChannel').returns(mockOutputChannel);
+
+    showInformationMessageStub = sinon
+      .stub(vscode.window, 'showInformationMessage')
+      .resolves(undefined);
+    showWarningMessageStub = sinon
+      .stub(vscode.window, 'showWarningMessage')
+      .resolves(undefined);
+    showErrorMessageStub = sinon
+      .stub(vscode.window, 'showErrorMessage')
+      .resolves(undefined);
 
     logger = new Logger(channelName);
   });
@@ -43,7 +56,7 @@ describe(Logger.name, () => {
       const message = 'Test info message';
       const label = 'TestLabel';
 
-      logger.info(message, label);
+      logger.info(message, { labels: [label] });
 
       expect(mockOutputChannel.appendLine.calledWith(`[${label}] ${message}`))
         .to.be.true;
@@ -53,7 +66,7 @@ describe(Logger.name, () => {
       const message = 'Test info message';
       const labels = ['Label1', 'Label2', 'Label3'];
 
-      logger.info(message, ...labels);
+      logger.info(message, { labels });
 
       expect(
         mockOutputChannel.appendLine.calledWith(
@@ -78,6 +91,37 @@ describe(Logger.name, () => {
       expect(mockOutputChannel.appendLine.calledWith(expectedMessage)).to.be
         .true;
     });
+
+    it('should show information notification when notify is true', () => {
+      const message = 'Test info message';
+
+      logger.info(message, { notify: true });
+
+      expect(showInformationMessageStub.calledOnceWithExactly(message)).to.be
+        .true;
+      expect(showWarningMessageStub.called).to.be.false;
+      expect(showErrorMessageStub.called).to.be.false;
+    });
+
+    it('should still support labels with notify option', () => {
+      const message = 'Test info message';
+
+      logger.info(message, {
+        labels: ['Label1', 'Label2'],
+        notify: true,
+      });
+
+      expect(
+        mockOutputChannel.appendLine.calledWith(
+          '[Label1] [Label2] Test info message',
+        ),
+      ).to.be.true;
+      expect(
+        showInformationMessageStub.calledOnceWithExactly(
+          '[Label1] [Label2] Test info message',
+        ),
+      ).to.be.true;
+    });
   });
 
   describe('warn', () => {
@@ -95,7 +139,7 @@ describe(Logger.name, () => {
       const message = 'Test warning message';
       const labels = ['WarnLabel1', 'WarnLabel2'];
 
-      logger.warn(message, ...labels);
+      logger.warn(message, { labels });
 
       expect(
         mockOutputChannel.appendLine.calledWith(
@@ -121,6 +165,16 @@ describe(Logger.name, () => {
       expect(mockOutputChannel.appendLine.calledWith(expectedMessage)).to.be
         .true;
     });
+
+    it('should show warning notification when notify is true', () => {
+      const message = 'Test warning message';
+
+      logger.warn(message, { notify: true });
+
+      expect(showWarningMessageStub.calledOnceWithExactly(message)).to.be.true;
+      expect(showInformationMessageStub.called).to.be.false;
+      expect(showErrorMessageStub.called).to.be.false;
+    });
   });
 
   describe('error', () => {
@@ -138,7 +192,7 @@ describe(Logger.name, () => {
       const message = 'Test error message';
       const labels = ['ErrorLabel1', 'ErrorLabel2'];
 
-      logger.error(message, ...labels);
+      logger.error(message, { labels });
 
       expect(
         mockOutputChannel.appendLine.calledWith(
@@ -163,6 +217,16 @@ describe(Logger.name, () => {
 
       expect(mockOutputChannel.appendLine.calledWith(expectedMessage)).to.be
         .true;
+    });
+
+    it('should show error notification when notify is true', () => {
+      const message = 'Test error message';
+
+      logger.error(message, { notify: true });
+
+      expect(showErrorMessageStub.calledOnceWithExactly(message)).to.be.true;
+      expect(showInformationMessageStub.called).to.be.false;
+      expect(showWarningMessageStub.called).to.be.false;
     });
   });
 
@@ -189,14 +253,14 @@ describe(Logger.name, () => {
     });
 
     it('should handle single empty string label', () => {
-      logger.info('Test message', '');
+      logger.info('Test message', { labels: [''] });
 
       expect(mockOutputChannel.appendLine.calledWith('[] Test message')).to.be
         .true;
     });
 
     it('should format labels with brackets and spaces correctly', () => {
-      logger.warn('Test message', 'Label1', 'Label2');
+      logger.warn('Test message', { labels: ['Label1', 'Label2'] });
 
       expect(
         mockOutputChannel.appendLine.calledWith(
@@ -207,7 +271,7 @@ describe(Logger.name, () => {
 
     it('should handle special characters in labels', () => {
       const specialLabel = 'Label-With_Special#Characters';
-      logger.error('Test message', specialLabel);
+      logger.error('Test message', { labels: [specialLabel] });
 
       expect(
         mockOutputChannel.appendLine.calledWith(
@@ -218,7 +282,7 @@ describe(Logger.name, () => {
 
     it('should handle special characters in messages', () => {
       const specialMessage = 'Message with special chars: @#$%^&*()';
-      logger.info(specialMessage, 'Label');
+      logger.info(specialMessage, { labels: ['Label'] });
 
       expect(
         mockOutputChannel.appendLine.calledWith(`[Label] ${specialMessage}`),
@@ -228,7 +292,7 @@ describe(Logger.name, () => {
 
   describe('level formatting', () => {
     it('should not add level prefix for info messages', () => {
-      logger.info('Test', 'Label');
+      logger.info('Test', { labels: ['Label'] });
 
       const expectedCall = mockOutputChannel.appendLine.firstCall;
       expect(expectedCall.args[0]).to.not.include('[INFO]');
@@ -251,9 +315,9 @@ describe(Logger.name, () => {
 
   describe('integration scenarios', () => {
     it('should handle multiple logging calls independently', () => {
-      logger.info('Info message', 'InfoLabel');
-      logger.warn('Warning message', 'WarnLabel');
-      logger.error('Error message', 'ErrorLabel');
+      logger.info('Info message', { labels: ['InfoLabel'] });
+      logger.warn('Warning message', { labels: ['WarnLabel'] });
+      logger.error('Error message', { labels: ['ErrorLabel'] });
 
       expect(mockOutputChannel.appendLine.calledThrice).to.be.true;
       expect(
@@ -282,7 +346,7 @@ describe(Logger.name, () => {
 
     it('should handle many labels', () => {
       const manyLabels = Array.from({ length: 10 }, (_, i) => `Label${i}`);
-      logger.info('Test', ...manyLabels);
+      logger.info('Test', { labels: manyLabels });
 
       const expectedPrefix = manyLabels.map((l) => `[${l}]`).join(' ') + ' ';
       expect(mockOutputChannel.appendLine.calledWith(`${expectedPrefix}Test`))

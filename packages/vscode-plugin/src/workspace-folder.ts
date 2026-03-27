@@ -17,9 +17,10 @@ export interface WorkspaceFolderContext extends BaseContext {
 }
 export class WorkspaceFolder {
   private readonly injector;
-  private readonly workspaceFolder;
+  readonly workspaceFolder;
   private readonly mutationServer;
   private readonly logger;
+  #initialized = false;
   #fileSystemWatcher?: FileSystemWatcher;
   #testExplorer?: TestExplorer;
   static readonly inject = [
@@ -40,6 +41,8 @@ export class WorkspaceFolder {
     this.logger = logger;
   }
   async init() {
+    this.#initialized = false;
+
     const enabled = Configuration.getSettingOrDefault<boolean>(
       Settings.enable,
       true,
@@ -88,11 +91,38 @@ export class WorkspaceFolder {
       discoverResult,
       serverWorkspaceDirectory,
     );
+
+    this.#initialized = true;
   }
-  getWorkspaceFolder(): vscode.WorkspaceFolder {
-    return this.workspaceFolder;
+
+  async runMutationTestsForFile(fileUri: vscode.Uri) {
+    const enabled = Configuration.getSettingOrDefault<boolean>(
+      Settings.enable,
+      true,
+      this.workspaceFolder,
+    );
+
+    if (!enabled) {
+      this.logger.error(
+        `Setting 'strykerMutator.enable' is false. Skipping mutation test run for: ${fileUri.fsPath}`,
+        { notify: true },
+      );
+      return;
+    }
+
+    if (!this.#initialized) {
+      this.logger.error(
+        `Workspace folder is not initialized for: ${this.workspaceFolder.uri.fsPath}. Skipping mutation test run for: ${fileUri.fsPath}`,
+        { notify: true },
+      );
+      return;
+    }
+
+    await this.#testExplorer!.runMutationTestsForFile(fileUri);
   }
+
   async dispose() {
+    this.#initialized = false;
     this.#fileSystemWatcher?.dispose();
     await this.#testExplorer?.dispose();
     await this.mutationServer.dispose();
