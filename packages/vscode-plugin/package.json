@@ -7,7 +7,7 @@
   "private": true,
   "author": "Jasper van der Veen",
   "engines": {
-    "vscode": "^1.104.3"
+    "vscode": "^1.110.0"
   },
   "categories": [
     "Testing"
