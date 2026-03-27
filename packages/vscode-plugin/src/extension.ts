@@ -5,7 +5,7 @@ import { Workspace } from './index.ts';
 
 let workspace: Workspace | undefined;
 
-export async function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext) {
   workspace = new Workspace(context, createInjector);
 
   context.subscriptions.push(

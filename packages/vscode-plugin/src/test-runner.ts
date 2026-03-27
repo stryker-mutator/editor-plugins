@@ -1,10 +1,11 @@
 import type {
   MutantResult,
-  MutationTestResult,
   MutationTestParams,
+  MutationTestResult,
 } from 'mutation-server-protocol';
 import { lastValueFrom, mergeMap } from 'rxjs';
 import vscode from 'vscode';
+
 import { commonTokens } from './di/index.ts';
 import type { MutationServer } from './index.ts';
 import type { ContextualLogger } from './logging/index.ts';
@@ -104,7 +105,7 @@ export class TestRunner {
 
     try {
       await this.executeMutationTest(testRun, mutationTestParams);
-    } catch (error: Error | unknown) {
+    } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       this.logger.error(

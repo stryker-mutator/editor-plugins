@@ -1,10 +1,11 @@
-import sinon from 'sinon';
-import vscode from 'vscode';
 import { expect } from 'chai';
 import { of, throwError } from 'rxjs';
-import { TestRunner } from '../../test-runner.ts';
-import { MutationServer } from '../../mutation-server.ts';
+import sinon from 'sinon';
+import vscode from 'vscode';
+
 import { ContextualLogger } from '../../logging/contextual-logger.ts';
+import { MutationServer } from '../../mutation-server.ts';
+import { TestRunner } from '../../test-runner.ts';
 import { testControllerUtils, testItemUtils } from '../../utils/index.ts';
 import * as factory from '../factory.ts';
 
@@ -66,7 +67,7 @@ describe(TestRunner.name, () => {
       isCancellationRequested: false,
       onCancellationRequested: (callback: () => void) => {
         onRegister?.(callback);
-        return { dispose() {} } as vscode.Disposable;
+        return { dispose: sinon.stub() } as unknown as vscode.Disposable;
       },
     } as vscode.CancellationToken;
   }
@@ -146,7 +147,9 @@ describe(TestRunner.name, () => {
       uri: fileUri,
       children: {
         size: 0,
-        [Symbol.iterator]: function* () {},
+        [Symbol.iterator]: function* () {
+          yield* [] as [string, vscode.TestItem][];
+        },
       },
     } as unknown as vscode.TestItem;
 

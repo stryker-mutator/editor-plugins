@@ -1,10 +1,11 @@
+import { expect } from 'chai';
 import sinon from 'sinon';
 import vscode from 'vscode';
-import { expect } from 'chai';
-import { Workspace } from '../../workspace.ts';
-import * as factory from '../factory.ts';
+
 import { ContextualLogger } from '../../logging/contextual-logger.ts';
+import { Workspace } from '../../workspace.ts';
 import { WorkspaceFolder } from '../../workspace-folder.ts';
+import * as factory from '../factory.ts';
 
 describe(Workspace.name, () => {
   let sandbox: sinon.SinonSandbox;
