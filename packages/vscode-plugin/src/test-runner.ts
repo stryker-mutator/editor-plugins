@@ -96,9 +96,7 @@ export class TestRunner {
     const fileTestItems = this.getExistingFileTestItems(fileUri);
     this.markAsStarted(testRun, fileTestItems);
 
-    const relativePath = vscode.workspace
-      .asRelativePath(fileUri, false)
-      .replaceAll('\\', '/');
+    const relativePath = testItemUtils.toWorkspaceRelativePath(fileUri);
     const mutationTestParams: MutationTestParams = {
       files: [{ path: relativePath }],
     };
