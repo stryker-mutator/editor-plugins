@@ -9,8 +9,6 @@ import { testControllerUtils, testItemUtils } from '../../utils/index.ts';
 import * as factory from '../factory.ts';
 
 describe(TestRunner.name, () => {
-  let sandbox: sinon.SinonSandbox;
-
   function createWorkspaceFolder(): vscode.WorkspaceFolder {
     return {
       uri: vscode.Uri.file('/workspace'),
@@ -21,13 +19,13 @@ describe(TestRunner.name, () => {
 
   function createTestRunStubs() {
     return {
-      appendOutput: sandbox.stub(),
-      passed: sandbox.stub(),
-      failed: sandbox.stub(),
-      skipped: sandbox.stub(),
-      errored: sandbox.stub(),
-      started: sandbox.stub(),
-      end: sandbox.stub(),
+      appendOutput: sinon.stub(),
+      passed: sinon.stub(),
+      failed: sinon.stub(),
+      skipped: sinon.stub(),
+      errored: sinon.stub(),
+      started: sinon.stub(),
+      end: sinon.stub(),
     };
   }
 
@@ -43,7 +41,7 @@ describe(TestRunner.name, () => {
           }
         },
       },
-      createTestRun: sandbox
+      createTestRun: sinon
         .stub()
         .returns(testRun as unknown as vscode.TestRun),
     } as unknown as vscode.TestController;
@@ -76,11 +74,11 @@ describe(TestRunner.name, () => {
   }
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
+    sinon = sinon.createsinon();
   });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
   });
 
   it('runs file-scoped mutation testing without queue tree preconditions', async () => {
@@ -94,11 +92,11 @@ describe(TestRunner.name, () => {
     const testRun = createTestRunStubs();
     const testController = createTestController(testRun);
 
-    sandbox.stub(vscode.workspace, 'asRelativePath').returns('src/file.ts');
-    sandbox
+    sinon.stub(vscode.workspace, 'asRelativePath').returns('src/file.ts');
+    sinon
       .stub(testControllerUtils, 'upsertMutantTestItem')
       .returns(testItem as unknown as vscode.TestItem);
-    const isMutantInTestTreeStub = sandbox
+    const isMutantInTestTreeStub = sinon
       .stub(testItemUtils, 'isMutantInTestTree')
       .returns(true);
 
@@ -163,8 +161,8 @@ describe(TestRunner.name, () => {
       ['file.ts', fileTestItem],
     ]);
 
-    sandbox.stub(vscode.workspace, 'asRelativePath').returns('src/file.ts');
-    sandbox
+    sinon.stub(vscode.workspace, 'asRelativePath').returns('src/file.ts');
+    sinon
       .stub(testControllerUtils, 'upsertMutantTestItem')
       .returns(mutantItem);
 
@@ -198,16 +196,16 @@ describe(TestRunner.name, () => {
       ['queued-item', queuedItem],
     ]);
 
-    const traverseStub = sandbox
+    const traverseStub = sinon
       .stub(testControllerUtils, 'traverse')
       .callsFake((item, action) => action(item));
-    const toMutationTestParamsStub = sandbox
+    const toMutationTestParamsStub = sinon
       .stub(testItemUtils, 'toMutationTestParams')
       .returns({ files: [{ path: 'src/file.ts' }] });
-    const isMutantInTestTreeStub = sandbox
+    const isMutantInTestTreeStub = sinon
       .stub(testItemUtils, 'isMutantInTestTree')
       .returns(false);
-    const upsertStub = sandbox.stub(
+    const upsertStub = sinon.stub(
       testControllerUtils,
       'upsertMutantTestItem',
     );
@@ -250,10 +248,10 @@ describe(TestRunner.name, () => {
       ['queued-item', queuedItem],
     ]);
 
-    sandbox
+    sinon
       .stub(testControllerUtils, 'traverse')
       .callsFake((item, action) => action(item));
-    sandbox
+    sinon
       .stub(testItemUtils, 'toMutationTestParams')
       .returns({ files: [{ path: 'src/file.ts' }] });
     mutationServerMock.mutationTest.returns(
@@ -283,10 +281,10 @@ describe(TestRunner.name, () => {
       ['queued-item', queuedItem],
     ]);
 
-    sandbox
+    sinon
       .stub(testControllerUtils, 'traverse')
       .callsFake((item, action) => action(item));
-    sandbox
+    sinon
       .stub(testItemUtils, 'toMutationTestParams')
       .returns({ files: [{ path: 'src/file.ts' }] });
     mutationServerMock.mutationTest.returns(of({ files: {} }));
@@ -318,8 +316,8 @@ describe(TestRunner.name, () => {
     const testRun = createTestRunStubs();
     const testController = createTestController(testRun);
 
-    sandbox.stub(vscode.workspace, 'asRelativePath').returns('src/file.ts');
-    sandbox
+    sinon.stub(vscode.workspace, 'asRelativePath').returns('src/file.ts');
+    sinon
       .stub(testControllerUtils, 'upsertMutantTestItem')
       .returns(testItem as unknown as vscode.TestItem);
     mutationServerMock.mutationTest.returns(
