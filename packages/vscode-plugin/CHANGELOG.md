@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/stryker-mutator/editor-plugins/compare/stryker-mutator@0.4.1...stryker-mutator@0.5.0) (2026-03-27)
+
+### Bug Fixes
+
+- **deps:** pin dependencies ([#122](https://github.com/stryker-mutator/editor-plugins/issues/122)) ([45112da](https://github.com/stryker-mutator/editor-plugins/commit/45112da83b49f8b27f7151ff4e5050865bad4a51))
+- update vscode engine version to ^1.110.0 ([#142](https://github.com/stryker-mutator/editor-plugins/issues/142)) ([905c1e0](https://github.com/stryker-mutator/editor-plugins/commit/905c1e0947f73106b3d5bb72a0808e8d8c08ff5c))
+
+### Features
+
+- **vscode:** run mutation tests for a specific file directly from the Explorer or Editor context menu. ([#114](https://github.com/stryker-mutator/editor-plugins/issues/114)) ([132f094](https://github.com/stryker-mutator/editor-plugins/commit/132f09418879c47cc9c597ff70079543c46b566b))
+
 ## [0.4.1](https://github.com/stryker-mutator/editor-plugins/compare/stryker-mutator@0.4.0...stryker-mutator@0.4.1) (2026-01-18)
 
 **Note:** Version bump only for package stryker-mutator

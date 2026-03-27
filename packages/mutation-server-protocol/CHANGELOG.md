@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.2](https://github.com/stryker-mutator/editor-plugins/compare/mutation-server-protocol@0.4.1...mutation-server-protocol@0.4.2) (2026-03-27)
+
+### Bug Fixes
+
+- **deps:** pin dependencies ([#122](https://github.com/stryker-mutator/editor-plugins/issues/122)) ([45112da](https://github.com/stryker-mutator/editor-plugins/commit/45112da83b49f8b27f7151ff4e5050865bad4a51))
+
 ## [0.4.1](https://github.com/stryker-mutator/editor-plugins/compare/mutation-server-protocol@0.4.0...mutation-server-protocol@0.4.1) (2026-01-16)
 
 **Note:** Version bump only for package mutation-server-protocol
