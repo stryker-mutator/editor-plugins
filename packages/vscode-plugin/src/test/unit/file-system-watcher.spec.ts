@@ -1,12 +1,13 @@
+import { expect } from 'chai';
 import sinon from 'sinon';
 import vscode from 'vscode';
-import { expect } from 'chai';
-import { FileSystemWatcher } from '../../file-system-watcher.ts';
-import * as factory from '../factory.ts';
-import { FileChangeHandler } from '../../file-change-handler.ts';
-import { ContextualLogger } from '../../logging/contextual-logger.ts';
+
 import { Configuration, Settings } from '../../config/index.ts';
 import { Constants } from '../../constants.ts';
+import { FileChangeHandler } from '../../file-change-handler.ts';
+import { FileSystemWatcher } from '../../file-system-watcher.ts';
+import { ContextualLogger } from '../../logging/contextual-logger.ts';
+import * as factory from '../factory.ts';
 
 describe(FileSystemWatcher.name, () => {
   let sandbox: sinon.SinonSandbox;
@@ -31,7 +32,7 @@ describe(FileSystemWatcher.name, () => {
       onDidChange: sandbox.stub(),
       onDidDelete: sandbox.stub(),
       dispose: sandbox.stub(),
-    } as any;
+    } as unknown as sinon.SinonStubbedInstance<vscode.FileSystemWatcher>;
 
     // Stub VS Code workspace API
     createFileSystemWatcherStub = sandbox

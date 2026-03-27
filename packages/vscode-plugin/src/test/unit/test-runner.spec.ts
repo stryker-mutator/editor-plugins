@@ -41,9 +41,7 @@ describe(TestRunner.name, () => {
           }
         },
       },
-      createTestRun: sinon
-        .stub()
-        .returns(testRun as unknown as vscode.TestRun),
+      createTestRun: sinon.stub().returns(testRun as unknown as vscode.TestRun),
     } as unknown as vscode.TestController;
   }
 
@@ -72,10 +70,6 @@ describe(TestRunner.name, () => {
       },
     } as vscode.CancellationToken;
   }
-
-  beforeEach(() => {
-    sinon = sinon.createsinon();
-  });
 
   afterEach(() => {
     sinon.restore();
@@ -162,9 +156,7 @@ describe(TestRunner.name, () => {
     ]);
 
     sinon.stub(vscode.workspace, 'asRelativePath').returns('src/file.ts');
-    sinon
-      .stub(testControllerUtils, 'upsertMutantTestItem')
-      .returns(mutantItem);
+    sinon.stub(testControllerUtils, 'upsertMutantTestItem').returns(mutantItem);
 
     mutationServerMock.mutationTest.returns(
       of(
@@ -205,10 +197,7 @@ describe(TestRunner.name, () => {
     const isMutantInTestTreeStub = sinon
       .stub(testItemUtils, 'isMutantInTestTree')
       .returns(false);
-    const upsertStub = sinon.stub(
-      testControllerUtils,
-      'upsertMutantTestItem',
-    );
+    const upsertStub = sinon.stub(testControllerUtils, 'upsertMutantTestItem');
 
     mutationServerMock.mutationTest.returns(
       of(

@@ -1,7 +1,7 @@
-import { ContextualLogger } from '../logging/index.ts';
-import { BaseTransport } from './base-transport.ts';
 import { commonTokens } from '../di/index.ts';
-import { Process } from '../process.ts';
+import type { ContextualLogger } from '../logging/index.ts';
+import type { Process } from '../process.ts';
+import { BaseTransport } from './base-transport.ts';
 
 /**
  * Stdio-based transport implementation
@@ -30,6 +30,7 @@ export class StdioTransport extends BaseTransport {
     });
 
     this.connected = true;
+    return Promise.resolve();
   }
 
   send(message: string): void {
@@ -46,5 +47,6 @@ export class StdioTransport extends BaseTransport {
   async dispose(): Promise<void> {
     this.connected = false;
     this.completeSubjects();
+    return Promise.resolve();
   }
 }

@@ -1,7 +1,5 @@
-import { commonTokens } from './di/index.ts';
 import { JSONRPCClient } from 'json-rpc-2.0';
-import { StdioTransport } from './transport/index.ts';
-import {
+import type {
   ConfigureParams,
   ConfigureResult,
   DiscoverParams,
@@ -9,10 +7,16 @@ import {
   MutationTestParams,
   MutationTestResult,
 } from 'mutation-server-protocol';
-import { filter, map, Observable, merge, from, takeUntil } from 'rxjs';
-import vscode from 'vscode';
+import type { Observable } from 'rxjs';
+import { filter, from, map, merge, takeUntil } from 'rxjs';
+import type vscode from 'vscode';
+
 import { Configuration, Settings } from './config/index.ts';
-import { Constants, Process } from './index.ts';
+import { commonTokens } from './di/index.ts';
+import type { Process } from './index.ts';
+import { Constants } from './index.ts';
+import type { StdioTransport } from './transport/index.ts';
+
 const rpcMethods = Object.freeze({
   configure: 'configure',
   discover: 'discover',
@@ -72,18 +76,18 @@ export class MutationServer {
     );
 
     const configureParams: ConfigureParams = { configFilePath: configFilePath };
-    return await this.jsonRPCClient.request(
+    return (await this.jsonRPCClient.request(
       rpcMethods.configure,
       configureParams,
-    );
+    )) as ConfigureResult;
   }
   public async discover(
     discoverParams: DiscoverParams,
   ): Promise<DiscoverResult> {
-    return await this.jsonRPCClient.request(
+    return (await this.jsonRPCClient.request(
       rpcMethods.discover,
       discoverParams,
-    );
+    )) as DiscoverResult;
   }
 
   public mutationTest(

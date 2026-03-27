@@ -1,8 +1,9 @@
-import vscode from 'vscode';
-import { DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
-import { testItemUtils } from './test-item-utils.ts';
-import { locationUtils } from './location-utils.ts';
+import type { DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
 import path from 'path';
+import vscode from 'vscode';
+
+import { locationUtils } from './location-utils.ts';
+import { testItemUtils } from './test-item-utils.ts';
 
 export const testControllerUtils = {
   traverse(
@@ -92,7 +93,7 @@ export const testControllerUtils = {
 
     for (const directory of directories) {
       const node = currentCollection.get(directory);
-      if (node && node.id === fileName) {
+      if (node?.id === fileName) {
         return node;
       }
       if (!node) {
@@ -134,7 +135,7 @@ export const testControllerUtils = {
       currentNodes = node.children;
     }
 
-    while (parent && parent.children.size === 0) {
+    while (parent?.children.size === 0) {
       const parentParent: vscode.TestItem | undefined = parent.parent;
       if (!parentParent) {
         testController.items.delete(parent.id);

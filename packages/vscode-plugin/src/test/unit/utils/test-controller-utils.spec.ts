@@ -1,10 +1,11 @@
 import { expect } from 'chai';
+import type { DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
+import path from 'path';
 import sinon from 'sinon';
 import vscode from 'vscode';
-import { DiscoveredMutant, MutantResult } from 'mutation-server-protocol';
+
 import { testControllerUtils } from '../../../utils/test-controller-utils.ts';
 import { createDiscoveredMutant } from '../../factory.ts';
-import path from 'path';
 
 describe('testControllerUtils', () => {
   let workspaceFolderMock: vscode.WorkspaceFolder;
@@ -201,7 +202,7 @@ describe('testControllerUtils', () => {
       );
 
       // Create second mutant in same file
-      const result = testControllerUtils.upsertMutantTestItem(
+      testControllerUtils.upsertMutantTestItem(
         testController,
         workspaceFolderMock,
         'src/utils/helper.ts',

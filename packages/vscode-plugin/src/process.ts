@@ -1,11 +1,12 @@
-import { commonTokens } from './di/index.ts';
-import { MissingServerPathError, CouldNotSpawnProcessError } from './index.ts';
-import vscode from 'vscode';
-import { ContextualLogger } from './logging/index.ts';
-import { Configuration, Settings } from './config/index.ts';
 import { type ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import path from 'path';
+import type vscode from 'vscode';
+
+import { Configuration, Settings } from './config/index.ts';
+import { commonTokens } from './di/index.ts';
+import { MissingServerPathError } from './index.ts';
+import type { ContextualLogger } from './logging/index.ts';
 
 export class Process extends EventEmitter {
   private readonly workspaceFolder;
@@ -23,7 +24,7 @@ export class Process extends EventEmitter {
     this.workspaceFolder = workspaceFolder;
     this.logger = logger;
   }
-  async init() {
+  async init(): Promise<void> {
     const serverPath = Configuration.getSetting<string>(
       Settings.ServerPath,
       this.workspaceFolder,
@@ -88,6 +89,7 @@ export class Process extends EventEmitter {
         );
       }
     });
+    return Promise.resolve();
   }
   write(data: string | Buffer) {
     this.#process!.stdin.write(data);

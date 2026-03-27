@@ -1,11 +1,12 @@
-import vscode from 'vscode';
-import {
+import fs from 'fs';
+import type {
   FileRange,
   MutantResult,
   MutationTestParams,
 } from 'mutation-server-protocol';
-import fs from 'fs';
 import path from 'path';
+import vscode from 'vscode';
+
 import { locationUtils } from './location-utils.ts';
 
 export const testItemUtils = {

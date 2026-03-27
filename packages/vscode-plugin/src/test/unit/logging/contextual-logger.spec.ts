@@ -1,7 +1,8 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
+
 import { ContextualLogger } from '../../../logging/contextual-logger.ts';
-import { Logger } from '../../../logging/logger.ts';
+import type { Logger } from '../../../logging/logger.ts';
 
 describe(ContextualLogger.name, () => {
   let mockLogger: sinon.SinonStubbedInstance<Logger>;
@@ -14,9 +15,9 @@ describe(ContextualLogger.name, () => {
       warn: sinon.stub(),
       error: sinon.stub(),
       clear: sinon.stub(),
-    } as any;
+    } as unknown as sinon.SinonStubbedInstance<Logger>;
 
-    contextualLogger = new ContextualLogger(mockLogger as any, testContext);
+    contextualLogger = new ContextualLogger(mockLogger, testContext);
   });
 
   afterEach(() => {

@@ -1,6 +1,7 @@
 import { expect } from 'chai';
+import type { Location } from 'mutation-server-protocol';
 import vscode from 'vscode';
-import { Location } from 'mutation-server-protocol';
+
 import { locationUtils } from '../../../utils/location-utils.ts';
 
 describe('locationUtils', () => {

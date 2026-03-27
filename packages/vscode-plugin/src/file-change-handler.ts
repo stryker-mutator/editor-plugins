@@ -1,9 +1,10 @@
-import vscode from 'vscode';
 import fs from 'fs/promises';
-import { FileRange } from 'mutation-server-protocol';
-import { MutationServer, TestExplorer } from './index.ts';
-import { ContextualLogger } from './logging/index.ts';
+import type { FileRange } from 'mutation-server-protocol';
+import type vscode from 'vscode';
+
 import { commonTokens } from './di/index.ts';
+import type { MutationServer, TestExplorer } from './index.ts';
+import type { ContextualLogger } from './logging/index.ts';
 
 export class FileChangeHandler {
   #mutationServer;
@@ -63,7 +64,7 @@ export class FileChangeHandler {
       );
     } catch (error) {
       this.#logger.error(
-        `Failed to process file changes: ${error} for ${fileRanges}`,
+        `Failed to process file changes: ${error} for ${JSON.stringify(fileRanges, undefined, 2)}`,
         { labels: [FileChangeHandler.name] },
       );
     }

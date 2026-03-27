@@ -3,7 +3,9 @@ import {
   workspace,
   type WorkspaceConfiguration,
 } from 'vscode';
-import { Settings, SettingSections } from './index.ts';
+
+import type { Settings } from './index.ts';
+import { SettingSections } from './index.ts';
 
 export class Configuration {
   /**
@@ -12,7 +14,7 @@ export class Configuration {
    */
   private static get(
     section?: string,
-    scope?: ConfigurationScope | null | undefined,
+    scope?: ConfigurationScope | null,
   ): WorkspaceConfiguration {
     return workspace.getConfiguration(section, scope);
   }
@@ -23,7 +25,7 @@ export class Configuration {
    */
   public static getSetting<T>(
     setting: Settings,
-    scope?: ConfigurationScope | null | undefined,
+    scope?: ConfigurationScope | null,
   ): T | undefined {
     const section = SettingSections[setting];
     const value = this.get(section, scope).get<T>(setting);
@@ -33,7 +35,7 @@ export class Configuration {
   public static getSettingOrDefault<T>(
     setting: Settings,
     defaultValue: T,
-    scope?: ConfigurationScope | null | undefined,
+    scope?: ConfigurationScope | null,
   ): T {
     const section = SettingSections[setting];
     const value = this.get(section, scope).get<T>(setting);
@@ -42,8 +44,8 @@ export class Configuration {
 
   public static async updateSetting(
     setting: Settings,
-    value: any,
-    scope?: ConfigurationScope | null | undefined,
+    value: unknown,
+    scope?: ConfigurationScope | null,
   ) {
     const section = SettingSections[setting];
     await this.get(section, scope).update(setting, value);
@@ -52,7 +54,7 @@ export class Configuration {
   public static async updateSettingIfChanged<T>(
     setting: Settings,
     value: T,
-    scope?: ConfigurationScope | null | undefined,
+    scope?: ConfigurationScope | null,
   ): Promise<void> {
     const current = this.getSetting<T>(setting, scope);
     if (JSON.stringify(current) !== JSON.stringify(value)) {

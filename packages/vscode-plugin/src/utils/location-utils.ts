@@ -1,5 +1,5 @@
+import type { Location } from 'mutation-server-protocol';
 import vscode from 'vscode';
-import { Location } from 'mutation-server-protocol';
 
 export const locationUtils = {
   locationToRange(location: Location): vscode.Range {

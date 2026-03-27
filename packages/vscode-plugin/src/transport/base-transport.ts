@@ -1,7 +1,8 @@
+import type { JSONRPCRequest, JSONRPCResponse } from 'json-rpc-2.0';
 import { Subject } from 'rxjs';
-import { JSONRPCRequest, JSONRPCResponse } from 'json-rpc-2.0';
+
+import type { ContextualLogger } from '../logging/index.ts';
 import { JsonRpcEventDeserializer } from '../utils/index.ts';
-import { ContextualLogger } from '../logging/index.ts';
 
 /**
  * Base transport class with common functionality
@@ -37,10 +38,10 @@ export abstract class BaseTransport {
       for (const event of events) {
         if (event.id === undefined) {
           // Notification (no id)
-          this.notifications.next(event);
+          this.notifications.next(event as JSONRPCRequest);
         } else {
           // Request or Response (has id)
-          this.messages.next(event);
+          this.messages.next(event as JSONRPCResponse);
         }
       }
     } catch (error) {

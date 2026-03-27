@@ -1,18 +1,18 @@
-import sinon from 'sinon';
-import vscode from 'vscode';
 import { expect } from 'chai';
-import { Injector } from 'typed-inject';
-import {
-  WorkspaceFolder,
-  WorkspaceFolderContext,
-} from '../../workspace-folder.ts';
-import * as factory from '../factory.ts';
-import { MutationServer } from '../../mutation-server.ts';
-import { ContextualLogger } from '../../logging/contextual-logger.ts';
+import sinon from 'sinon';
+import type { Injector } from 'typed-inject';
+import type vscode from 'vscode';
+
 import { Configuration, Settings } from '../../config/index.ts';
 import { commonTokens } from '../../di/tokens.ts';
-import { provideTestController, TestExplorer } from '../../test-explorer.ts';
 import { FileSystemWatcher } from '../../file-system-watcher.ts';
+import { ContextualLogger } from '../../logging/contextual-logger.ts';
+import { MutationServer } from '../../mutation-server.ts';
+import { provideTestController, TestExplorer } from '../../test-explorer.ts';
+import type { WorkspaceFolderContext } from '../../workspace-folder.ts';
+import { WorkspaceFolder } from '../../workspace-folder.ts';
+import * as factory from '../factory.ts';
+import { Uri } from 'vscode';
 
 describe(WorkspaceFolder.name, () => {
   let sandbox: sinon.SinonSandbox;
@@ -256,7 +256,7 @@ describe(WorkspaceFolder.name, () => {
 
       await sut.init();
 
-      const fileUri = vscode.Uri.file('/foo/bar/file.ts');
+      const fileUri = Uri.file('/foo/bar/file.ts');
 
       // Act
       await sut.runMutationTestsForFile(fileUri);
@@ -269,7 +269,7 @@ describe(WorkspaceFolder.name, () => {
 
     it('should skip with warning alert when setting "enable" is false', async () => {
       // Arrange
-      const fileUri = vscode.Uri.file('/foo/bar/file.ts');
+      const fileUri = Uri.file('/foo/bar/file.ts');
       getSettingOrDefaultStub
         .withArgs(Settings.enable, true, workspaceFolderMock)
         .returns(false);
@@ -290,7 +290,7 @@ describe(WorkspaceFolder.name, () => {
 
     it('should skip when workspace folder is not initialized', async () => {
       // Arrange
-      const fileUri = vscode.Uri.file('/foo/bar/file.ts');
+      const fileUri = Uri.file('/foo/bar/file.ts');
       getSettingOrDefaultStub
         .withArgs(Settings.enable, true, workspaceFolderMock)
         .returns(true);
@@ -328,7 +328,7 @@ describe(WorkspaceFolder.name, () => {
       await sut.init();
       await sut.dispose();
 
-      const fileUri = vscode.Uri.file('/foo/bar/file.ts');
+      const fileUri = Uri.file('/foo/bar/file.ts');
 
       // Act
       await sut.runMutationTestsForFile(fileUri);

@@ -1,18 +1,19 @@
-import vscode from 'vscode';
-import {
-  MutationTestResult,
+import type {
   MutantResult,
+  MutationTestResult,
   MutationTestParams,
 } from 'mutation-server-protocol';
-import { ContextualLogger } from './logging/index.ts';
-import { MutationServer } from './index.ts';
+import { lastValueFrom, mergeMap } from 'rxjs';
+import vscode from 'vscode';
 import { commonTokens } from './di/index.ts';
+import type { MutationServer } from './index.ts';
+import type { ContextualLogger } from './logging/index.ts';
 import {
   locationUtils,
-  testItemUtils,
   testControllerUtils,
+  testItemUtils,
 } from './utils/index.ts';
-import { lastValueFrom, mergeMap } from 'rxjs';
+
 export class TestRunner {
   private readonly mutationServer;
   private readonly workspaceFolder;
@@ -54,16 +55,16 @@ export class TestRunner {
     );
     const queue: vscode.TestItem[] = request.include
       ? [...request.include]
-      : [...testController.items].map(([_, testItem]) => testItem);
+      : [...testController.items].map(([, testItem]) => testItem);
     this.markAsStarted(testRun, queue);
-    token.onCancellationRequested(async () => {
+    token.onCancellationRequested(() => {
       testRun.appendOutput('Test run cancellation requested, ending test run.');
       testRun.end();
     });
     const mutationTestParams = testItemUtils.toMutationTestParams(queue);
     try {
       await this.executeMutationTest(testRun, mutationTestParams, queue);
-    } catch (error: Error | unknown) {
+    } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       this.logger.error(
@@ -187,8 +188,10 @@ export class TestRunner {
             testRun.skipped(testItem);
             break;
           default:
-            const testMessage = await this.getTestMessage(mutant, filePath);
-            testRun.failed(testItem, testMessage);
+            testRun.failed(
+              testItem,
+              await this.getTestMessage(mutant, filePath),
+            );
             break;
         }
         testRun.appendOutput(

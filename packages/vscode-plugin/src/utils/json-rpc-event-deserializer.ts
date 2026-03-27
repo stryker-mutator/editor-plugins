@@ -1,3 +1,5 @@
+import type { JSONRPCRequest, JSONRPCResponse } from 'json-rpc-2.0';
+
 const CONTENT_LENGTH_HEADER = 'Content-Length:';
 const CARRIAGE_RETURN_CODE = '\r'.charCodeAt(0);
 const LINE_FEED_CODE = '\n'.charCodeAt(0);
@@ -5,9 +7,9 @@ const LINE_FEED_CODE = '\n'.charCodeAt(0);
 export class JsonRpcEventDeserializer {
   #chunk = Buffer.alloc(0);
 
-  deserialize(data: Buffer) {
+  deserialize(data: Buffer): (JSONRPCRequest | JSONRPCResponse)[] {
     this.#chunk = Buffer.concat([this.#chunk, data]);
-    const events = [];
+    const events: (JSONRPCRequest | JSONRPCResponse)[] = [];
     do {
       const headerInfo = parseHeader(this.#chunk);
       if (!headerInfo) {
@@ -28,7 +30,7 @@ export class JsonRpcEventDeserializer {
       }
       const content = this.#chunk.subarray(contentStart, contentEnd).toString();
       this.#chunk = this.#chunk.subarray(contentEnd);
-      events.push(JSON.parse(content));
+      events.push(JSON.parse(content) as JSONRPCRequest | JSONRPCResponse);
     } while (this.#chunk.length > 0);
     return events;
   }
