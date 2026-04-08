@@ -142,7 +142,7 @@
     "ovsx": "0.10.10",
     "sinon": "21.0.3",
     "sinon-chai": "4.0.1",
-    "typescript": "5.9.3"
+    "typescript": "6.0.2"
   },
   "dependencies": {
     "json-rpc-2.0": "1.7.1",
