@@ -11,6 +11,7 @@
     "erasableSyntaxOnly": true,
     "rewriteRelativeImportExtensions": true,
     "outDir": "out",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": ["node", "vscode"]
   }
 }
