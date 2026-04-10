@@ -114,9 +114,9 @@
   },
   "scripts": {
     "all": "pnpm run clean && pnpm run build && pnpm run test",
-    "build": "node esbuild.mjs --production && tsc -b",
+    "build": "tsdown && tsc -b",
     "watch:tsc": "tsc -b -w",
-    "watch:esbuild": "node esbuild.mjs --watch",
+    "watch:build": "tsdown --watch",
     "clean": "rm -rf dist out \".vscode-test\"",
     "test": "vscode-test",
     "test:linux": "xvfb-run -a vscode-test",
@@ -137,17 +137,16 @@
     "@vscode/vsce": "3.7.1",
     "chai": "6.2.2",
     "chai-as-promised": "8.0.2",
-    "esbuild": "0.28.0",
     "glob": "13.0.6",
-    "ovsx": "0.10.10",
-    "sinon": "21.0.3",
-    "sinon-chai": "4.0.1",
-    "typescript": "6.0.2"
-  },
-  "dependencies": {
     "json-rpc-2.0": "1.7.1",
     "mutation-server-protocol": "workspace:*",
+    "ovsx": "0.10.10",
     "rxjs": "7.8.2",
-    "typed-inject": "5.0.0"
-  }
+    "sinon": "21.0.3",
+    "sinon-chai": "4.0.1",
+    "tsdown": "0.21.7",
+    "typed-inject": "5.0.0",
+    "typescript": "6.0.2"
+  },
+  "dependencies": {}
 }
