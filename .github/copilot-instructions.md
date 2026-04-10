@@ -113,7 +113,7 @@ For the VS Code extension (`packages/vscode-plugin/`), tests are organized in th
 
 **Development Dependencies:**
 
-- `esbuild` - Fast bundling
+- `tsdown` - Fast bundling
 - `typescript` - Type checking
 - `eslint` - Linting
 - `@types/vscode` - VS Code API types
