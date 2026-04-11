@@ -142,7 +142,7 @@
     "mutation-server-protocol": "workspace:*",
     "ovsx": "0.10.10",
     "rxjs": "7.8.2",
-    "sinon": "21.0.3",
+    "sinon": "21.1.0",
     "sinon-chai": "4.0.1",
     "tsdown": "0.21.7",
     "typed-inject": "5.0.0",
