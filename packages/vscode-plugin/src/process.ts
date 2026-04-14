@@ -58,7 +58,11 @@ export class Process extends EventEmitter {
       `Server configuration: path=${resolvedServerPath}, args=${serverArgs}, cwd=${cwd}`,
     );
 
-    this.#process = spawn(resolvedServerPath, serverArgs, {
+    // On Windows, wrap the path in double quotes to handle spaces and special
+    // characters (e.g. parentheses) when the path is interpreted by cmd.exe
+    const spawnPath = isWindows ? `"${resolvedServerPath}"` : resolvedServerPath;
+
+    this.#process = spawn(spawnPath, serverArgs, {
       cwd,
       shell: isWindows,
     });
