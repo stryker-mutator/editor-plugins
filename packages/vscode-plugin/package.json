@@ -140,7 +140,7 @@
     "glob": "13.0.6",
     "json-rpc-2.0": "1.7.1",
     "mutation-server-protocol": "workspace:*",
-    "ovsx": "0.10.10",
+    "ovsx": "0.10.11",
     "rxjs": "7.8.2",
     "sinon": "21.1.1",
     "sinon-chai": "4.0.1",
