@@ -60,7 +60,9 @@ export class Process extends EventEmitter {
 
     // On Windows, wrap the path in double quotes to handle spaces and special
     // characters (e.g. parentheses) when the path is interpreted by cmd.exe
-    const spawnPath = isWindows ? `"${resolvedServerPath}"` : resolvedServerPath;
+    const spawnPath = isWindows
+      ? `"${resolvedServerPath}"`
+      : resolvedServerPath;
 
     this.#process = spawn(spawnPath, serverArgs, {
       cwd,
