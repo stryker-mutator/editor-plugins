@@ -25,6 +25,11 @@
       "automerge": true
     },
     {
+      "matchPackageNames": ["@types/vscode"],
+      "enabled": false,
+      "description": "@types/vscode must stay in sync with engines.vscode in package.json; update manually only"
+    },
+    {
       "groupName": "Types",
       "matchPackageNames": ["@types/**"]
     },
