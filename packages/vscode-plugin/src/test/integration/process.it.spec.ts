@@ -105,6 +105,56 @@ describe(`${Process.name} (Integration)`, () => {
       ).to.be.true;
     });
 
+    it('should successfully spawn a process with spaces in the path', async () => {
+      // Arrange - create a subdirectory with spaces in the name
+      const dirWithSpaces = path.join(tempDir, 'path with spaces');
+      await fs.mkdir(dirWithSpaces);
+      const execName = isWindows ? 'echo-spaces.bat' : 'echo-spaces.sh';
+      const execPath = path.join(dirWithSpaces, execName);
+      await fs.writeFile(
+        execPath,
+        isWindows ? '@echo spaces test' : '#!/bin/sh\necho "spaces test"',
+      );
+      if (!isWindows) {
+        await fs.chmod(execPath, 0o755);
+      }
+
+      const serverPath = execPath;
+      const serverArgs: string[] = [];
+
+      configurationGetSettingStub
+        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .returns(serverPath);
+      configurationGetSettingOrDefaultStub
+        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
+        .returns(serverArgs);
+      configurationGetSettingOrDefaultStub
+        .withArgs(
+          Settings.CurrentWorkingDirectory,
+          workspaceFolderMock.uri.fsPath,
+          workspaceFolderMock,
+        )
+        .returns(workspaceFolderMock.uri.fsPath);
+
+      // Set up promise to wait for process completion
+      const processExitPromise = new Promise<number>((resolve) => {
+        loggerMock.info.callsFake((message: string) => {
+          if (message.includes('Server process exited normally with code 0')) {
+            resolve(0);
+          }
+        });
+      });
+
+      // Act
+      await sut.init();
+
+      // Wait for process to complete
+      const exitCode = await processExitPromise;
+
+      // Assert
+      expect(exitCode).to.equal(0);
+    });
+
     it('should successfully spawn a simple command and handle exit', async () => {
       // Arrange
       const serverPath = isWindows ? 'echo-test.bat' : 'echo-test.sh';
