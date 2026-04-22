@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.1](https://github.com/stryker-mutator/editor-plugins/compare/stryker-mutator@0.5.0...stryker-mutator@0.5.1) (2026-04-22)
+
+### Bug Fixes
+
+- spawn failure for server paths containing spaces on Windows ([#163](https://github.com/stryker-mutator/editor-plugins/issues/163)) ([0c1ef04](https://github.com/stryker-mutator/editor-plugins/commit/0c1ef04b61ff7349e176592382d961d2494fa1fa)), closes [#113](https://github.com/stryker-mutator/editor-plugins/issues/113)
+
 # [0.5.0](https://github.com/stryker-mutator/editor-plugins/compare/stryker-mutator@0.4.1...stryker-mutator@0.5.0) (2026-03-27)
 
 ### Bug Fixes
