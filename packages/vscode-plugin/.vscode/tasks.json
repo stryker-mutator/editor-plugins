@@ -20,6 +20,17 @@
       "group": "build",
       "isBackground": true,
       "label": "npm: watch:build",
+      "problemMatcher": {
+        "owner": "tsdown",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Build start",
+          "endsPattern": "Rebuilt in"
+        }
+      },
       "presentation": {
         "group": "watch",
         "reveal": "never"
