@@ -144,7 +144,7 @@
     "rxjs": "7.8.2",
     "sinon": "21.1.2",
     "sinon-chai": "4.0.1",
-    "tsdown": "0.21.9",
+    "tsdown": "0.21.10",
     "typed-inject": "5.0.0",
     "typescript": "6.0.3"
   },
