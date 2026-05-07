@@ -45,7 +45,7 @@ describe(WorkspaceFolder.name, () => {
     );
 
     sut = new WorkspaceFolder(
-      injectorMock as Injector<WorkspaceFolderContext>,
+      injectorMock,
       workspaceFolderMock,
       mutationServerMock,
       contextualLoggerMock,

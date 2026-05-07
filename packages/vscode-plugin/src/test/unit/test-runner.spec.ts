@@ -15,7 +15,7 @@ describe(TestRunner.name, () => {
       uri: vscode.Uri.file('/workspace'),
       name: 'workspace',
       index: 0,
-    } as vscode.WorkspaceFolder;
+    };
   }
 
   function createTestRunStubs() {
@@ -42,7 +42,7 @@ describe(TestRunner.name, () => {
           }
         },
       },
-      createTestRun: sinon.stub().returns(testRun as unknown as vscode.TestRun),
+      createTestRun: sinon.stub().returns(testRun),
     } as unknown as vscode.TestController;
   }
 
@@ -67,7 +67,8 @@ describe(TestRunner.name, () => {
       isCancellationRequested: false,
       onCancellationRequested: (callback: () => void) => {
         onRegister?.(callback);
-        return { dispose: sinon.stub() } as unknown as vscode.Disposable;
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        return { dispose: sinon.stub() } as vscode.Disposable;
       },
     } as vscode.CancellationToken;
   }
@@ -88,9 +89,7 @@ describe(TestRunner.name, () => {
     const testController = createTestController(testRun);
 
     sinon.stub(vscode.workspace, 'asRelativePath').returns('src/file.ts');
-    sinon
-      .stub(testControllerUtils, 'upsertMutantTestItem')
-      .returns(testItem as unknown as vscode.TestItem);
+    sinon.stub(testControllerUtils, 'upsertMutantTestItem').returns(testItem);
     const isMutantInTestTreeStub = sinon
       .stub(testItemUtils, 'isMutantInTestTree')
       .returns(true);
@@ -309,9 +308,7 @@ describe(TestRunner.name, () => {
     const testController = createTestController(testRun);
 
     sinon.stub(vscode.workspace, 'asRelativePath').returns('src/file.ts');
-    sinon
-      .stub(testControllerUtils, 'upsertMutantTestItem')
-      .returns(testItem as unknown as vscode.TestItem);
+    sinon.stub(testControllerUtils, 'upsertMutantTestItem').returns(testItem);
     mutationServerMock.mutationTest.returns(
       of(
         factory.createMutationTestResult({

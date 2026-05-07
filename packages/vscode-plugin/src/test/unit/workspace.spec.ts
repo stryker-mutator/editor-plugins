@@ -40,9 +40,9 @@ describe(Workspace.name, () => {
       const injectorMock = factory.injector();
       injectorMock.injectClass
         .withArgs(ContextualLogger)
-        .returns(loggerMock as unknown as ContextualLogger)
+        .returns(loggerMock)
         .withArgs(WorkspaceFolder)
-        .returns(workspaceFolderRuntimeMock as unknown as WorkspaceFolder);
+        .returns(workspaceFolderRuntimeMock);
 
       sandbox
         .stub(vscode.workspace, 'workspaceFolders')
@@ -62,9 +62,7 @@ describe(Workspace.name, () => {
       const loggerMock = sinon.createStubInstance(ContextualLogger);
 
       const injectorMock = factory.injector();
-      injectorMock.injectClass
-        .withArgs(ContextualLogger)
-        .returns(loggerMock as unknown as ContextualLogger);
+      injectorMock.injectClass.withArgs(ContextualLogger).returns(loggerMock);
 
       sandbox.stub(vscode.workspace, 'workspaceFolders').value([]);
 
@@ -103,9 +101,9 @@ describe(Workspace.name, () => {
       const injectorMock = factory.injector();
       injectorMock.injectClass
         .withArgs(ContextualLogger)
-        .returns(loggerMock as unknown as ContextualLogger)
+        .returns(loggerMock)
         .withArgs(WorkspaceFolder)
-        .returns(workspaceFolderRuntimeMock as unknown as WorkspaceFolder);
+        .returns(workspaceFolderRuntimeMock);
 
       sandbox
         .stub(vscode.workspace, 'workspaceFolders')
@@ -136,9 +134,7 @@ describe(Workspace.name, () => {
       const loggerMock = sinon.createStubInstance(ContextualLogger);
 
       const injectorMock = factory.injector();
-      injectorMock.injectClass
-        .withArgs(ContextualLogger)
-        .returns(loggerMock as unknown as ContextualLogger);
+      injectorMock.injectClass.withArgs(ContextualLogger).returns(loggerMock);
 
       const context = {
         subscriptions: [],
@@ -168,9 +164,7 @@ describe(Workspace.name, () => {
       } as vscode.WorkspaceFolder;
 
       const injectorMock = factory.injector();
-      injectorMock.injectClass
-        .withArgs(ContextualLogger)
-        .returns(loggerMock as unknown as ContextualLogger);
+      injectorMock.injectClass.withArgs(ContextualLogger).returns(loggerMock);
 
       sandbox.stub(vscode.workspace, 'workspaceFolders').value([]);
 
@@ -229,15 +223,13 @@ describe(Workspace.name, () => {
 
       const injectorMock = factory.injector();
       const injectClassStub = injectorMock.injectClass;
-      injectClassStub
-        .withArgs(ContextualLogger)
-        .returns(loggerMock as unknown as ContextualLogger);
+      injectClassStub.withArgs(ContextualLogger).returns(loggerMock);
       injectClassStub
         .withArgs(WorkspaceFolder)
         .onFirstCall()
-        .returns(workspaceFolderRuntime1Mock as unknown as WorkspaceFolder)
+        .returns(workspaceFolderRuntime1Mock)
         .onSecondCall()
-        .returns(workspaceFolderRuntime2Mock as unknown as WorkspaceFolder);
+        .returns(workspaceFolderRuntime2Mock);
 
       sandbox
         .stub(vscode.workspace, 'workspaceFolders')
@@ -290,9 +282,9 @@ describe(Workspace.name, () => {
       const injectorMock = factory.injector();
       injectorMock.injectClass
         .withArgs(ContextualLogger)
-        .returns(loggerMock as unknown as ContextualLogger)
+        .returns(loggerMock)
         .withArgs(WorkspaceFolder)
-        .returns(workspaceFolderRuntimeMock as unknown as WorkspaceFolder);
+        .returns(workspaceFolderRuntimeMock);
 
       sandbox
         .stub(vscode.workspace, 'workspaceFolders')
@@ -335,9 +327,9 @@ describe(Workspace.name, () => {
       const injectorMock = factory.injector();
       injectorMock.injectClass
         .withArgs(ContextualLogger)
-        .returns(loggerMock as unknown as ContextualLogger)
+        .returns(loggerMock)
         .withArgs(WorkspaceFolder)
-        .returns(workspaceFolderRuntimeMock as unknown as WorkspaceFolder);
+        .returns(workspaceFolderRuntimeMock);
 
       sandbox
         .stub(vscode.workspace, 'workspaceFolders')
