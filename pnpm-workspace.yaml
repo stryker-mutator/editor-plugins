@@ -3,9 +3,8 @@ packages:
 
 minimumReleaseAge: 2880 # 2 days, see: https://pnpm.io/settings#minimumreleaseage
 
-onlyBuiltDependencies:
-  - '@vscode/vsce-sign'
-  - nx
-
-ignoredBuiltDependencies:
-  - keytar
+allowBuilds:
+  '@vscode/vsce-sign': true
+  nx: true
+  keytar: false
+  unrs-resolver: false

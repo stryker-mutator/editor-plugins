@@ -20,7 +20,7 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm ci
       - name: Build packages
         run: pnpm run build
       - uses: azure/login@v3

@@ -21,7 +21,7 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm ci
       - name: Build & lint & test
         if: runner.os == 'Windows'
         run: pnpm run all
