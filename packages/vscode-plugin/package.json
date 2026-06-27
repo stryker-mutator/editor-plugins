@@ -133,7 +133,7 @@
     "@types/sinon-chai": "4.0.0",
     "@types/vscode": "1.110.0",
     "@vscode/test-cli": "0.0.15",
-    "@vscode/test-electron": "2.5.2",
+    "@vscode/test-electron": "3.0.0",
     "@vscode/vsce": "3.9.2",
     "chai": "6.2.2",
     "chai-as-promised": "8.0.2",
