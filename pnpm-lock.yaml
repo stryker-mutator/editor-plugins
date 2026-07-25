@@ -28,10 +28,10 @@ importers:
         version: 10.6.0(jiti@2.7.0)(supports-color@8.1.1)
       eslint-import-resolver-typescript:
         specifier: 4.4.5
-        version: 4.4.5(eslint-plugin-import-x@4.17.0(@typescript-eslint/utils@8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(typescript@6.0.3))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)
+        version: 4.4.5(eslint-plugin-import-x@4.17.0(@typescript-eslint/utils@8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)
       eslint-plugin-import-x:
         specifier: 4.17.0
-        version: 4.17.0(@typescript-eslint/utils@8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(typescript@6.0.3))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)
+        version: 4.17.0(@typescript-eslint/utils@8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)
       eslint-plugin-simple-import-sort:
         specifier: 13.0.0
         version: 13.0.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))
@@ -43,7 +43,7 @@ importers:
         version: 2.7.0
       lerna:
         specifier: 9.0.7
-        version: 9.0.7(@types/node@24.13.3)
+        version: 9.0.7(@types/node@24.13.3)(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       mocha:
         specifier: 11.7.6
         version: 11.7.6
@@ -94,10 +94,10 @@ importers:
         version: 0.0.15
       '@vscode/test-electron':
         specifier: 2.5.2
-        version: 2.5.2
+        version: 2.5.2(supports-color@8.1.1)
       '@vscode/vsce':
         specifier: 3.9.2
-        version: 3.9.2(supports-color@8.1.1)
+        version: 3.9.2(supports-color@10.2.2)
       chai:
         specifier: 6.2.2
         version: 6.2.2
@@ -115,7 +115,7 @@ importers:
         version: link:../mutation-server-protocol
       ovsx:
         specifier: 1.0.2
-        version: 1.0.2
+        version: 1.0.2(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
@@ -126,8 +126,8 @@ importers:
         specifier: 4.0.1
         version: 4.0.1(chai@6.2.2)(sinon@21.1.2)
       tsdown:
-        specifier: 0.22.13
-        version: 0.22.13(typescript@6.0.3)
+        specifier: 0.22.14
+        version: 0.22.14(typescript@6.0.3)
       typed-inject:
         specifier: 5.0.0
         version: 5.0.0
@@ -3997,14 +3997,14 @@ packages:
     resolution: {integrity: sha512-NoZ4roiN7LnbKn9QqE1amc9DJfzvZXxF4xDavcOWt1BPkdx+m+0gJuPM+S0vCe7zTJMYUP0R8pO2XMr+Y8oLIg==}
     engines: {node: '>=6'}
 
-  tsdown@0.22.13:
-    resolution: {integrity: sha512-XaYFhtiKRUvTpXv/YAehsHdbEb3LN/iMlzjSINbjlaATtXN2zVPKox2STKhcyFPlh++8Zg7suNN27E679IfAUA==}
+  tsdown@0.22.14:
+    resolution: {integrity: sha512-ule7Y+fsAN2iZbLDoo7C4KYljFJNJJ+fLshyn+9gozeTspVersWHxwdGB+Dm2hzA38s6muFnUTl0jK3vJm9ifQ==}
     engines: {node: ^22.18.0 || >=24.11.0}
     hasBin: true
     peerDependencies:
       '@arethetypeswrong/core': ^0.18.1
-      '@tsdown/css': 0.22.13
-      '@tsdown/exe': 0.22.13
+      '@tsdown/css': 0.22.14
+      '@tsdown/exe': 0.22.14
       '@vitejs/devtools': '*'
       publint: ^0.3.8
       tsx: '*'
@@ -4167,8 +4167,8 @@ packages:
     resolution: {integrity: sha512-IUoow1YUtvoBBC06dXs8bR8B9vuA3aJfmQNKMoaPG/OFsPmoQvw8xh+6Ye25Gx9DQhoEom3Pcu9MKHerm/NpUQ==}
     engines: {node: ^18.17.0 || >=20.5.0}
 
-  verkit@0.1.2:
-    resolution: {integrity: sha512-WqkT8n3hqizuCu71W3bUzf5fjBmkbXcudsehe/NbxA8PgqoKnSOY5K0Ba2ckg1qaRaSpSz7as/n9K1R9JXjQKg==}
+  verkit@0.3.0:
+    resolution: {integrity: sha512-Njrh4U8UODGajoZ44QS2C/BsoEM9DTI/aCqY5swsizb+/ap0FamvnCMcZAxrR5+aoC0ZqkawEfpC/N2SBc+xeA==}
     engines: {node: '>=18.12.0'}
 
   version-range@4.15.0:
@@ -4353,34 +4353,34 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@azure/core-auth@1.10.1':
+  '@azure/core-auth@1.10.1(supports-color@10.2.2)':
     dependencies:
       '@azure/abort-controller': 2.1.2
-      '@azure/core-util': 1.13.1
+      '@azure/core-util': 1.13.1(supports-color@10.2.2)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
 
-  '@azure/core-client@1.10.2':
+  '@azure/core-client@1.10.2(supports-color@10.2.2)':
     dependencies:
       '@azure/abort-controller': 2.1.2
-      '@azure/core-auth': 1.10.1
-      '@azure/core-rest-pipeline': 1.24.0
+      '@azure/core-auth': 1.10.1(supports-color@10.2.2)
+      '@azure/core-rest-pipeline': 1.24.0(supports-color@10.2.2)
       '@azure/core-tracing': 1.3.1
-      '@azure/core-util': 1.13.1
-      '@azure/logger': 1.3.0
+      '@azure/core-util': 1.13.1(supports-color@10.2.2)
+      '@azure/logger': 1.3.0(supports-color@10.2.2)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
 
-  '@azure/core-rest-pipeline@1.24.0':
+  '@azure/core-rest-pipeline@1.24.0(supports-color@10.2.2)':
     dependencies:
       '@azure/abort-controller': 2.1.2
-      '@azure/core-auth': 1.10.1
+      '@azure/core-auth': 1.10.1(supports-color@10.2.2)
       '@azure/core-tracing': 1.3.1
-      '@azure/core-util': 1.13.1
-      '@azure/logger': 1.3.0
-      '@typespec/ts-http-runtime': 0.3.6
+      '@azure/core-util': 1.13.1(supports-color@10.2.2)
+      '@azure/logger': 1.3.0(supports-color@10.2.2)
+      '@typespec/ts-http-runtime': 0.3.6(supports-color@10.2.2)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
@@ -4389,23 +4389,23 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@azure/core-util@1.13.1':
+  '@azure/core-util@1.13.1(supports-color@10.2.2)':
     dependencies:
       '@azure/abort-controller': 2.1.2
-      '@typespec/ts-http-runtime': 0.3.6
+      '@typespec/ts-http-runtime': 0.3.6(supports-color@10.2.2)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
 
-  '@azure/identity@4.13.1':
+  '@azure/identity@4.13.1(supports-color@10.2.2)':
     dependencies:
       '@azure/abort-controller': 2.1.2
-      '@azure/core-auth': 1.10.1
-      '@azure/core-client': 1.10.2
-      '@azure/core-rest-pipeline': 1.24.0
+      '@azure/core-auth': 1.10.1(supports-color@10.2.2)
+      '@azure/core-client': 1.10.2(supports-color@10.2.2)
+      '@azure/core-rest-pipeline': 1.24.0(supports-color@10.2.2)
       '@azure/core-tracing': 1.3.1
-      '@azure/core-util': 1.13.1
-      '@azure/logger': 1.3.0
+      '@azure/core-util': 1.13.1(supports-color@10.2.2)
+      '@azure/logger': 1.3.0(supports-color@10.2.2)
       '@azure/msal-browser': 5.16.0
       '@azure/msal-node': 5.3.1
       open: 10.2.0
@@ -4413,9 +4413,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@azure/logger@1.3.0':
+  '@azure/logger@1.3.0(supports-color@10.2.2)':
     dependencies:
-      '@typespec/ts-http-runtime': 0.3.6
+      '@typespec/ts-http-runtime': 0.3.6(supports-color@10.2.2)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
@@ -4803,23 +4803,23 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
-  '@npmcli/agent@4.0.2':
+  '@npmcli/agent@4.0.2(supports-color@8.1.1)':
     dependencies:
       agent-base: 7.1.4
-      http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.6
+      http-proxy-agent: 7.0.2(supports-color@8.1.1)
+      https-proxy-agent: 7.0.6(supports-color@8.1.1)
       lru-cache: 11.5.1
-      socks-proxy-agent: 8.0.5
+      socks-proxy-agent: 8.0.5(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
-  '@npmcli/arborist@9.1.6':
+  '@npmcli/arborist@9.1.6(supports-color@8.1.1)':
     dependencies:
       '@isaacs/string-locale-compare': 1.1.0
       '@npmcli/fs': 4.0.0
       '@npmcli/installed-package-contents': 3.0.0
       '@npmcli/map-workspaces': 5.0.3
-      '@npmcli/metavuln-calculator': 9.0.3
+      '@npmcli/metavuln-calculator': 9.0.3(supports-color@8.1.1)
       '@npmcli/name-from-folder': 3.0.0
       '@npmcli/node-gyp': 4.0.0
       '@npmcli/package-json': 7.0.2
@@ -4837,8 +4837,8 @@ snapshots:
       npm-install-checks: 7.1.2
       npm-package-arg: 13.0.1
       npm-pick-manifest: 11.0.3
-      npm-registry-fetch: 19.1.0
-      pacote: 21.5.1
+      npm-registry-fetch: 19.1.0(supports-color@8.1.1)
+      pacote: 21.5.1(supports-color@8.1.1)
       parse-conflict-json: 4.0.0
       proc-log: 5.0.0
       proggy: 3.0.0
@@ -4898,11 +4898,11 @@ snapshots:
       glob: 13.0.6
       minimatch: 10.2.5
 
-  '@npmcli/metavuln-calculator@9.0.3':
+  '@npmcli/metavuln-calculator@9.0.3(supports-color@8.1.1)':
     dependencies:
       cacache: 20.0.4
       json-parse-even-better-errors: 5.0.0
-      pacote: 21.5.1
+      pacote: 21.5.1(supports-color@8.1.1)
       proc-log: 6.1.0
       semver: 7.8.5
     transitivePeerDependencies:
@@ -4951,13 +4951,13 @@ snapshots:
       proc-log: 6.1.0
       which: 6.0.1
 
-  '@nx/devkit@22.7.6(nx@22.7.6)':
+  '@nx/devkit@22.7.6(nx@22.7.6(debug@4.4.3(supports-color@8.1.1)))':
     dependencies:
       '@zkochan/js-yaml': 0.0.7
       ejs: 5.0.1
       enquirer: 2.3.6
       minimatch: 10.2.5
-      nx: 22.7.6
+      nx: 22.7.6(debug@4.4.3(supports-color@8.1.1))
       semver: 7.8.5
       tslib: 2.8.1
       yargs-parser: 21.1.1
@@ -5121,35 +5121,35 @@ snapshots:
     dependencies:
       '@secretlint/types': 10.2.2
 
-  '@secretlint/config-loader@10.2.2':
+  '@secretlint/config-loader@10.2.2(supports-color@10.2.2)':
     dependencies:
       '@secretlint/profiler': 10.2.2
       '@secretlint/resolver': 10.2.2
       '@secretlint/types': 10.2.2
       ajv: 8.20.0
-      debug: 4.4.3(supports-color@8.1.1)
-      rc-config-loader: 4.1.4
+      debug: 4.4.3(supports-color@10.2.2)
+      rc-config-loader: 4.1.4(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
-  '@secretlint/core@10.2.2':
+  '@secretlint/core@10.2.2(supports-color@10.2.2)':
     dependencies:
       '@secretlint/profiler': 10.2.2
       '@secretlint/types': 10.2.2
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.4.3(supports-color@10.2.2)
       structured-source: 4.0.0
     transitivePeerDependencies:
       - supports-color
 
-  '@secretlint/formatter@10.2.2':
+  '@secretlint/formatter@10.2.2(supports-color@10.2.2)':
     dependencies:
       '@secretlint/resolver': 10.2.2
       '@secretlint/types': 10.2.2
-      '@textlint/linter-formatter': 15.7.1
+      '@textlint/linter-formatter': 15.7.1(supports-color@10.2.2)
       '@textlint/module-interop': 15.7.1
       '@textlint/types': 15.7.1
       chalk: 5.6.2
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.4.3(supports-color@10.2.2)
       pluralize: 8.0.0
       strip-ansi: 7.2.0
       table: 6.9.0
@@ -5157,15 +5157,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@secretlint/node@10.2.2':
+  '@secretlint/node@10.2.2(supports-color@10.2.2)':
     dependencies:
-      '@secretlint/config-loader': 10.2.2
-      '@secretlint/core': 10.2.2
-      '@secretlint/formatter': 10.2.2
+      '@secretlint/config-loader': 10.2.2(supports-color@10.2.2)
+      '@secretlint/core': 10.2.2(supports-color@10.2.2)
+      '@secretlint/formatter': 10.2.2(supports-color@10.2.2)
       '@secretlint/profiler': 10.2.2
       '@secretlint/source-creator': 10.2.2
       '@secretlint/types': 10.2.2
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.4.3(supports-color@10.2.2)
       p-map: 7.0.5
     transitivePeerDependencies:
       - supports-color
@@ -5199,21 +5199,21 @@ snapshots:
 
   '@sigstore/protobuf-specs@0.5.1': {}
 
-  '@sigstore/sign@4.1.1':
+  '@sigstore/sign@4.1.1(supports-color@8.1.1)':
     dependencies:
       '@gar/promise-retry': 1.0.3
       '@sigstore/bundle': 4.0.0
       '@sigstore/core': 3.2.1
       '@sigstore/protobuf-specs': 0.5.1
-      make-fetch-happen: 15.0.6
+      make-fetch-happen: 15.0.6(supports-color@8.1.1)
       proc-log: 6.1.0
     transitivePeerDependencies:
       - supports-color
 
-  '@sigstore/tuf@4.0.2':
+  '@sigstore/tuf@4.0.2(supports-color@8.1.1)':
     dependencies:
       '@sigstore/protobuf-specs': 0.5.1
-      tuf-js: 4.1.0
+      tuf-js: 4.1.0(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -5242,7 +5242,7 @@ snapshots:
 
   '@textlint/ast-node-types@15.7.1': {}
 
-  '@textlint/linter-formatter@15.7.1':
+  '@textlint/linter-formatter@15.7.1(supports-color@10.2.2)':
     dependencies:
       '@azu/format-text': 1.0.2
       '@azu/style-format': 1.0.1
@@ -5250,7 +5250,7 @@ snapshots:
       '@textlint/resolver': 15.7.1
       '@textlint/types': 15.7.1
       chalk: 4.1.2
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.4.3(supports-color@10.2.2)
       js-yaml: 4.3.0
       lodash: 4.18.1
       pluralize: 2.0.0
@@ -5335,7 +5335,7 @@ snapshots:
       '@typescript-eslint/parser': 8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
       '@typescript-eslint/scope-manager': 8.62.0
       '@typescript-eslint/type-utils': 8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
-      '@typescript-eslint/utils': 8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
       '@typescript-eslint/visitor-keys': 8.62.0
       eslint: 10.6.0(jiti@2.7.0)(supports-color@8.1.1)
       ignore: 7.0.5
@@ -5349,7 +5349,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/scope-manager': 8.62.0
       '@typescript-eslint/types': 8.62.0
-      '@typescript-eslint/typescript-estree': 8.62.0(typescript@6.0.3)
+      '@typescript-eslint/typescript-estree': 8.62.0(supports-color@8.1.1)(typescript@6.0.3)
       '@typescript-eslint/visitor-keys': 8.62.0
       debug: 4.4.3(supports-color@8.1.1)
       eslint: 10.6.0(jiti@2.7.0)(supports-color@8.1.1)
@@ -5357,7 +5357,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/project-service@8.62.0(typescript@6.0.3)':
+  '@typescript-eslint/project-service@8.62.0(supports-color@8.1.1)(typescript@6.0.3)':
     dependencies:
       '@typescript-eslint/tsconfig-utils': 8.62.0(typescript@6.0.3)
       '@typescript-eslint/types': 8.62.1
@@ -5378,8 +5378,8 @@ snapshots:
   '@typescript-eslint/type-utils@8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)':
     dependencies:
       '@typescript-eslint/types': 8.62.0
-      '@typescript-eslint/typescript-estree': 8.62.0(typescript@6.0.3)
-      '@typescript-eslint/utils': 8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(typescript@6.0.3)
+      '@typescript-eslint/typescript-estree': 8.62.0(supports-color@8.1.1)(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
       debug: 4.4.3(supports-color@8.1.1)
       eslint: 10.6.0(jiti@2.7.0)(supports-color@8.1.1)
       ts-api-utils: 2.5.0(typescript@6.0.3)
@@ -5391,9 +5391,9 @@ snapshots:
 
   '@typescript-eslint/types@8.62.1': {}
 
-  '@typescript-eslint/typescript-estree@8.62.0(typescript@6.0.3)':
+  '@typescript-eslint/typescript-estree@8.62.0(supports-color@8.1.1)(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/project-service': 8.62.0(typescript@6.0.3)
+      '@typescript-eslint/project-service': 8.62.0(supports-color@8.1.1)(typescript@6.0.3)
       '@typescript-eslint/tsconfig-utils': 8.62.0(typescript@6.0.3)
       '@typescript-eslint/types': 8.62.0
       '@typescript-eslint/visitor-keys': 8.62.0
@@ -5406,12 +5406,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(typescript@6.0.3)':
+  '@typescript-eslint/utils@8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))
       '@typescript-eslint/scope-manager': 8.62.0
       '@typescript-eslint/types': 8.62.0
-      '@typescript-eslint/typescript-estree': 8.62.0(typescript@6.0.3)
+      '@typescript-eslint/typescript-estree': 8.62.0(supports-color@8.1.1)(typescript@6.0.3)
       eslint: 10.6.0(jiti@2.7.0)(supports-color@8.1.1)
       typescript: 6.0.3
     transitivePeerDependencies:
@@ -5422,10 +5422,10 @@ snapshots:
       '@typescript-eslint/types': 8.62.0
       eslint-visitor-keys: 5.0.1
 
-  '@typespec/ts-http-runtime@0.3.6':
+  '@typespec/ts-http-runtime@0.3.6(supports-color@10.2.2)':
     dependencies:
-      http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.6
+      http-proxy-agent: 7.0.2(supports-color@10.2.2)
+      https-proxy-agent: 7.0.6(supports-color@10.2.2)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
@@ -5514,10 +5514,10 @@ snapshots:
     transitivePeerDependencies:
       - monocart-coverage-reports
 
-  '@vscode/test-electron@2.5.2':
+  '@vscode/test-electron@2.5.2(supports-color@8.1.1)':
     dependencies:
-      http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.6
+      http-proxy-agent: 7.0.2(supports-color@8.1.1)
+      https-proxy-agent: 7.0.6(supports-color@8.1.1)
       jszip: 3.10.1
       ora: 8.2.0
       semver: 7.8.5
@@ -5563,10 +5563,10 @@ snapshots:
       '@vscode/vsce-sign-win32-arm64': 2.0.6
       '@vscode/vsce-sign-win32-x64': 2.0.6
 
-  '@vscode/vsce@3.9.2(supports-color@8.1.1)':
+  '@vscode/vsce@3.9.2(supports-color@10.2.2)':
     dependencies:
-      '@azure/identity': 4.13.1
-      '@secretlint/node': 10.2.2
+      '@azure/identity': 4.13.1(supports-color@10.2.2)
+      '@secretlint/node': 10.2.2(supports-color@10.2.2)
       '@secretlint/secretlint-formatter-sarif': 10.2.2
       '@secretlint/secretlint-rule-no-dotenv': 10.2.2
       '@secretlint/secretlint-rule-preset-recommend': 10.2.2
@@ -5586,7 +5586,7 @@ snapshots:
       minimatch: 10.2.5
       parse-semver: 1.1.1
       read: 1.0.7
-      secretlint: 10.2.2(supports-color@8.1.1)
+      secretlint: 10.2.2(supports-color@10.2.2)
       semver: 7.8.5
       tmp: 0.2.7
       typed-rest-client: 1.8.11
@@ -5745,9 +5745,9 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.16.0:
+  axios@1.16.0(debug@4.4.3(supports-color@8.1.1)):
     dependencies:
-      follow-redirects: 1.16.0
+      follow-redirects: 1.16.0(debug@4.4.3(supports-color@8.1.1))
       form-data: 4.0.6
       proxy-from-env: 2.1.0
     transitivePeerDependencies:
@@ -6116,6 +6116,12 @@ snapshots:
 
   dateformat@3.0.3: {}
 
+  debug@4.4.3(supports-color@10.2.2):
+    dependencies:
+      ms: 2.1.3
+    optionalDependencies:
+      supports-color: 10.2.2
+
   debug@4.4.3(supports-color@8.1.1):
     dependencies:
       ms: 2.1.3
@@ -6308,7 +6314,7 @@ snapshots:
     optionalDependencies:
       unrs-resolver: 1.12.2
 
-  eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.0(@typescript-eslint/utils@8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(typescript@6.0.3))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1):
+  eslint-import-resolver-typescript@4.4.5(eslint-plugin-import-x@4.17.0(@typescript-eslint/utils@8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1):
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
       eslint: 10.6.0(jiti@2.7.0)(supports-color@8.1.1)
@@ -6319,11 +6325,11 @@ snapshots:
       tinyglobby: 0.2.17
       unrs-resolver: 1.12.2
     optionalDependencies:
-      eslint-plugin-import-x: 4.17.0(@typescript-eslint/utils@8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(typescript@6.0.3))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)
+      eslint-plugin-import-x: 4.17.0(@typescript-eslint/utils@8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import-x@4.17.0(@typescript-eslint/utils@8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(typescript@6.0.3))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1):
+  eslint-plugin-import-x@4.17.0(@typescript-eslint/utils@8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1):
     dependencies:
       '@typescript-eslint/types': 8.62.1
       comment-parser: 1.4.7
@@ -6336,7 +6342,7 @@ snapshots:
       stable-hash-x: 0.2.0
       unrs-resolver: 1.12.2
     optionalDependencies:
-      '@typescript-eslint/utils': 8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
     transitivePeerDependencies:
       - supports-color
 
@@ -6488,7 +6494,13 @@ snapshots:
 
   flatted@3.4.2: {}
 
-  follow-redirects@1.16.0: {}
+  follow-redirects@1.16.0(debug@4.4.3(supports-color@10.2.2)):
+    optionalDependencies:
+      debug: 4.4.3(supports-color@10.2.2)
+
+  follow-redirects@1.16.0(debug@4.4.3(supports-color@8.1.1)):
+    optionalDependencies:
+      debug: 4.4.3(supports-color@8.1.1)
 
   foreground-child@3.3.1:
     dependencies:
@@ -6702,14 +6714,28 @@ snapshots:
 
   http-cache-semantics@4.2.0: {}
 
-  http-proxy-agent@7.0.2:
+  http-proxy-agent@7.0.2(supports-color@10.2.2):
+    dependencies:
+      agent-base: 7.1.4
+      debug: 4.4.3(supports-color@10.2.2)
+    transitivePeerDependencies:
+      - supports-color
+
+  http-proxy-agent@7.0.2(supports-color@8.1.1):
     dependencies:
       agent-base: 7.1.4
       debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
-  https-proxy-agent@7.0.6:
+  https-proxy-agent@7.0.6(supports-color@10.2.2):
+    dependencies:
+      agent-base: 7.1.4
+      debug: 4.4.3(supports-color@10.2.2)
+    transitivePeerDependencies:
+      - supports-color
+
+  https-proxy-agent@7.0.6(supports-color@8.1.1):
     dependencies:
       agent-base: 7.1.4
       debug: 4.4.3(supports-color@8.1.1)
@@ -7003,12 +7029,12 @@ snapshots:
 
   kind-of@6.0.3: {}
 
-  lerna@9.0.7(@types/node@24.13.3):
+  lerna@9.0.7(@types/node@24.13.3)(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1):
     dependencies:
-      '@npmcli/arborist': 9.1.6
+      '@npmcli/arborist': 9.1.6(supports-color@8.1.1)
       '@npmcli/package-json': 7.0.2
       '@npmcli/run-script': 10.0.3
-      '@nx/devkit': 22.7.6(nx@22.7.6)
+      '@nx/devkit': 22.7.6(nx@22.7.6(debug@4.4.3(supports-color@8.1.1)))
       '@octokit/plugin-enterprise-rest': 6.0.1
       '@octokit/rest': 20.1.2
       aproba: 2.0.0
@@ -7038,22 +7064,22 @@ snapshots:
       is-ci: 3.0.1
       jest-diff: 30.4.1
       js-yaml: 4.1.1
-      libnpmaccess: 10.0.3
-      libnpmpublish: 11.1.2
+      libnpmaccess: 10.0.3(supports-color@8.1.1)
+      libnpmpublish: 11.1.2(supports-color@8.1.1)
       load-json-file: 6.2.0
-      make-fetch-happen: 15.0.2
+      make-fetch-happen: 15.0.2(supports-color@8.1.1)
       minimatch: 3.1.4
       npm-package-arg: 13.0.1
       npm-packlist: 10.0.3
-      npm-registry-fetch: 19.1.0
-      nx: 22.7.6
+      npm-registry-fetch: 19.1.0(supports-color@8.1.1)
+      nx: 22.7.6(debug@4.4.3(supports-color@8.1.1))
       p-map: 4.0.0
       p-map-series: 2.1.0
       p-pipe: 3.1.0
       p-queue: 6.6.2
       p-reduce: 2.1.0
       p-waterfall: 2.1.1
-      pacote: 21.0.1
+      pacote: 21.0.1(supports-color@8.1.1)
       read-cmd-shim: 4.0.0
       semver: 7.7.2
       signal-exit: 3.0.7
@@ -7086,22 +7112,22 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  libnpmaccess@10.0.3:
+  libnpmaccess@10.0.3(supports-color@8.1.1):
     dependencies:
       npm-package-arg: 13.0.1
-      npm-registry-fetch: 19.1.0
+      npm-registry-fetch: 19.1.0(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
-  libnpmpublish@11.1.2:
+  libnpmpublish@11.1.2(supports-color@8.1.1):
     dependencies:
       '@npmcli/package-json': 7.0.2
       ci-info: 4.3.1
       npm-package-arg: 13.0.1
-      npm-registry-fetch: 19.1.0
+      npm-registry-fetch: 19.1.0(supports-color@8.1.1)
       proc-log: 5.0.0
       semver: 7.8.5
-      sigstore: 4.1.1
+      sigstore: 4.1.1(supports-color@8.1.1)
       ssri: 12.0.0
     transitivePeerDependencies:
       - supports-color
@@ -7187,9 +7213,9 @@ snapshots:
     dependencies:
       semver: 7.8.5
 
-  make-fetch-happen@15.0.2:
+  make-fetch-happen@15.0.2(supports-color@8.1.1):
     dependencies:
-      '@npmcli/agent': 4.0.2
+      '@npmcli/agent': 4.0.2(supports-color@8.1.1)
       cacache: 20.0.4
       http-cache-semantics: 4.2.0
       minipass: 7.1.3
@@ -7203,10 +7229,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  make-fetch-happen@15.0.6:
+  make-fetch-happen@15.0.6(supports-color@8.1.1):
     dependencies:
       '@gar/promise-retry': 1.0.3
-      '@npmcli/agent': 4.0.2
+      '@npmcli/agent': 4.0.2(supports-color@8.1.1)
       '@npmcli/redact': 4.0.0
       cacache: 20.0.4
       http-cache-semantics: 4.2.0
@@ -7496,11 +7522,11 @@ snapshots:
       npm-package-arg: 13.0.1
       semver: 7.8.5
 
-  npm-registry-fetch@19.1.0:
+  npm-registry-fetch@19.1.0(supports-color@8.1.1):
     dependencies:
       '@npmcli/redact': 3.2.2
       jsonparse: 1.3.1
-      make-fetch-happen: 15.0.2
+      make-fetch-happen: 15.0.2(supports-color@8.1.1)
       minipass: 7.1.3
       minipass-fetch: 4.0.1
       minizlib: 3.1.0
@@ -7517,7 +7543,7 @@ snapshots:
     dependencies:
       boolbase: 1.0.0
 
-  nx@22.7.6:
+  nx@22.7.6(debug@4.4.3(supports-color@8.1.1)):
     dependencies:
       '@emnapi/core': 1.4.5
       '@emnapi/runtime': 1.4.5
@@ -7532,7 +7558,7 @@ snapshots:
       ansi-styles: 4.3.0
       argparse: 2.0.1
       asynckit: 0.4.0
-      axios: 1.16.0
+      axios: 1.16.0(debug@4.4.3(supports-color@8.1.1))
       balanced-match: 4.0.3
       base64-js: 1.5.1
       bl: 4.1.0
@@ -7565,7 +7591,7 @@ snapshots:
       escape-string-regexp: 1.0.5
       figures: 3.2.0
       flat: 5.0.2
-      follow-redirects: 1.16.0
+      follow-redirects: 1.16.0(debug@4.4.3(supports-color@8.1.1))
       form-data: 4.0.6
       fs-constants: 1.0.0
       function-bind: 1.1.2
@@ -7706,11 +7732,11 @@ snapshots:
       string-width: 7.2.0
       strip-ansi: 7.2.0
 
-  ovsx@1.0.2:
+  ovsx@1.0.2(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2):
     dependencies:
-      '@vscode/vsce': 3.9.2(supports-color@8.1.1)
+      '@vscode/vsce': 3.9.2(supports-color@10.2.2)
       commander: 6.2.1
-      follow-redirects: 1.16.0
+      follow-redirects: 1.16.0(debug@4.4.3(supports-color@10.2.2))
       is-ci: 2.0.0
       leven: 3.1.0
       semver: 7.8.5
@@ -7777,7 +7803,7 @@ snapshots:
 
   package-json-from-dist@1.0.1: {}
 
-  pacote@21.0.1:
+  pacote@21.0.1(supports-color@8.1.1):
     dependencies:
       '@npmcli/git': 6.0.3
       '@npmcli/installed-package-contents': 3.0.0
@@ -7790,16 +7816,16 @@ snapshots:
       npm-package-arg: 13.0.1
       npm-packlist: 10.0.3
       npm-pick-manifest: 10.0.0
-      npm-registry-fetch: 19.1.0
+      npm-registry-fetch: 19.1.0(supports-color@8.1.1)
       proc-log: 5.0.0
       promise-retry: 2.0.1
-      sigstore: 4.1.1
+      sigstore: 4.1.1(supports-color@8.1.1)
       ssri: 12.0.0
       tar: 7.5.11
     transitivePeerDependencies:
       - supports-color
 
-  pacote@21.5.1:
+  pacote@21.5.1(supports-color@8.1.1):
     dependencies:
       '@gar/promise-retry': 1.0.3
       '@npmcli/git': 7.0.2
@@ -7813,9 +7839,9 @@ snapshots:
       npm-package-arg: 13.0.1
       npm-packlist: 10.0.3
       npm-pick-manifest: 11.0.3
-      npm-registry-fetch: 19.1.0
+      npm-registry-fetch: 19.1.0(supports-color@8.1.1)
       proc-log: 6.1.0
-      sigstore: 4.1.1
+      sigstore: 4.1.1(supports-color@8.1.1)
       ssri: 13.0.1
       tar: 7.5.11
     transitivePeerDependencies:
@@ -8002,9 +8028,9 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
 
-  rc-config-loader@4.1.4:
+  rc-config-loader@4.1.4(supports-color@10.2.2):
     dependencies:
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.4.3(supports-color@10.2.2)
       js-yaml: 4.3.0
       json5: 2.2.3
       require-from-string: 2.0.2
@@ -8189,11 +8215,11 @@ snapshots:
 
   sax@1.6.0: {}
 
-  secretlint@10.2.2(supports-color@8.1.1):
+  secretlint@10.2.2(supports-color@10.2.2):
     dependencies:
       '@secretlint/config-creator': 10.2.2
-      '@secretlint/formatter': 10.2.2
-      '@secretlint/node': 10.2.2
+      '@secretlint/formatter': 10.2.2(supports-color@10.2.2)
+      '@secretlint/node': 10.2.2(supports-color@10.2.2)
       '@secretlint/profiler': 10.2.2
       debug: 4.4.3(supports-color@8.1.1)
       globby: 14.1.0
@@ -8253,13 +8279,13 @@ snapshots:
 
   signal-exit@4.1.0: {}
 
-  sigstore@4.1.1:
+  sigstore@4.1.1(supports-color@8.1.1):
     dependencies:
       '@sigstore/bundle': 4.0.0
       '@sigstore/core': 3.2.1
       '@sigstore/protobuf-specs': 0.5.1
-      '@sigstore/sign': 4.1.1
-      '@sigstore/tuf': 4.0.2
+      '@sigstore/sign': 4.1.1(supports-color@8.1.1)
+      '@sigstore/tuf': 4.0.2(supports-color@8.1.1)
       '@sigstore/verify': 3.1.1
     transitivePeerDependencies:
       - supports-color
@@ -8302,7 +8328,7 @@ snapshots:
 
   smol-toml@1.6.1: {}
 
-  socks-proxy-agent@8.0.5:
+  socks-proxy-agent@8.0.5(supports-color@8.1.1):
     dependencies:
       agent-base: 7.1.4
       debug: 4.4.3(supports-color@8.1.1)
@@ -8515,7 +8541,7 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
-  tsdown@0.22.13(typescript@6.0.3):
+  tsdown@0.22.14(typescript@6.0.3):
     dependencies:
       ansis: 4.3.1
       cac: 7.0.0
@@ -8531,7 +8557,7 @@ snapshots:
       tinyglobby: 0.2.17
       tree-kill: 1.2.2
       unconfig-core: 7.5.0
-      verkit: 0.1.2
+      verkit: 0.3.0
     optionalDependencies:
       typescript: 6.0.3
     transitivePeerDependencies:
@@ -8542,11 +8568,11 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  tuf-js@4.1.0:
+  tuf-js@4.1.0(supports-color@8.1.1):
     dependencies:
       '@tufjs/models': 4.1.0
       debug: 4.4.3(supports-color@8.1.1)
-      make-fetch-happen: 15.0.2
+      make-fetch-happen: 15.0.2(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -8587,8 +8613,8 @@ snapshots:
     dependencies:
       '@typescript-eslint/eslint-plugin': 8.62.0(@typescript-eslint/parser@8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
       '@typescript-eslint/parser': 8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
-      '@typescript-eslint/typescript-estree': 8.62.0(typescript@6.0.3)
-      '@typescript-eslint/utils': 8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(typescript@6.0.3)
+      '@typescript-eslint/typescript-estree': 8.62.0(supports-color@8.1.1)(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.62.0(eslint@10.6.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
       eslint: 10.6.0(jiti@2.7.0)(supports-color@8.1.1)
       typescript: 6.0.3
     transitivePeerDependencies:
@@ -8674,7 +8700,7 @@ snapshots:
 
   validate-npm-package-name@6.0.2: {}
 
-  verkit@0.1.2: {}
+  verkit@0.3.0: {}
 
   version-range@4.15.0: {}
 
