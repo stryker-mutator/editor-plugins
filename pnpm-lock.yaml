@@ -108,8 +108,8 @@ importers:
         specifier: 13.0.6
         version: 13.0.6
       json-rpc-2.0:
-        specifier: 1.7.2
-        version: 1.7.2
+        specifier: 1.8.0
+        version: 1.8.0
       mutation-server-protocol:
         specifier: workspace:*
         version: link:../mutation-server-protocol
@@ -2852,8 +2852,8 @@ packages:
     resolution: {integrity: sha512-ZF1nxZ28VhQouRWhUcVlUIN3qwSgPuswK05s/HIaoetAoE/9tngVmCHjSxmSQPav1nd+lPtTL0YZ/2AFdR/iYQ==}
     engines: {node: ^20.17.0 || >=22.9.0}
 
-  json-rpc-2.0@1.7.2:
-    resolution: {integrity: sha512-UV6rm08DNynb/qLosex00cpwfJtsbbLcHDKFoEF3ocbvZXvxxmqiJ7qTqCYdE6ePsveZC5Mij0XVYOeuk9c8lw==}
+  json-rpc-2.0@1.8.0:
+    resolution: {integrity: sha512-4nw+XlJbk5XokA7BtqHGu+0PEiUPfAkRzXXd1Cgjy1c3F2UI/3Gy7yr76wyJEv3X1F1SRGGF8xPAPPhelBiGmA==}
 
   json-schema-traverse@0.4.1:
     resolution: {integrity: sha512-xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg==}
@@ -7124,7 +7124,7 @@ snapshots:
 
   json-parse-even-better-errors@5.0.0: {}
 
-  json-rpc-2.0@1.7.2: {}
+  json-rpc-2.0@1.8.0: {}
 
   json-schema-traverse@0.4.1: {}
 
