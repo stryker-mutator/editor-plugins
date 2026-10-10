@@ -92,19 +92,18 @@
           "default": "js"
         },
         "strykerMutator.watchPattern": {
-          "markdownDescription": "Glob pattern for files to watch for changes and trigger mutation discovery. Uses [VS Code glob pattern syntax](https://code.visualstudio.com/docs/editor/glob-patterns#_glob-pattern-syntax).",
+          "markdownDescription": "Glob pattern for files to watch for changes and trigger mutation discovery. Uses [VS Code glob pattern syntax](https://code.visualstudio.com/docs/editor/glob-patterns#_glob-pattern-syntax). When not set, defaults to `**/*.{js,ts,jsx,tsx}` for the `js` platform and `**/*.cs` for the `dotnet` platform.",
           "scope": "resource",
-          "type": "string",
-          "default": "**/*.{js,ts,jsx,tsx}"
+          "type": "string"
         },
         "strykerMutator.server.path": {
-          "description": "Path to the mutation server executable.",
+          "description": "Path to the mutation server executable (Stryker JS only; the dotnet platform runs `dotnet`).",
           "scope": "resource",
           "type": "string",
           "default": "node_modules/.bin/stryker"
         },
         "strykerMutator.server.args": {
-          "description": "Arguments to pass to the mutation server process when starting.",
+          "description": "Arguments to pass to the mutation server process when starting (Stryker JS only).",
           "scope": "resource",
           "type": "array",
           "default": [
@@ -112,8 +111,24 @@
             "stdio"
           ]
         },
+        "strykerMutator.server.dotnetArgs": {
+          "description": "Arguments to pass to the `dotnet` command when starting the Stryker.NET mutation server (dotnet platform only).",
+          "scope": "resource",
+          "type": "array",
+          "default": [
+            "stryker",
+            "serve",
+            "stdio"
+          ]
+        },
         "strykerMutator.server.workingDirectory": {
-          "description": "Working directory for the Stryker server process. Defaults to the workspace folder if not set.",
+          "description": "Working directory for the Stryker JS server process (js platform). Defaults to the workspace folder if not set.",
+          "scope": "resource",
+          "type": "string",
+          "default": "."
+        },
+        "strykerMutator.server.dotnetWorkingDirectory": {
+          "description": "Working directory for the Stryker.NET server process (dotnet platform). Defaults to the workspace folder if not set.",
           "scope": "resource",
           "type": "string",
           "default": "."

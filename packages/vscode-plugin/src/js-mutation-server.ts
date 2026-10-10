@@ -78,7 +78,7 @@ export class JsMutationServer implements MutationServer {
     );
 
     const serverWorkingDirectory = Configuration.getSettingOrDefault<string>(
-      Settings.WorkingDirectory,
+      Settings.JsWorkingDirectory,
       this.workspaceFolder.uri.fsPath,
       this.workspaceFolder,
     );

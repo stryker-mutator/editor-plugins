@@ -60,13 +60,13 @@ export class DotNetMutationServer implements MutationServer {
 
   public async init() {
     const serverArgs = Configuration.getSettingOrDefault<string[]>(
-      Settings.StrykerJsServerArgs,
-      [],
+      Settings.StrykerDotNetServerArgs,
+      ['stryker', 'serve', 'stdio'],
       this.workspaceFolder,
     );
 
     const serverWorkingDirectory = Configuration.getSettingOrDefault<string>(
-      Settings.WorkingDirectory,
+      Settings.DotNetWorkingDirectory,
       this.workspaceFolder.uri.fsPath,
       this.workspaceFolder,
     );
@@ -76,13 +76,11 @@ export class DotNetMutationServer implements MutationServer {
       serverWorkingDirectory,
     );
 
-    const fullServerArgs = ['stryker', 'serve', 'stdio', ...serverArgs];
-
     this.logger.info(
-      `Server configuration: path=dotnet, args=${fullServerArgs}, cwd=${cwd}`,
+      `Server configuration: path=dotnet, args=${serverArgs}, cwd=${cwd}`,
     );
 
-    await this.serverProcess.init(cwd, 'dotnet', fullServerArgs);
+    await this.serverProcess.init(cwd, 'dotnet', serverArgs);
     await this.transport.init();
 
     // Handle incoming messages (responses and requests with id)

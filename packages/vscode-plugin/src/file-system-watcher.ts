@@ -1,34 +1,32 @@
 import { buffer, debounceTime, Subject } from 'rxjs';
 import vscode from 'vscode';
 
-import { Configuration, Settings } from './config/index.ts';
+import { Configuration, Platforms, Settings } from './config/index.ts';
 import { commonTokens } from './di/index.ts';
 import type { FileChangeHandler } from './file-change-handler.ts';
 import { Constants } from './index.ts';
-import type { ContextualLogger } from './logging/contextual-logger.ts';
 
 export class FileSystemWatcher {
   private readonly workspaceFolder;
   private readonly fileChangeHandler;
-  private readonly logger;
 
   #watcher?: vscode.FileSystemWatcher;
   private readonly fileChangeSubject = new Subject<vscode.Uri>();
   private readonly fileDeleteSubject = new Subject<vscode.Uri>();
+
   public static readonly inject = [
     commonTokens.workspaceFolder,
     commonTokens.fileChangeHandler,
-    commonTokens.contextualLogger,
   ] as const;
+
   constructor(
     workspaceFolder: vscode.WorkspaceFolder,
     fileChangeHandler: FileChangeHandler,
-    logger: ContextualLogger,
   ) {
     this.workspaceFolder = workspaceFolder;
     this.fileChangeHandler = fileChangeHandler;
-    this.logger = logger;
   }
+
   init() {
     this.fileChangeSubject
       .pipe(
@@ -42,6 +40,7 @@ export class FileSystemWatcher {
       .subscribe(async (uris) => {
         await this.fileChangeHandler.handleFilesChanged(uris);
       });
+
     this.fileDeleteSubject
       .pipe(
         buffer(
@@ -53,20 +52,29 @@ export class FileSystemWatcher {
       .subscribe((uris) => {
         this.fileChangeHandler.handleFilesDeleted(uris);
       });
+
+    const defaultPattern =
+      Configuration.getPlatform(this.workspaceFolder) === Platforms.DotNet
+        ? Constants.DefaultDotNetFileSystemWatcherPattern
+        : Constants.DefaultJsFileSystemWatcherPattern;
+
     const configuredPattern = Configuration.getSettingOrDefault<string>(
       Settings.FileSystemWatcherPattern,
-      Constants.DefaultFileSystemWatcherPattern,
+      defaultPattern,
       this.workspaceFolder,
     );
+
     const relativePattern = new vscode.RelativePattern(
       this.workspaceFolder,
       configuredPattern,
     );
+
     this.#watcher = vscode.workspace.createFileSystemWatcher(relativePattern);
     this.#watcher.onDidCreate((uri) => this.fileChangeSubject.next(uri));
     this.#watcher.onDidChange((uri) => this.fileChangeSubject.next(uri));
     this.#watcher.onDidDelete((uri) => this.fileDeleteSubject.next(uri));
   }
+
   dispose() {
     this.#watcher?.dispose();
     this.fileChangeSubject.complete();

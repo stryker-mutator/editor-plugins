@@ -47,7 +47,7 @@ export class WorkspaceFolder {
     this.#initialized = false;
 
     const enabled = Configuration.getSettingOrDefault<boolean>(
-      Settings.enable,
+      Settings.Enable,
       true,
       this.workspaceFolder,
     );
@@ -64,8 +64,7 @@ export class WorkspaceFolder {
       return;
     }
 
-    const serverWorkspaceDirectory = Configuration.getSettingOrDefault<string>(
-      Settings.WorkingDirectory,
+    const serverWorkspaceDirectory = Configuration.getServerWorkingDirectory(
       '.',
       this.workspaceFolder,
     );
@@ -100,7 +99,7 @@ export class WorkspaceFolder {
 
   async runMutationTestsForFile(fileUri: vscode.Uri) {
     const enabled = Configuration.getSettingOrDefault<boolean>(
-      Settings.enable,
+      Settings.Enable,
       true,
       this.workspaceFolder,
     );

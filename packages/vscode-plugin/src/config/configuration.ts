@@ -4,8 +4,8 @@ import {
   type WorkspaceConfiguration,
 } from 'vscode';
 
-import type { Settings } from './index.ts';
-import { SettingSections } from './index.ts';
+import type { Platform } from './index.ts';
+import { Platforms, Settings, SettingSections } from './index.ts';
 
 export class Configuration {
   /**
@@ -40,6 +40,28 @@ export class Configuration {
     const section = SettingSections[setting];
     const value = this.get(section, scope).get<T>(setting);
     return value === undefined || value === '' ? defaultValue : value;
+  }
+
+  public static getPlatform(scope?: ConfigurationScope | null): Platform {
+    return this.getSettingOrDefault<Platform>(
+      Settings.Platform,
+      Platforms.Js,
+      scope,
+    );
+  }
+
+  /**
+   * Working directory of the server, taken from the setting belonging to the configured platform
+   */
+  public static getServerWorkingDirectory(
+    defaultValue: string,
+    scope?: ConfigurationScope | null,
+  ): string {
+    const setting =
+      this.getPlatform(scope) === Platforms.DotNet
+        ? Settings.DotNetWorkingDirectory
+        : Settings.JsWorkingDirectory;
+    return this.getSettingOrDefault<string>(setting, defaultValue, scope);
   }
 
   public static async updateSetting(
