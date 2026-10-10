@@ -19,6 +19,7 @@ import type vscode from 'vscode';
 import { Configuration } from '../../config/index.ts';
 import { Constants } from '../../constants.ts';
 import { JsMutationServer } from '../../js-mutation-server.ts';
+import { ContextualLogger } from '../../logging/index.ts';
 import { ServerProcess } from '../../server-process.ts';
 import type { StdioTransport } from '../../transport';
 import { createMutantResult, createMutationTestResult } from '../factory';
@@ -53,7 +54,12 @@ describe(JsMutationServer.name, () => {
 
     configurationStub = sandbox.stub(Configuration, 'getSetting');
 
-    sut = new JsMutationServer(workspaceFolderMock, processMock, transportMock);
+    sut = new JsMutationServer(
+      workspaceFolderMock,
+      processMock,
+      transportMock,
+      sandbox.createStubInstance(ContextualLogger),
+    );
   });
 
   afterEach(() => {

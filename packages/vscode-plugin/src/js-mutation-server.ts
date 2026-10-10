@@ -7,18 +7,18 @@ import type {
   MutationTestParams,
   MutationTestResult,
 } from 'mutation-server-protocol';
+import path from 'path';
 import type { Observable } from 'rxjs';
 import { filter, from, map, merge, takeUntil } from 'rxjs';
 import type vscode from 'vscode';
-import path from 'path';
 
 import { Configuration, Settings } from './config/index.ts';
 import { commonTokens } from './di/index.ts';
 import type { ServerProcess } from './index.ts';
 import { Constants, MissingServerPathError } from './index.ts';
+import type { ContextualLogger } from './logging/contextual-logger.ts';
 import type { MutationServer } from './mutation-server.ts';
 import type { StdioTransport } from './transport/index.ts';
-import { ContextualLogger } from './logging/contextual-logger.ts';
 
 const rpcMethods = Object.freeze({
   configure: 'configure',
@@ -72,13 +72,13 @@ export class JsMutationServer implements MutationServer {
     }
 
     const serverArgs = Configuration.getSettingOrDefault<string[]>(
-      Settings.StrykerJsServerArgs,
+      Settings.JsServerArgs,
       [],
       this.workspaceFolder,
     );
 
     const serverWorkingDirectory = Configuration.getSettingOrDefault<string>(
-      Settings.JsWorkingDirectory,
+      Settings.JsServerWorkingDirectory,
       this.workspaceFolder.uri.fsPath,
       this.workspaceFolder,
     );
@@ -91,7 +91,7 @@ export class JsMutationServer implements MutationServer {
     const resolvedServerPath = path.resolve(cwd, serverExePath);
 
     this.logger.info(
-      `Server configuration: path=${resolvedServerPath}, args=${serverArgs}, cwd=${cwd}`,
+      `Starting JS mutation server with configuration: path=${resolvedServerPath}, args=${serverArgs}, cwd=${cwd}`,
     );
 
     await this.serverProcess.init(cwd, resolvedServerPath, serverArgs);
@@ -123,6 +123,7 @@ export class JsMutationServer implements MutationServer {
       configureParams,
     )) as ConfigureResult;
   }
+
   public async discover(
     discoverParams: DiscoverParams,
   ): Promise<DiscoverResult> {

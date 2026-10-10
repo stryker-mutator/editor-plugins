@@ -27,7 +27,7 @@ describe(Configuration.name, () => {
 
   describe('getSetting', () => {
     it('should get setting from correct section', () => {
-      const setting = Settings.enable;
+      const setting = Settings.Enable;
       const expectedSection = SettingSections[setting];
       const expectedValue = true;
       mockWorkspaceConfig.get.returns(expectedValue);
@@ -130,7 +130,7 @@ describe(Configuration.name, () => {
 
   describe('updateSetting', () => {
     it('should update setting in correct section', async () => {
-      const setting = Settings.enable;
+      const setting = Settings.Enable;
       const value = true;
       const expectedSection = SettingSections[setting];
       mockWorkspaceConfig.update.resolves();
@@ -208,7 +208,7 @@ describe(Configuration.name, () => {
     });
 
     it('should handle complex objects', async () => {
-      const setting = Settings.StrykerJsServerArgs;
+      const setting = Settings.JsServerArgs;
       const currentValue = ['old', 'args'];
       const newValue = ['new', 'args'];
       mockWorkspaceConfig.get.returns(currentValue);
@@ -221,7 +221,7 @@ describe(Configuration.name, () => {
     });
 
     it('should not update when complex objects are the same', async () => {
-      const setting = Settings.StrykerJsServerArgs;
+      const setting = Settings.JsServerArgs;
       const value = ['same', 'args'];
       mockWorkspaceConfig.get.returns(value);
 

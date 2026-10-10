@@ -59,8 +59,8 @@ export class Configuration {
   ): string {
     const setting =
       this.getPlatform(scope) === Platforms.DotNet
-        ? Settings.DotNetWorkingDirectory
-        : Settings.JsWorkingDirectory;
+        ? Settings.DotNetServerWorkingDirectory
+        : Settings.JsServerWorkingDirectory;
     return this.getSettingOrDefault<string>(setting, defaultValue, scope);
   }
 

@@ -60,7 +60,7 @@ describe(WorkspaceFolder.name, () => {
     describe('when setting "enable" is false', () => {
       beforeEach(() => {
         getSettingOrDefaultStub
-          .withArgs(Settings.enable, true, workspaceFolderMock)
+          .withArgs(Settings.Enable, true, workspaceFolderMock)
           .returns(false);
       });
 
@@ -76,10 +76,10 @@ describe(WorkspaceFolder.name, () => {
     describe('when setting "enable" is true', () => {
       beforeEach(() => {
         getSettingOrDefaultStub
-          .withArgs(Settings.enable, true, workspaceFolderMock)
+          .withArgs(Settings.Enable, true, workspaceFolderMock)
           .returns(true);
         getSettingOrDefaultStub
-          .withArgs(Settings.WorkingDirectory, '.', workspaceFolderMock)
+          .withArgs(Settings.JsServerWorkingDirectory, '.', workspaceFolderMock)
           .returns('/foo/bar/server');
 
         injectorMock.injectClass
@@ -151,7 +151,7 @@ describe(WorkspaceFolder.name, () => {
     describe('when mutation server initialization fails', () => {
       beforeEach(() => {
         getSettingOrDefaultStub
-          .withArgs(Settings.enable, true, workspaceFolderMock)
+          .withArgs(Settings.Enable, true, workspaceFolderMock)
           .returns(true);
         mutationServerMock.init.rejects(
           new Error('Server initialization failed'),
@@ -182,10 +182,10 @@ describe(WorkspaceFolder.name, () => {
     it('should dispose all resources when components are initialized', async () => {
       // Arrange
       getSettingOrDefaultStub
-        .withArgs(Settings.enable, true, workspaceFolderMock)
+        .withArgs(Settings.Enable, true, workspaceFolderMock)
         .returns(true);
       getSettingOrDefaultStub
-        .withArgs(Settings.WorkingDirectory, '.', workspaceFolderMock)
+        .withArgs(Settings.JsServerWorkingDirectory, '.', workspaceFolderMock)
         .returns('/foo/bar/server');
 
       injectorMock.injectClass
@@ -240,10 +240,10 @@ describe(WorkspaceFolder.name, () => {
     it('should delegate file-scoped mutation tests when initialized', async () => {
       // Arrange
       getSettingOrDefaultStub
-        .withArgs(Settings.enable, true, workspaceFolderMock)
+        .withArgs(Settings.Enable, true, workspaceFolderMock)
         .returns(true);
       getSettingOrDefaultStub
-        .withArgs(Settings.WorkingDirectory, '.', workspaceFolderMock)
+        .withArgs(Settings.JsServerWorkingDirectory, '.', workspaceFolderMock)
         .returns('/foo/bar/server');
 
       injectorMock.injectClass
@@ -271,7 +271,7 @@ describe(WorkspaceFolder.name, () => {
       // Arrange
       const fileUri = Uri.file('/foo/bar/file.ts');
       getSettingOrDefaultStub
-        .withArgs(Settings.enable, true, workspaceFolderMock)
+        .withArgs(Settings.Enable, true, workspaceFolderMock)
         .returns(false);
 
       // Act
@@ -292,7 +292,7 @@ describe(WorkspaceFolder.name, () => {
       // Arrange
       const fileUri = Uri.file('/foo/bar/file.ts');
       getSettingOrDefaultStub
-        .withArgs(Settings.enable, true, workspaceFolderMock)
+        .withArgs(Settings.Enable, true, workspaceFolderMock)
         .returns(true);
 
       // Act
@@ -311,10 +311,10 @@ describe(WorkspaceFolder.name, () => {
     it('should skip when running after dispose', async () => {
       // Arrange
       getSettingOrDefaultStub
-        .withArgs(Settings.enable, true, workspaceFolderMock)
+        .withArgs(Settings.Enable, true, workspaceFolderMock)
         .returns(true);
       getSettingOrDefaultStub
-        .withArgs(Settings.WorkingDirectory, '.', workspaceFolderMock)
+        .withArgs(Settings.JsServerWorkingDirectory, '.', workspaceFolderMock)
         .returns('/foo/bar/server');
 
       injectorMock.injectClass
