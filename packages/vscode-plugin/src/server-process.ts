@@ -1,70 +1,36 @@
 import { type ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import path from 'path';
-import type vscode from 'vscode';
 
-import { Configuration, Settings } from './config/index.ts';
 import { commonTokens } from './di/index.ts';
-import { MissingServerPathError } from './index.ts';
 import type { ContextualLogger } from './logging/index.ts';
 
-export class Process extends EventEmitter {
-  private readonly workspaceFolder;
+export class ServerProcess extends EventEmitter {
   private readonly logger;
   #process: ChildProcessWithoutNullStreams | undefined;
+
   static readonly inject = [
     commonTokens.workspaceFolder,
     commonTokens.contextualLogger,
   ] as const;
+
   constructor(
-    workspaceFolder: vscode.WorkspaceFolder,
     logger: ContextualLogger,
   ) {
     super();
-    this.workspaceFolder = workspaceFolder;
     this.logger = logger;
   }
-  async init(): Promise<void> {
-    const serverPath = Configuration.getSetting<string>(
-      Settings.ServerPath,
-      this.workspaceFolder,
-    );
-    if (!serverPath) {
-      this.logger.error(
-        'Cannot start server. Missing server path configuration.',
-      );
-      throw new MissingServerPathError();
-    }
-    const serverArgs = Configuration.getSettingOrDefault<string[]>(
-      Settings.ServerArgs,
-      [],
-      this.workspaceFolder,
-    );
-    const serverWorkingDirectory = Configuration.getSettingOrDefault<string>(
-      Settings.CurrentWorkingDirectory,
-      this.workspaceFolder.uri.fsPath,
-      this.workspaceFolder,
-    );
-    const cwd = path.resolve(
-      this.workspaceFolder.uri.fsPath,
-      serverWorkingDirectory,
-    );
 
-    const resolvedServerPath = path.resolve(cwd, serverPath);
-
+  async init(cwd: string, startCommand: string, commandArgs: string[]): Promise<void> {
     const isWindows = process.platform === 'win32';
-
-    this.logger.info(
-      `Server configuration: path=${resolvedServerPath}, args=${serverArgs}, cwd=${cwd}`,
-    );
 
     // On Windows, wrap the path in double quotes to handle spaces and special
     // characters (e.g. parentheses) when the path is interpreted by cmd.exe
     const spawnPath = isWindows
-      ? `"${resolvedServerPath}"`
-      : resolvedServerPath;
+      ? `"${startCommand}"`
+      : startCommand;
 
-    this.#process = spawn(spawnPath, serverArgs, {
+    this.#process = spawn(spawnPath, commandArgs, {
       cwd,
       shell: isWindows,
     });
@@ -97,9 +63,11 @@ export class Process extends EventEmitter {
     });
     return Promise.resolve();
   }
+
   write(data: string | Buffer) {
     this.#process!.stdin.write(data);
   }
+  
   dispose() {
     this.#process?.removeAllListeners();
     this.#process?.kill();

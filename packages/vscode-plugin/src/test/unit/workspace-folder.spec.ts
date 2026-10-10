@@ -8,7 +8,7 @@ import { Configuration, Settings } from '../../config/index.ts';
 import { commonTokens } from '../../di/tokens.ts';
 import { FileSystemWatcher } from '../../file-system-watcher.ts';
 import { ContextualLogger } from '../../logging/contextual-logger.ts';
-import { MutationServer } from '../../mutation-server.ts';
+import { JsMutationServer } from '../../js-mutation-server.ts';
 import { provideTestController, TestExplorer } from '../../test-explorer.ts';
 import type { WorkspaceFolderContext } from '../../workspace-folder.ts';
 import { WorkspaceFolder } from '../../workspace-folder.ts';
@@ -20,7 +20,7 @@ describe(WorkspaceFolder.name, () => {
   let injectorMock: sinon.SinonStubbedInstance<
     Injector<WorkspaceFolderContext>
   >;
-  let mutationServerMock: sinon.SinonStubbedInstance<MutationServer>;
+  let mutationServerMock: sinon.SinonStubbedInstance<JsMutationServer>;
   let workspaceFolderMock: sinon.SinonStubbedInstance<vscode.WorkspaceFolder>;
   let contextualLoggerMock: sinon.SinonStubbedInstance<ContextualLogger>;
   let testExplorerMock: sinon.SinonStubbedInstance<TestExplorer>;
@@ -32,7 +32,7 @@ describe(WorkspaceFolder.name, () => {
     injectorMock = factory.injector() as unknown as sinon.SinonStubbedInstance<
       Injector<WorkspaceFolderContext>
     >;
-    mutationServerMock = sinon.createStubInstance(MutationServer);
+    mutationServerMock = sinon.createStubInstance(JsMutationServer);
     workspaceFolderMock = factory.workspaceFolder();
     contextualLoggerMock = sinon.createStubInstance(ContextualLogger);
     testExplorerMock = sinon.createStubInstance(TestExplorer);
@@ -79,7 +79,7 @@ describe(WorkspaceFolder.name, () => {
           .withArgs(Settings.enable, true, workspaceFolderMock)
           .returns(true);
         getSettingOrDefaultStub
-          .withArgs(Settings.CurrentWorkingDirectory, '.', workspaceFolderMock)
+          .withArgs(Settings.WorkingDirectory, '.', workspaceFolderMock)
           .returns('/foo/bar/server');
 
         injectorMock.injectClass
@@ -185,7 +185,7 @@ describe(WorkspaceFolder.name, () => {
         .withArgs(Settings.enable, true, workspaceFolderMock)
         .returns(true);
       getSettingOrDefaultStub
-        .withArgs(Settings.CurrentWorkingDirectory, '.', workspaceFolderMock)
+        .withArgs(Settings.WorkingDirectory, '.', workspaceFolderMock)
         .returns('/foo/bar/server');
 
       injectorMock.injectClass
@@ -243,7 +243,7 @@ describe(WorkspaceFolder.name, () => {
         .withArgs(Settings.enable, true, workspaceFolderMock)
         .returns(true);
       getSettingOrDefaultStub
-        .withArgs(Settings.CurrentWorkingDirectory, '.', workspaceFolderMock)
+        .withArgs(Settings.WorkingDirectory, '.', workspaceFolderMock)
         .returns('/foo/bar/server');
 
       injectorMock.injectClass
@@ -314,7 +314,7 @@ describe(WorkspaceFolder.name, () => {
         .withArgs(Settings.enable, true, workspaceFolderMock)
         .returns(true);
       getSettingOrDefaultStub
-        .withArgs(Settings.CurrentWorkingDirectory, '.', workspaceFolderMock)
+        .withArgs(Settings.WorkingDirectory, '.', workspaceFolderMock)
         .returns('/foo/bar/server');
 
       injectorMock.injectClass

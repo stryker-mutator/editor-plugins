@@ -8,11 +8,11 @@ import type vscode from 'vscode';
 import { Configuration, Settings } from '../../config/index.ts';
 import { MissingServerPathError } from '../../errors.ts';
 import { ContextualLogger } from '../../logging/index.ts';
-import { Process } from '../../process.ts';
+import { ServerProcess } from '../../server-process.ts';
 
-describe(`${Process.name} (Integration)`, () => {
+describe(`${ServerProcess.name} (Integration)`, () => {
   let sandbox: sinon.SinonSandbox;
-  let sut: Process;
+  let sut: ServerProcess;
   let loggerMock: sinon.SinonStubbedInstance<ContextualLogger>;
   let workspaceFolderMock: vscode.WorkspaceFolder;
   let configurationGetSettingStub: sinon.SinonStub;
@@ -72,7 +72,7 @@ describe(`${Process.name} (Integration)`, () => {
       'getSettingOrDefault',
     );
 
-    sut = new Process(workspaceFolderMock, loggerMock);
+    sut = new ServerProcess(workspaceFolderMock, loggerMock);
   });
 
   afterEach(async () => {
@@ -91,7 +91,7 @@ describe(`${Process.name} (Integration)`, () => {
     it('should throw MissingServerPathError when server path is not configured', async () => {
       // Arrange
       configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerExePath, workspaceFolderMock)
         .returns(undefined);
 
       // Act & Assert
@@ -123,14 +123,14 @@ describe(`${Process.name} (Integration)`, () => {
       const serverArgs: string[] = [];
 
       configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerExePath, workspaceFolderMock)
         .returns(serverPath);
       configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerArgs, [], workspaceFolderMock)
         .returns(serverArgs);
       configurationGetSettingOrDefaultStub
         .withArgs(
-          Settings.CurrentWorkingDirectory,
+          Settings.WorkingDirectory,
           workspaceFolderMock.uri.fsPath,
           workspaceFolderMock,
         )
@@ -161,14 +161,14 @@ describe(`${Process.name} (Integration)`, () => {
       const serverArgs = ['test'];
 
       configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerExePath, workspaceFolderMock)
         .returns(serverPath);
       configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerArgs, [], workspaceFolderMock)
         .returns(serverArgs);
       configurationGetSettingOrDefaultStub
         .withArgs(
-          Settings.CurrentWorkingDirectory,
+          Settings.WorkingDirectory,
           workspaceFolderMock.uri.fsPath,
           workspaceFolderMock,
         )
@@ -213,14 +213,14 @@ describe(`${Process.name} (Integration)`, () => {
       const serverArgs: string[] = [];
 
       configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerExePath, workspaceFolderMock)
         .returns(serverPath);
       configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerArgs, [], workspaceFolderMock)
         .returns(serverArgs);
       configurationGetSettingOrDefaultStub
         .withArgs(
-          Settings.CurrentWorkingDirectory,
+          Settings.WorkingDirectory,
           workspaceFolderMock.uri.fsPath,
           workspaceFolderMock,
         )
@@ -257,14 +257,14 @@ describe(`${Process.name} (Integration)`, () => {
       const serverArgs: string[] = [];
 
       configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerExePath, workspaceFolderMock)
         .returns(serverPath);
       configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerArgs, [], workspaceFolderMock)
         .returns(serverArgs);
       configurationGetSettingOrDefaultStub
         .withArgs(
-          Settings.CurrentWorkingDirectory,
+          Settings.WorkingDirectory,
           workspaceFolderMock.uri.fsPath,
           workspaceFolderMock,
         )
@@ -288,14 +288,14 @@ describe(`${Process.name} (Integration)`, () => {
       const serverArgs: string[] = [];
 
       configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerExePath, workspaceFolderMock)
         .returns(serverPath);
       configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerArgs, [], workspaceFolderMock)
         .returns(serverArgs);
       configurationGetSettingOrDefaultStub
         .withArgs(
-          Settings.CurrentWorkingDirectory,
+          Settings.WorkingDirectory,
           workspaceFolderMock.uri.fsPath,
           workspaceFolderMock,
         )
@@ -319,14 +319,14 @@ describe(`${Process.name} (Integration)`, () => {
       const serverArgs = [testMessage];
 
       configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerExePath, workspaceFolderMock)
         .returns(serverPath);
       configurationGetSettingOrDefaultStub.returns([]);
       configurationGetSettingOrDefaultStub.returns(
         workspaceFolderMock.uri.fsPath,
       );
       configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerArgs, [], workspaceFolderMock)
         .returns(serverArgs);
 
       const stdoutEvents: Buffer[] = [];
@@ -352,14 +352,14 @@ describe(`${Process.name} (Integration)`, () => {
       const serverArgs: string[] = [];
 
       configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerExePath, workspaceFolderMock)
         .returns(serverPath);
       configurationGetSettingOrDefaultStub.returns([]);
       configurationGetSettingOrDefaultStub.returns(
         workspaceFolderMock.uri.fsPath,
       );
       configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
+        .withArgs(Settings.StrykerJsServerArgs, [], workspaceFolderMock)
         .returns(serverArgs);
 
       const stderrEvents: Buffer[] = [];

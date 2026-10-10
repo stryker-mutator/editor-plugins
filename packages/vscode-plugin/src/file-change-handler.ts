@@ -3,7 +3,7 @@ import type { FileRange } from 'mutation-server-protocol';
 import type vscode from 'vscode';
 
 import { commonTokens } from './di/index.ts';
-import type { MutationServer, TestExplorer } from './index.ts';
+import type { JsMutationServer, TestExplorer } from './index.ts';
 import type { ContextualLogger } from './logging/index.ts';
 
 export class FileChangeHandler {
@@ -20,7 +20,7 @@ export class FileChangeHandler {
   ] as const;
 
   constructor(
-    mutationServer: MutationServer,
+    mutationServer: JsMutationServer,
     testExplorer: TestExplorer,
     serverWorkspaceDirectory: string,
     logger: ContextualLogger,

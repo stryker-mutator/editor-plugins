@@ -10,12 +10,14 @@ import type {
 import type { Observable } from 'rxjs';
 import { filter, from, map, merge, takeUntil } from 'rxjs';
 import type vscode from 'vscode';
+import path from 'path';
 
 import { Configuration, Settings } from './config/index.ts';
 import { commonTokens } from './di/index.ts';
-import type { Process } from './index.ts';
-import { Constants } from './index.ts';
+import type { ServerProcess } from './index.ts';
+import { Constants, MissingServerPathError } from './index.ts';
 import type { StdioTransport } from './transport/index.ts';
+import { ContextualLogger } from './logging/contextual-logger.ts';
 
 const rpcMethods = Object.freeze({
   configure: 'configure',
@@ -23,25 +25,26 @@ const rpcMethods = Object.freeze({
   mutationTest: 'mutationTest',
   reportMutationTestProgressNotification: 'reportMutationTestProgress',
 });
-export class MutationServer {
+export class DotNetMutationServer {
   private readonly workspaceFolder;
-  private readonly process;
-  private transport: StdioTransport;
-  private jsonRPCClient: JSONRPCClient;
+  private readonly serverProcess;
+  private readonly transport: StdioTransport;
+  private readonly jsonRPCClient: JSONRPCClient;
 
   public static readonly inject = [
     commonTokens.workspaceFolder,
     commonTokens.process,
     commonTokens.transport,
+    commonTokens.contextualLogger,
   ] as const;
 
   constructor(
     workspaceFolder: vscode.WorkspaceFolder,
-    process: Process,
+    serverProcess: ServerProcess,
     transport: StdioTransport,
   ) {
     this.workspaceFolder = workspaceFolder;
-    this.process = process;
+    this.serverProcess = serverProcess;
     this.transport = transport;
 
     // Setup JSON-RPC client with transport
@@ -52,7 +55,26 @@ export class MutationServer {
   }
 
   public async init() {
-    await this.process.init();
+    const serverArgs = Configuration.getSettingOrDefault<string[]>(
+      Settings.StrykerJsServerArgs,
+      [],
+      this.workspaceFolder,
+    );
+
+    const serverWorkingDirectory = Configuration.getSettingOrDefault<string>(
+      Settings.WorkingDirectory,
+      this.workspaceFolder.uri.fsPath,
+      this.workspaceFolder,
+    );
+
+    const cwd = path.resolve(
+      this.workspaceFolder.uri.fsPath,
+      serverWorkingDirectory,
+    );
+
+    const fullServerArgs = ['stryker', 'serve', 'stdio', ...serverArgs];
+
+    await this.serverProcess.init(cwd, 'dotnet', fullServerArgs);
     await this.transport.init();
 
     // Handle incoming messages (responses and requests with id)
@@ -81,6 +103,7 @@ export class MutationServer {
       configureParams,
     )) as ConfigureResult;
   }
+
   public async discover(
     discoverParams: DiscoverParams,
   ): Promise<DiscoverResult> {
@@ -115,6 +138,6 @@ export class MutationServer {
 
   public async dispose() {
     await this.transport.dispose();
-    this.process.dispose();
+    this.serverProcess.dispose();
   }
 }

@@ -18,23 +18,23 @@ import type vscode from 'vscode';
 
 import { Configuration } from '../../config/index.ts';
 import { Constants } from '../../constants.ts';
-import { MutationServer } from '../../mutation-server.ts';
-import { Process } from '../../process.ts';
+import { JsMutationServer } from '../../js-mutation-server.ts';
+import { ServerProcess } from '../../server-process.ts';
 import type { StdioTransport } from '../../transport';
 import { createMutantResult, createMutationTestResult } from '../factory';
 
-describe(MutationServer.name, () => {
+describe(JsMutationServer.name, () => {
   let sandbox: sinon.SinonSandbox;
-  let sut: MutationServer;
+  let sut: JsMutationServer;
   let workspaceFolderMock: vscode.WorkspaceFolder;
-  let processMock: sinon.SinonStubbedInstance<Process>;
+  let processMock: sinon.SinonStubbedInstance<ServerProcess>;
   let transportMock: sinon.SinonStubbedInstance<StdioTransport>;
   let configurationStub: sinon.SinonStub;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
 
-    processMock = sandbox.createStubInstance(Process);
+    processMock = sandbox.createStubInstance(ServerProcess);
 
     workspaceFolderMock = {
       uri: { fsPath: '/test/workspace' } as vscode.Uri,
@@ -53,7 +53,7 @@ describe(MutationServer.name, () => {
 
     configurationStub = sandbox.stub(Configuration, 'getSetting');
 
-    sut = new MutationServer(workspaceFolderMock, processMock, transportMock);
+    sut = new JsMutationServer(workspaceFolderMock, processMock, transportMock);
   });
 
   afterEach(() => {

@@ -2,9 +2,10 @@ import { Constants } from '../constants.ts';
 
 export const Settings = {
   enable: 'enable',
-  ServerPath: 'path',
-  ServerArgs: 'args',
-  CurrentWorkingDirectory: 'workingDirectory',
+  Platform: 'platform',
+  StrykerJsServerExePath: 'path',
+  StrykerJsServerArgs: 'args',
+  WorkingDirectory: 'workingDirectory',
   ConfigFilePath: 'configFile',
   FileSystemWatcherPattern: 'watchPattern',
 } as const;
@@ -14,8 +15,9 @@ export type Settings = (typeof Settings)[keyof typeof Settings];
 export const SettingSections = {
   [Settings.FileSystemWatcherPattern]: Constants.AppName,
   [Settings.enable]: Constants.AppName,
-  [Settings.ServerPath]: `${Constants.AppName}.server`,
-  [Settings.ServerArgs]: `${Constants.AppName}.server`,
-  [Settings.CurrentWorkingDirectory]: `${Constants.AppName}.server`,
+  [Settings.Platform]: Constants.AppName,
+  [Settings.StrykerJsServerExePath]: `${Constants.AppName}.server`,
+  [Settings.StrykerJsServerArgs]: `${Constants.AppName}.server`,
+  [Settings.WorkingDirectory]: `${Constants.AppName}.server`,
   [Settings.ConfigFilePath]: `${Constants.AppName}.server`,
 };
