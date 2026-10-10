@@ -5,11 +5,11 @@ import type { BaseContext } from './di/index.ts';
 import { commonTokens } from './di/tokens.ts';
 import {
   Constants,
-  JsMutationServer,
   ServerProcess,
   WorkspaceFolder,
 } from './index.ts';
 import { ContextualLogger, provideLogger } from './logging/index.ts';
+import { provideMutationServer } from './provide-mutation-server.ts';
 import { StdioTransport } from './transport/stdio-transport.ts';
 
 export class Workspace {
@@ -94,7 +94,7 @@ export class Workspace {
       .provideClass(commonTokens.contextualLogger, ContextualLogger)
       .provideClass(commonTokens.process, ServerProcess)
       .provideClass(commonTokens.transport, StdioTransport)
-      .provideClass(commonTokens.mutationServer, JsMutationServer)
+      .provideFactory(commonTokens.mutationServer, provideMutationServer)
       .injectClass(WorkspaceFolder);
 
     this.#workspaceFolders.push(workspaceFolder);

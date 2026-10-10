@@ -7,7 +7,7 @@ import { lastValueFrom, mergeMap } from 'rxjs';
 import vscode from 'vscode';
 
 import { commonTokens } from './di/index.ts';
-import type { JsMutationServer } from './index.ts';
+import type { MutationServer } from './index.ts';
 import type { ContextualLogger } from './logging/index.ts';
 import {
   locationUtils,
@@ -30,7 +30,7 @@ export class TestRunner {
   ] as const;
 
   constructor(
-    mutationServer: JsMutationServer,
+    mutationServer: MutationServer,
     workspaceFolder: vscode.WorkspaceFolder,
     serverWorkspaceDirectory: string,
     testController: vscode.TestController,

@@ -5,7 +5,7 @@ import { Configuration, Settings } from './config/index.ts';
 import { type BaseContext, commonTokens } from './di/index.ts';
 import { FileChangeHandler } from './file-change-handler.ts';
 import { FileSystemWatcher } from './file-system-watcher.ts';
-import type { JsMutationServer } from './index.ts';
+import type { MutationServer } from './index.ts';
 import { TestRunner } from './index.ts';
 import type { ContextualLogger } from './logging/index.ts';
 import { provideTestController, TestExplorer } from './test-explorer.ts';
@@ -18,7 +18,7 @@ export interface WorkspaceFolderContext extends BaseContext {
 export class WorkspaceFolder {
   private readonly injector;
   readonly workspaceFolder;
-  private readonly jsMutationServer;
+  private readonly mutationServer;
   private readonly logger;
   #initialized = false;
   #fileSystemWatcher?: FileSystemWatcher;
@@ -34,12 +34,12 @@ export class WorkspaceFolder {
   constructor(
     injector: Injector<WorkspaceFolderContext>,
     workspaceFolder: vscode.WorkspaceFolder,
-    jsMutationServer: JsMutationServer,
+    mutationServer: MutationServer,
     logger: ContextualLogger,
   ) {
     this.injector = injector;
     this.workspaceFolder = workspaceFolder;
-    this.jsMutationServer = jsMutationServer;
+    this.mutationServer = mutationServer;
     this.logger = logger;
   }
   
@@ -58,7 +58,7 @@ export class WorkspaceFolder {
     }
 
     try {
-      await this.jsMutationServer.init();
+      await this.mutationServer.init();
     } catch (error) {
       this.logger.error(`Failed to initialize mutation server: ${error}`);
       return;
@@ -71,7 +71,7 @@ export class WorkspaceFolder {
     );
 
     const workspaceScopedInjector = this.injector
-      .provideValue(commonTokens.mutationServer, this.jsMutationServer)
+      .provideValue(commonTokens.mutationServer, this.mutationServer)
       .provideValue(
         commonTokens.serverWorkspaceDirectory,
         serverWorkspaceDirectory,
@@ -89,7 +89,7 @@ export class WorkspaceFolder {
     this.#fileSystemWatcher.init();
 
     // Initial discovery of mutants
-    const discoverResult = await this.jsMutationServer.discover({});
+    const discoverResult = await this.mutationServer.discover({});
     this.#testExplorer.processDiscoverResult(
       discoverResult,
       serverWorkspaceDirectory,
@@ -128,7 +128,7 @@ export class WorkspaceFolder {
     this.#initialized = false;
     this.#fileSystemWatcher?.dispose();
     await this.#testExplorer?.dispose();
-    await this.jsMutationServer.dispose();
+    await this.mutationServer.dispose();
     this.logger.info(
       `Disposed workspace folder: ${this.workspaceFolder.uri.fsPath}`,
     );

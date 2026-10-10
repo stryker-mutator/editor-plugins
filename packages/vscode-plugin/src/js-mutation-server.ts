@@ -16,6 +16,7 @@ import { Configuration, Settings } from './config/index.ts';
 import { commonTokens } from './di/index.ts';
 import type { ServerProcess } from './index.ts';
 import { Constants, MissingServerPathError } from './index.ts';
+import type { MutationServer } from './mutation-server.ts';
 import type { StdioTransport } from './transport/index.ts';
 import { ContextualLogger } from './logging/contextual-logger.ts';
 
@@ -25,7 +26,7 @@ const rpcMethods = Object.freeze({
   mutationTest: 'mutationTest',
   reportMutationTestProgressNotification: 'reportMutationTestProgress',
 });
-export class JsMutationServer {
+export class JsMutationServer implements MutationServer {
   private readonly workspaceFolder;
   private readonly serverProcess;
   private readonly transport: StdioTransport;

@@ -9,10 +9,7 @@ export class ServerProcess extends EventEmitter {
   private readonly logger;
   #process: ChildProcessWithoutNullStreams | undefined;
 
-  static readonly inject = [
-    commonTokens.workspaceFolder,
-    commonTokens.contextualLogger,
-  ] as const;
+  static readonly inject = [commonTokens.contextualLogger] as const;
 
   constructor(
     logger: ContextualLogger,

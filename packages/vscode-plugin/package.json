@@ -77,6 +77,20 @@
           "type": "boolean",
           "default": true
         },
+        "strykerMutator.platform": {
+          "markdownDescription": "The platform of the project under test. Determines which mutation server is started: Stryker JS (`js`) or Stryker.NET (`dotnet`).",
+          "scope": "resource",
+          "type": "string",
+          "enum": [
+            "js",
+            "dotnet"
+          ],
+          "enumDescriptions": [
+            "Stryker JS (starts the configured server executable)",
+            "Stryker.NET (runs `dotnet stryker serve stdio`)"
+          ],
+          "default": "js"
+        },
         "strykerMutator.watchPattern": {
           "markdownDescription": "Glob pattern for files to watch for changes and trigger mutation discovery. Uses [VS Code glob pattern syntax](https://code.visualstudio.com/docs/editor/glob-patterns#_glob-pattern-syntax).",
           "scope": "resource",

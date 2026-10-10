@@ -15,7 +15,8 @@ import path from 'path';
 import { Configuration, Settings } from './config/index.ts';
 import { commonTokens } from './di/index.ts';
 import type { ServerProcess } from './index.ts';
-import { Constants, MissingServerPathError } from './index.ts';
+import { Constants } from './index.ts';
+import type { MutationServer } from './mutation-server.ts';
 import type { StdioTransport } from './transport/index.ts';
 import { ContextualLogger } from './logging/contextual-logger.ts';
 
@@ -25,11 +26,12 @@ const rpcMethods = Object.freeze({
   mutationTest: 'mutationTest',
   reportMutationTestProgressNotification: 'reportMutationTestProgress',
 });
-export class DotNetMutationServer {
+export class DotNetMutationServer implements MutationServer {
   private readonly workspaceFolder;
   private readonly serverProcess;
   private readonly transport: StdioTransport;
   private readonly jsonRPCClient: JSONRPCClient;
+  private readonly logger: ContextualLogger;
 
   public static readonly inject = [
     commonTokens.workspaceFolder,
@@ -42,10 +44,12 @@ export class DotNetMutationServer {
     workspaceFolder: vscode.WorkspaceFolder,
     serverProcess: ServerProcess,
     transport: StdioTransport,
+    logger: ContextualLogger,
   ) {
     this.workspaceFolder = workspaceFolder;
     this.serverProcess = serverProcess;
     this.transport = transport;
+    this.logger = logger;
 
     // Setup JSON-RPC client with transport
     this.jsonRPCClient = new JSONRPCClient((jsonRPCRequest) => {
@@ -73,6 +77,10 @@ export class DotNetMutationServer {
     );
 
     const fullServerArgs = ['stryker', 'serve', 'stdio', ...serverArgs];
+
+    this.logger.info(
+      `Server configuration: path=dotnet, args=${fullServerArgs}, cwd=${cwd}`,
+    );
 
     await this.serverProcess.init(cwd, 'dotnet', fullServerArgs);
     await this.transport.init();

@@ -11,6 +11,12 @@ export const Settings = {
 } as const;
 export type Settings = (typeof Settings)[keyof typeof Settings];
 
+export const Platforms = {
+  Js: 'js',
+  DotNet: 'dotnet',
+} as const;
+export type Platform = (typeof Platforms)[keyof typeof Platforms];
+
 // Define a mapping for the section of each setting
 export const SettingSections = {
   [Settings.FileSystemWatcherPattern]: Constants.AppName,
