@@ -91,7 +91,7 @@ export class JsMutationServer implements MutationServer {
     const resolvedServerPath = path.resolve(cwd, serverExePath);
 
     this.logger.info(
-      `Starting JS mutation server with configuration: path=${resolvedServerPath}, args=${serverArgs}, cwd=${cwd}`,
+      `Starting JS mutation server with configuration: cwd=${cwd}; command=${resolvedServerPath} ${serverArgs.join(' ')}`,
     );
 
     await this.serverProcess.init(cwd, resolvedServerPath, serverArgs);

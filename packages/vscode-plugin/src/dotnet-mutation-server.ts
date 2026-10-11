@@ -77,7 +77,7 @@ export class DotNetMutationServer implements MutationServer {
     );
 
     this.logger.info(
-      `Starting dotnet mutation server with configuration: command=dotnet, args=${serverArgs}, cwd=${cwd}`,
+      `Starting dotnet mutation server with configuration: cwd=${cwd}; command=dotnet ${serverArgs.join(' ')}`,
     );
 
     await this.serverProcess.init(cwd, 'dotnet', serverArgs);
