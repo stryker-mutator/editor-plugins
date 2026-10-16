@@ -27,7 +27,7 @@ describe(Configuration.name, () => {
 
   describe('getSetting', () => {
     it('should get setting from correct section', () => {
-      const setting = Settings.enable;
+      const setting = Settings.Enable;
       const expectedSection = SettingSections[setting];
       const expectedValue = true;
       mockWorkspaceConfig.get.returns(expectedValue);
@@ -43,7 +43,7 @@ describe(Configuration.name, () => {
     it('should return undefined when value is undefined', () => {
       mockWorkspaceConfig.get.returns(undefined);
 
-      const result = Configuration.getSetting<string>(Settings.ServerPath);
+      const result = Configuration.getSetting<string>(Settings.StrykerJsServerExePath);
 
       expect(result).to.be.undefined;
     });
@@ -51,7 +51,7 @@ describe(Configuration.name, () => {
     it('should return undefined when value is empty string', () => {
       mockWorkspaceConfig.get.returns('');
 
-      const result = Configuration.getSetting<string>(Settings.ServerPath);
+      const result = Configuration.getSetting<string>(Settings.StrykerJsServerExePath);
 
       expect(result).to.be.undefined;
     });
@@ -60,14 +60,14 @@ describe(Configuration.name, () => {
       const expectedValue = 'node_modules/.bin/stryker';
       mockWorkspaceConfig.get.returns(expectedValue);
 
-      const result = Configuration.getSetting<string>(Settings.ServerPath);
+      const result = Configuration.getSetting<string>(Settings.StrykerJsServerExePath);
 
       expect(result).to.equal(expectedValue);
     });
 
     it('should use provided scope', () => {
       const scope = {} as vscode.ConfigurationScope;
-      const setting = Settings.ServerPath;
+      const setting = Settings.StrykerJsServerExePath;
       const expectedSection = SettingSections[setting];
 
       Configuration.getSetting<string>(setting, scope);
@@ -84,7 +84,7 @@ describe(Configuration.name, () => {
       mockWorkspaceConfig.get.returns(expectedValue);
 
       const result = Configuration.getSettingOrDefault<string>(
-        Settings.ServerPath,
+        Settings.StrykerJsServerExePath,
         defaultValue,
       );
 
@@ -96,7 +96,7 @@ describe(Configuration.name, () => {
       mockWorkspaceConfig.get.returns(undefined);
 
       const result = Configuration.getSettingOrDefault<string>(
-        Settings.ServerPath,
+        Settings.StrykerJsServerExePath,
         defaultValue,
       );
 
@@ -108,7 +108,7 @@ describe(Configuration.name, () => {
       mockWorkspaceConfig.get.returns('');
 
       const result = Configuration.getSettingOrDefault<string>(
-        Settings.ServerPath,
+        Settings.StrykerJsServerExePath,
         defaultValue,
       );
 
@@ -117,7 +117,7 @@ describe(Configuration.name, () => {
 
     it('should use provided scope', () => {
       const scope = {} as vscode.ConfigurationScope;
-      const setting = Settings.ServerPath;
+      const setting = Settings.StrykerJsServerExePath;
       const expectedSection = SettingSections[setting];
       const defaultValue = 'default-path';
 
@@ -130,7 +130,7 @@ describe(Configuration.name, () => {
 
   describe('updateSetting', () => {
     it('should update setting in correct section', async () => {
-      const setting = Settings.enable;
+      const setting = Settings.Enable;
       const value = true;
       const expectedSection = SettingSections[setting];
       mockWorkspaceConfig.update.resolves();
@@ -144,7 +144,7 @@ describe(Configuration.name, () => {
 
     it('should use provided scope', async () => {
       const scope = {} as vscode.ConfigurationScope;
-      const setting = Settings.ServerPath;
+      const setting = Settings.StrykerJsServerExePath;
       const value = 'new-path';
       const expectedSection = SettingSections[setting];
       mockWorkspaceConfig.update.resolves();
@@ -157,7 +157,7 @@ describe(Configuration.name, () => {
     });
 
     it('should handle update errors', async () => {
-      const setting = Settings.ServerPath;
+      const setting = Settings.StrykerJsServerExePath;
       const value = 'new-path';
       const error = new Error('Update failed');
       mockWorkspaceConfig.update.rejects(error);
@@ -173,7 +173,7 @@ describe(Configuration.name, () => {
 
   describe('updateSettingIfChanged', () => {
     it('should update setting when value has changed', async () => {
-      const setting = Settings.ServerPath;
+      const setting = Settings.StrykerJsServerExePath;
       const currentValue = 'old-path';
       const newValue = 'new-path';
       mockWorkspaceConfig.get.returns(currentValue);
@@ -186,7 +186,7 @@ describe(Configuration.name, () => {
     });
 
     it('should not update setting when value has not changed', async () => {
-      const setting = Settings.ServerPath;
+      const setting = Settings.StrykerJsServerExePath;
       const currentValue = 'same-path';
       mockWorkspaceConfig.get.returns(currentValue);
 
@@ -196,7 +196,7 @@ describe(Configuration.name, () => {
     });
 
     it('should update setting when current value is undefined and new value is not', async () => {
-      const setting = Settings.ServerPath;
+      const setting = Settings.StrykerJsServerExePath;
       const newValue = 'new-path';
       mockWorkspaceConfig.get.returns(undefined);
       mockWorkspaceConfig.update.resolves();
@@ -208,7 +208,7 @@ describe(Configuration.name, () => {
     });
 
     it('should handle complex objects', async () => {
-      const setting = Settings.ServerArgs;
+      const setting = Settings.JsServerArgs;
       const currentValue = ['old', 'args'];
       const newValue = ['new', 'args'];
       mockWorkspaceConfig.get.returns(currentValue);
@@ -221,7 +221,7 @@ describe(Configuration.name, () => {
     });
 
     it('should not update when complex objects are the same', async () => {
-      const setting = Settings.ServerArgs;
+      const setting = Settings.JsServerArgs;
       const value = ['same', 'args'];
       mockWorkspaceConfig.get.returns(value);
 
@@ -232,7 +232,7 @@ describe(Configuration.name, () => {
 
     it('should use provided scope', async () => {
       const scope = {} as vscode.ConfigurationScope;
-      const setting = Settings.ServerPath;
+      const setting = Settings.StrykerJsServerExePath;
       const newValue = 'new-path';
       const expectedSection = SettingSections[setting];
       mockWorkspaceConfig.get.returns('old-path');

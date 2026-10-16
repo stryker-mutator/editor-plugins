@@ -23,12 +23,14 @@ export class WorkspaceFolder {
   #initialized = false;
   #fileSystemWatcher?: FileSystemWatcher;
   #testExplorer?: TestExplorer;
+
   static readonly inject = [
     commonTokens.injector,
     commonTokens.workspaceFolder,
     commonTokens.mutationServer,
     commonTokens.contextualLogger,
   ] as const;
+
   constructor(
     injector: Injector<WorkspaceFolderContext>,
     workspaceFolder: vscode.WorkspaceFolder,
@@ -40,11 +42,12 @@ export class WorkspaceFolder {
     this.mutationServer = mutationServer;
     this.logger = logger;
   }
+  
   async init() {
     this.#initialized = false;
 
     const enabled = Configuration.getSettingOrDefault<boolean>(
-      Settings.enable,
+      Settings.Enable,
       true,
       this.workspaceFolder,
     );
@@ -61,8 +64,7 @@ export class WorkspaceFolder {
       return;
     }
 
-    const serverWorkspaceDirectory = Configuration.getSettingOrDefault<string>(
-      Settings.CurrentWorkingDirectory,
+    const serverWorkspaceDirectory = Configuration.getServerWorkingDirectory(
       '.',
       this.workspaceFolder,
     );
@@ -97,7 +99,7 @@ export class WorkspaceFolder {
 
   async runMutationTestsForFile(fileUri: vscode.Uri) {
     const enabled = Configuration.getSettingOrDefault<boolean>(
-      Settings.enable,
+      Settings.Enable,
       true,
       this.workspaceFolder,
     );

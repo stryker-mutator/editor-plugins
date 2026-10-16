@@ -3,20 +3,14 @@ import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
 import sinon from 'sinon';
-import type vscode from 'vscode';
 
-import { Configuration, Settings } from '../../config/index.ts';
-import { MissingServerPathError } from '../../errors.ts';
 import { ContextualLogger } from '../../logging/index.ts';
-import { Process } from '../../process.ts';
+import { ServerProcess } from '../../server-process.ts';
 
-describe(`${Process.name} (Integration)`, () => {
+describe(`${ServerProcess.name} (Integration)`, () => {
   let sandbox: sinon.SinonSandbox;
-  let sut: Process;
+  let sut: ServerProcess;
   let loggerMock: sinon.SinonStubbedInstance<ContextualLogger>;
-  let workspaceFolderMock: vscode.WorkspaceFolder;
-  let configurationGetSettingStub: sinon.SinonStub;
-  let configurationGetSettingOrDefaultStub: sinon.SinonStub;
   let tempDir: string;
   const isWindows = process.platform === 'win32';
 
@@ -28,6 +22,10 @@ describe(`${Process.name} (Integration)`, () => {
     }
   }
 
+  function startServer(serverPath: string, serverArgs: string[] = []) {
+    return sut.init(tempDir, path.resolve(tempDir, serverPath), serverArgs);
+  }
+
   beforeEach(async () => {
     sandbox = sinon.createSandbox();
 
@@ -35,12 +33,6 @@ describe(`${Process.name} (Integration)`, () => {
 
     // Create a temporary directory for test workspace
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'process-test-'));
-
-    workspaceFolderMock = {
-      uri: { fsPath: tempDir } as vscode.Uri,
-      name: 'test-workspace',
-      index: 0,
-    };
 
     // Create test executables
     await createTestExecutable(
@@ -66,13 +58,7 @@ describe(`${Process.name} (Integration)`, () => {
       isWindows ? '@findstr /V "^$"' : '#!/bin/sh\ncat',
     );
 
-    configurationGetSettingStub = sandbox.stub(Configuration, 'getSetting');
-    configurationGetSettingOrDefaultStub = sandbox.stub(
-      Configuration,
-      'getSettingOrDefault',
-    );
-
-    sut = new Process(workspaceFolderMock, loggerMock);
+    sut = new ServerProcess(loggerMock);
   });
 
   afterEach(async () => {
@@ -88,23 +74,6 @@ describe(`${Process.name} (Integration)`, () => {
   });
 
   describe('init', () => {
-    it('should throw MissingServerPathError when server path is not configured', async () => {
-      // Arrange
-      configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
-        .returns(undefined);
-
-      // Act & Assert
-      await expect(sut.init()).to.eventually.be.rejectedWith(
-        MissingServerPathError,
-      );
-      expect(
-        loggerMock.error.calledWith(
-          'Cannot start server. Missing server path configuration.',
-        ),
-      ).to.be.true;
-    });
-
     it('should successfully spawn a process with spaces in the path', async () => {
       // Arrange - create a subdirectory with spaces in the name
       const dirWithSpaces = path.join(tempDir, 'path with spaces');
@@ -119,23 +88,6 @@ describe(`${Process.name} (Integration)`, () => {
         await fs.chmod(execPath, 0o755);
       }
 
-      const serverPath = execPath;
-      const serverArgs: string[] = [];
-
-      configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
-        .returns(serverPath);
-      configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
-        .returns(serverArgs);
-      configurationGetSettingOrDefaultStub
-        .withArgs(
-          Settings.CurrentWorkingDirectory,
-          workspaceFolderMock.uri.fsPath,
-          workspaceFolderMock,
-        )
-        .returns(workspaceFolderMock.uri.fsPath);
-
       // Set up promise to wait for process completion
       const processExitPromise = new Promise<number>((resolve) => {
         loggerMock.info.callsFake((message: string) => {
@@ -146,7 +98,7 @@ describe(`${Process.name} (Integration)`, () => {
       });
 
       // Act
-      await sut.init();
+      await startServer(execPath);
 
       // Wait for process to complete
       const exitCode = await processExitPromise;
@@ -158,21 +110,6 @@ describe(`${Process.name} (Integration)`, () => {
     it('should successfully spawn a simple command and handle exit', async () => {
       // Arrange
       const serverPath = isWindows ? 'echo-test.bat' : 'echo-test.sh';
-      const serverArgs = ['test'];
-
-      configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
-        .returns(serverPath);
-      configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
-        .returns(serverArgs);
-      configurationGetSettingOrDefaultStub
-        .withArgs(
-          Settings.CurrentWorkingDirectory,
-          workspaceFolderMock.uri.fsPath,
-          workspaceFolderMock,
-        )
-        .returns(workspaceFolderMock.uri.fsPath);
 
       // Set up promise to wait for process completion
       const processExitPromise = new Promise<number>((resolve) => {
@@ -184,23 +121,13 @@ describe(`${Process.name} (Integration)`, () => {
       });
 
       // Act
-      await sut.init();
+      await startServer(serverPath, ['test']);
 
       // Wait for process to complete
       const exitCode = await processExitPromise;
 
       // Assert
       expect(exitCode).to.equal(0);
-      sinon.assert.calledWith(
-        loggerMock.info,
-        sinon.match((message: string) => {
-          const expectedPath = path.resolve(
-            workspaceFolderMock.uri.fsPath,
-            serverPath,
-          );
-          return message.includes(`Server configuration: path=${expectedPath}`);
-        }),
-      );
       sinon.assert.calledWith(
         loggerMock.info,
         'Server process exited normally with code 0',
@@ -210,21 +137,6 @@ describe(`${Process.name} (Integration)`, () => {
     it('should handle process that exits with non-zero code', async () => {
       // Arrange
       const serverPath = isWindows ? 'exit-error.bat' : 'exit-error.sh';
-      const serverArgs: string[] = [];
-
-      configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
-        .returns(serverPath);
-      configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
-        .returns(serverArgs);
-      configurationGetSettingOrDefaultStub
-        .withArgs(
-          Settings.CurrentWorkingDirectory,
-          workspaceFolderMock.uri.fsPath,
-          workspaceFolderMock,
-        )
-        .returns(workspaceFolderMock.uri.fsPath);
 
       // Set up promise to wait for process error
       const processExitPromise = new Promise<number>((resolve) => {
@@ -236,7 +148,7 @@ describe(`${Process.name} (Integration)`, () => {
       });
 
       // Act
-      await sut.init();
+      await startServer(serverPath);
 
       // Wait for process to complete
       const exitCode = await processExitPromise;
@@ -254,27 +166,12 @@ describe(`${Process.name} (Integration)`, () => {
     it('should write data to process stdin when initialized', async () => {
       // Arrange
       const serverPath = isWindows ? 'cat-test.bat' : 'cat-test.sh';
-      const serverArgs: string[] = [];
-
-      configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
-        .returns(serverPath);
-      configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
-        .returns(serverArgs);
-      configurationGetSettingOrDefaultStub
-        .withArgs(
-          Settings.CurrentWorkingDirectory,
-          workspaceFolderMock.uri.fsPath,
-          workspaceFolderMock,
-        )
-        .returns(workspaceFolderMock.uri.fsPath);
 
       const stdoutData: Buffer[] = [];
       sut.on('stdout', (data: Buffer) => {
         stdoutData.push(data);
       });
-      await sut.init();
+      await startServer(serverPath);
 
       // Act & Assert - should not throw
       expect(() => sut.write('test data\n')).to.not.throw();
@@ -285,23 +182,8 @@ describe(`${Process.name} (Integration)`, () => {
     it('should kill long running process when disposed', async () => {
       // Arrange
       const serverPath = isWindows ? 'sleep-test.bat' : 'sleep-test.sh';
-      const serverArgs: string[] = [];
 
-      configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
-        .returns(serverPath);
-      configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
-        .returns(serverArgs);
-      configurationGetSettingOrDefaultStub
-        .withArgs(
-          Settings.CurrentWorkingDirectory,
-          workspaceFolderMock.uri.fsPath,
-          workspaceFolderMock,
-        )
-        .returns(workspaceFolderMock.uri.fsPath);
-
-      await sut.init();
+      await startServer(serverPath);
 
       // Act
       sut.dispose();
@@ -316,18 +198,6 @@ describe(`${Process.name} (Integration)`, () => {
       // Arrange
       const testMessage = 'stdout test';
       const serverPath = isWindows ? 'echo-test.bat' : 'echo-test.sh';
-      const serverArgs = [testMessage];
-
-      configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
-        .returns(serverPath);
-      configurationGetSettingOrDefaultStub.returns([]);
-      configurationGetSettingOrDefaultStub.returns(
-        workspaceFolderMock.uri.fsPath,
-      );
-      configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
-        .returns(serverArgs);
 
       const stdoutEvents: Buffer[] = [];
       sut.on('stdout', (data: Buffer) => {
@@ -335,7 +205,7 @@ describe(`${Process.name} (Integration)`, () => {
       });
 
       // Act
-      await sut.init();
+      await startServer(serverPath, [testMessage]);
 
       // Wait a bit for the output
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -349,18 +219,6 @@ describe(`${Process.name} (Integration)`, () => {
     it('should emit stderr events for error output', async () => {
       // Arrange
       const serverPath = isWindows ? 'stderr-test.bat' : 'stderr-test.sh';
-      const serverArgs: string[] = [];
-
-      configurationGetSettingStub
-        .withArgs(Settings.ServerPath, workspaceFolderMock)
-        .returns(serverPath);
-      configurationGetSettingOrDefaultStub.returns([]);
-      configurationGetSettingOrDefaultStub.returns(
-        workspaceFolderMock.uri.fsPath,
-      );
-      configurationGetSettingOrDefaultStub
-        .withArgs(Settings.ServerArgs, [], workspaceFolderMock)
-        .returns(serverArgs);
 
       const stderrEvents: Buffer[] = [];
       sut.on('stderr', (data: Buffer) => {
@@ -368,7 +226,7 @@ describe(`${Process.name} (Integration)`, () => {
       });
 
       // Act
-      await sut.init();
+      await startServer(serverPath);
 
       // Wait a bit for the output
       await new Promise((resolve) => setTimeout(resolve, 100));
