@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import vscode from 'vscode';
 
 import { ContextualLogger } from '../../logging/contextual-logger.ts';
-import { MutationServer } from '../../mutation-server.ts';
+import { JsMutationServer } from '../../js-mutation-server.ts';
 import { TestRunner } from '../../test-runner.ts';
 import { testControllerUtils, testItemUtils } from '../../utils/index.ts';
 import * as factory from '../factory.ts';
@@ -47,7 +47,7 @@ describe(TestRunner.name, () => {
   }
 
   function createSut(
-    mutationServerMock: sinon.SinonStubbedInstance<MutationServer>,
+    mutationServerMock: sinon.SinonStubbedInstance<JsMutationServer>,
     testController: vscode.TestController,
     loggerMock: sinon.SinonStubbedInstance<ContextualLogger>,
   ) {
@@ -78,7 +78,7 @@ describe(TestRunner.name, () => {
   });
 
   it('runs file-scoped mutation testing without queue tree preconditions', async () => {
-    const mutationServerMock = sinon.createStubInstance(MutationServer);
+    const mutationServerMock = sinon.createStubInstance(JsMutationServer);
     const loggerMock = sinon.createStubInstance(ContextualLogger);
 
     const testItem = {
@@ -127,7 +127,7 @@ describe(TestRunner.name, () => {
   });
 
   it('marks existing file test items as started before file-scoped mutation run', async () => {
-    const mutationServerMock = sinon.createStubInstance(MutationServer);
+    const mutationServerMock = sinon.createStubInstance(JsMutationServer);
     const loggerMock = sinon.createStubInstance(ContextualLogger);
 
     const fileUri = vscode.Uri.file('/workspace/src/file.ts');
@@ -182,7 +182,7 @@ describe(TestRunner.name, () => {
   });
 
   it('filters out mutants not present in queue for regular runs', async () => {
-    const mutationServerMock = sinon.createStubInstance(MutationServer);
+    const mutationServerMock = sinon.createStubInstance(JsMutationServer);
     const loggerMock = sinon.createStubInstance(ContextualLogger);
     const queuedItem = { id: 'queued-item' } as vscode.TestItem;
     const testRun = createTestRunStubs();
@@ -231,7 +231,7 @@ describe(TestRunner.name, () => {
   });
 
   it('marks queued items as errored when regular run throws', async () => {
-    const mutationServerMock = sinon.createStubInstance(MutationServer);
+    const mutationServerMock = sinon.createStubInstance(JsMutationServer);
     const loggerMock = sinon.createStubInstance(ContextualLogger);
     const queuedItem = { id: 'queued-item' } as vscode.TestItem;
     const testRun = createTestRunStubs();
@@ -264,7 +264,7 @@ describe(TestRunner.name, () => {
   });
 
   it('appends cancellation message when token is cancelled', async () => {
-    const mutationServerMock = sinon.createStubInstance(MutationServer);
+    const mutationServerMock = sinon.createStubInstance(JsMutationServer);
     const loggerMock = sinon.createStubInstance(ContextualLogger);
     const queuedItem = { id: 'queued-item' } as vscode.TestItem;
     const testRun = createTestRunStubs();
@@ -301,7 +301,7 @@ describe(TestRunner.name, () => {
   });
 
   it('marks ignored mutants as skipped in file-scoped runs', async () => {
-    const mutationServerMock = sinon.createStubInstance(MutationServer);
+    const mutationServerMock = sinon.createStubInstance(JsMutationServer);
     const loggerMock = sinon.createStubInstance(ContextualLogger);
     const testItem = { id: 'mutant-item' } as vscode.TestItem;
     const testRun = createTestRunStubs();
