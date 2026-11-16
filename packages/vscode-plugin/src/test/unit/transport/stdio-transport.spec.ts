@@ -3,19 +3,19 @@ import type { JSONRPCRequest, JSONRPCResponse } from 'json-rpc-2.0';
 import sinon from 'sinon';
 
 import { ContextualLogger } from '../../../logging/index.ts';
-import { Process } from '../../../process.ts';
+import { ServerProcess } from '../../../server-process.ts';
 import { StdioTransport } from '../../../transport/stdio-transport.ts';
 
 describe(StdioTransport.name, () => {
   let sandbox: sinon.SinonSandbox;
   let sut: StdioTransport;
   let loggerMock: sinon.SinonStubbedInstance<ContextualLogger>;
-  let processMock: sinon.SinonStubbedInstance<Process>;
+  let processMock: sinon.SinonStubbedInstance<ServerProcess>;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     loggerMock = sandbox.createStubInstance(ContextualLogger);
-    processMock = sandbox.createStubInstance(Process);
+    processMock = sandbox.createStubInstance(ServerProcess);
 
     sut = new StdioTransport(loggerMock, processMock);
   });

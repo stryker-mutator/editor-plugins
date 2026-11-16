@@ -6,7 +6,6 @@ import { Configuration, Settings } from '../../config/index.ts';
 import { Constants } from '../../constants.ts';
 import { FileChangeHandler } from '../../file-change-handler.ts';
 import { FileSystemWatcher } from '../../file-system-watcher.ts';
-import { ContextualLogger } from '../../logging/contextual-logger.ts';
 import * as factory from '../factory.ts';
 
 describe(FileSystemWatcher.name, () => {
@@ -14,7 +13,6 @@ describe(FileSystemWatcher.name, () => {
   let sut: FileSystemWatcher;
   let fileChangeHandlerMock: sinon.SinonStubbedInstance<FileChangeHandler>;
   let workspaceFolderMock: sinon.SinonStubbedInstance<vscode.WorkspaceFolder>;
-  let contextualLoggerMock: sinon.SinonStubbedInstance<ContextualLogger>;
   let getSettingOrDefaultStub: sinon.SinonStub;
   let vscodeFileSystemWatcherMock: sinon.SinonStubbedInstance<vscode.FileSystemWatcher>;
   let createFileSystemWatcherStub: sinon.SinonStub;
@@ -24,7 +22,6 @@ describe(FileSystemWatcher.name, () => {
     sandbox = sinon.createSandbox();
     fileChangeHandlerMock = sinon.createStubInstance(FileChangeHandler);
     workspaceFolderMock = factory.workspaceFolder();
-    contextualLoggerMock = sinon.createStubInstance(ContextualLogger);
 
     // Create mock for VS Code FileSystemWatcher
     vscodeFileSystemWatcherMock = {
@@ -48,11 +45,7 @@ describe(FileSystemWatcher.name, () => {
       'getSettingOrDefault',
     );
 
-    sut = new FileSystemWatcher(
-      workspaceFolderMock,
-      fileChangeHandlerMock,
-      contextualLoggerMock,
-    );
+    sut = new FileSystemWatcher(workspaceFolderMock, fileChangeHandlerMock);
   });
 
   afterEach(() => {
@@ -64,7 +57,7 @@ describe(FileSystemWatcher.name, () => {
       getSettingOrDefaultStub
         .withArgs(
           Settings.FileSystemWatcherPattern,
-          Constants.DefaultFileSystemWatcherPattern,
+          Constants.DefaultJsFileSystemWatcherPattern,
           workspaceFolderMock,
         )
         .returns('**/*.{js,ts,jsx,tsx}');
@@ -97,10 +90,10 @@ describe(FileSystemWatcher.name, () => {
       getSettingOrDefaultStub
         .withArgs(
           Settings.FileSystemWatcherPattern,
-          Constants.DefaultFileSystemWatcherPattern,
+          Constants.DefaultJsFileSystemWatcherPattern,
           workspaceFolderMock,
         )
-        .returns(Constants.DefaultFileSystemWatcherPattern);
+        .returns(Constants.DefaultJsFileSystemWatcherPattern);
 
       // Act
       sut.init();
@@ -108,7 +101,7 @@ describe(FileSystemWatcher.name, () => {
       // Assert
       expect(relativePatternStub).calledOnceWithExactly(
         workspaceFolderMock,
-        Constants.DefaultFileSystemWatcherPattern,
+        Constants.DefaultJsFileSystemWatcherPattern,
       );
     });
 

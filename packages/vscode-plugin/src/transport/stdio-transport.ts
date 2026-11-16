@@ -1,6 +1,6 @@
 import { commonTokens } from '../di/index.ts';
 import type { ContextualLogger } from '../logging/index.ts';
-import type { Process } from '../process.ts';
+import type { ServerProcess } from '../server-process.ts';
 import { BaseTransport } from './base-transport.ts';
 
 /**
@@ -8,14 +8,14 @@ import { BaseTransport } from './base-transport.ts';
  * Communicates with the mutation server through stdin/stdout
  */
 export class StdioTransport extends BaseTransport {
-  private readonly process: Process;
+  private readonly process: ServerProcess;
 
   public static readonly inject = [
     commonTokens.contextualLogger,
     commonTokens.process,
   ] as const;
 
-  constructor(logger: ContextualLogger, process: Process) {
+  constructor(logger: ContextualLogger, process: ServerProcess) {
     super(logger);
     this.process = process;
   }

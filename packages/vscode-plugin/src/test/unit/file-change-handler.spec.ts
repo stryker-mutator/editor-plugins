@@ -5,14 +5,14 @@ import type vscode from 'vscode';
 
 import { FileChangeHandler } from '../../file-change-handler.ts';
 import { ContextualLogger } from '../../logging/contextual-logger.ts';
-import { MutationServer } from '../../mutation-server.ts';
+import { JsMutationServer } from '../../js-mutation-server.ts';
 import { TestExplorer } from '../../test-explorer.ts';
 import * as factory from '../factory.ts';
 
 describe(FileChangeHandler.name, () => {
   let sandbox: sinon.SinonSandbox;
   let sut: FileChangeHandler;
-  let mutationServerMock: sinon.SinonStubbedInstance<MutationServer>;
+  let mutationServerMock: sinon.SinonStubbedInstance<JsMutationServer>;
   let testExplorerMock: sinon.SinonStubbedInstance<TestExplorer>;
   let contextualLoggerMock: sinon.SinonStubbedInstance<ContextualLogger>;
   let fsStub: sinon.SinonStub;
@@ -21,7 +21,7 @@ describe(FileChangeHandler.name, () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-    mutationServerMock = sinon.createStubInstance(MutationServer);
+    mutationServerMock = sinon.createStubInstance(JsMutationServer);
     testExplorerMock = sinon.createStubInstance(TestExplorer);
     contextualLoggerMock = sinon.createStubInstance(ContextualLogger);
     fsStub = sandbox.stub(fs, 'lstat');
